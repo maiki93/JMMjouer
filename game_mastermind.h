@@ -3,6 +3,6 @@
 
 #include "historique.h"
 
-int start_game_mastermind(Joueur joueur, Historique historique);
+int start_game_mastermind(Joueur joueur, Historique *historique);
 
 #endif // GAME_MASTERMIND_H_INCLUDED

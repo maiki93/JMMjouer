@@ -41,9 +41,9 @@ int main()
     printf("Vous avez choisi %d \n", choice_game);
 
     switch( choice_game ) {
-        case 1 : start_game_pendu( joueur, historique );
+        case 1 : start_game_pendu( joueur, &historique );
                  break;
-        case 2 : start_game_mastermind( joueur, historique );
+        case 2 : start_game_mastermind( joueur, &historique );
                  break;
         default : printf("Error !");
                  return 1;
