@@ -4,6 +4,7 @@
 #include "historique.h"
 #include "game_pendu.h"
 #include "game_mastermind.h"
+#include "utils.h"
 
 int main()
 {
@@ -37,7 +38,7 @@ int main()
     printf("2. une partie de Mastermind\n");
     printf("3. une bataille de morpion\n");
     scanf("%d", &choice_game);
-
+    clean_stdin();
     printf("Vous avez choisi %d \n", choice_game);
 
     switch( choice_game ) {
