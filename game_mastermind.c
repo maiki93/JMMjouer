@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+// #include <time.h>
 #include <string.h>
+#include <stdbool.h>
 
 // colors in console
 // #include <conio.h>  // color in console, only for windows ?
@@ -12,53 +13,91 @@
 #include "utils.h"
 
 /*** functions declaration, definition below ****/
-// genere un code secret
+
+/** Toute la logique pour une partie de mastermind
+
+    return int vainqueur : 1-le joueur, 2-l'ordinateur
+**/
+int mm_make_one_game( const int NbPIECE, const int MaxTENTATIVE );
+/** genere un code secret aléatoire **/
 void mm_make_random_secret_code( char *secret, const int size_secret, const char* colors, const int size_colors );
-
+/** demande une proposition du code à deviner au joueur **/
 void mm_ask_guess_user( char * p_tab_guess, const int size );
-
+/** algorithme pour indiquer bien place et mal **/
 void mm_algo_mastermind(char* p_tab_guess, char* p_tab_code_secret, const int size, int *nb_bien_place, int *nb_mal_place );
 
-//  affiche les resultats du jeu de test, colored with grpahics
+/**  affiche les resultats du jeu de test, version colored with grpahics **/
 void mm_affiche_resultat_guess( const int nb_bien_place, const int nb_mal_place );
 void mm_affiche_resultat_guess_colored( const int nb_bien_place, const int nb_mal_place );
 
-// affiche les pieces joues par le joueur, colored with graphic shift by SHIFT_DRAW_PIECE
+/** affiche les pieces joues par le joueur, colored with graphic shift by SHIFT_DRAW_PIECE **/
 void mm_print_code( char* p_code, const int size );
-// version with colring
 void mm_print_code_with_colors( char* p_code, const int size );
 
+/** helper function for colors **/
+void mm_get_formatted_string_colored( char code, char* p_out);
+
 /*** globale definitions of colors ***/
+// not used, keep  for help
+/*
 const int colorCode[][3] = { { (int)'R', 31, 41 },   // rouge, Foreground color, Background color
                              { (int)'V', 32, 42 },   // vert
                               {(int)'J', 33, 43 },   // jaune
                               {(int)'B', 34, 44 },   // bleu
                               {(int)'W', 97, 107}    // white for background
                            };
-                            //{(int)'J', 35, 45},   // Magenta
+*/
 
-const int SHIFT_DRAW_PIECE = 50; // shift on screen
+const int SHIFT_DRAW_PIECE = 50; // shift right on screen for printing the pieice
+const int SHIFT_RESULTAT_PLACE = 25;
 
+/** main entry **/
 int start_game_mastermind(Joueur joueur, Historique *historique)
 {
-    printf("Entrée Mastermind\nBienvenue ");
-    printf("%s \n", joueur.nom);
-
-    // constantes
+    // message d'intro au jeu
+    printf("Entrée Mastermind\nBienvenue %s\n", joueur.nom);
+    ( joueur.serie_3_game == true ) ? printf("C'est du sérieux, on est dans une série de 3 jeux\n")
+                                    : printf("Mode détente, qq parties pour s'entraîner\n");
+    // constantes du jeu
     const int NB_PIECE_MM = 4;
     const int MAX_TENTATIVE = 10;
 
+    // initalization pour random
+    //srand(time(NULL));
+    // vainqueur de la partie
+    int victoire = 0;
+    bool rejouer = false;
+
+    do {
+        victoire = mm_make_one_game( NB_PIECE_MM, MAX_TENTATIVE );
+
+        if (victoire == 1) {
+            printf("on incremente votre historique\n");
+            historique->nbre_victoire_mm++;
+        } else {
+            printf("une defaite de plus %s et enregistrée dans votre historique \n", joueur.nom);
+            historique->nbre_defaite_mm++;
+        }
+
+        if( joueur.serie_3_game == false ) {
+            rejouer = rejouer_une_partie();
+        }
+
+    } while ( (rejouer == true) && (joueur.serie_3_game == false) );
+
+    printf("Mastemind vous dit à bientôt %s, revenez vite\n\n", joueur.nom);
+    return 0;
+}
+
+int mm_make_one_game( const int NbPIECE, const int MaxTENTATIVE ) {
     // déclare les tableaux : pieces et internal pour l'alrithme de match
     char colors[] = {'V','R','M','B','J'};        // available colors
-    char tab_code_secret[NB_PIECE_MM];            // code secret de l'ordinateur
-    char tab_guess[NB_PIECE_MM];                  // guess du joueur
+    char tab_code_secret[NbPIECE];            // code secret de l'ordinateur
+    char tab_guess[NbPIECE];
 
-    // initaliza pour random
-    srand(time(NULL));
-
-    mm_make_random_secret_code( tab_code_secret, NB_PIECE_MM, colors, sizeof(colors) );
+    mm_make_random_secret_code( tab_code_secret, NbPIECE, colors, sizeof(colors) );
     // affiche pour tests
-    for(int i = 0; i < NB_PIECE_MM; i++ ) {
+    for(int i = 0; i < NbPIECE; i++ ) {
         printf("%c", tab_code_secret[i]);
     }
     printf("\n");
@@ -74,36 +113,40 @@ int start_game_mastermind(Joueur joueur, Historique *historique)
         // incremente tentatives
         tentatives++;
 
-        mm_ask_guess_user( tab_guess, NB_PIECE_MM );
+        mm_ask_guess_user( tab_guess, NbPIECE );
         // afficher tableau joueur pour test
-        // mm_print_code( tab_guess , NB_PIECE_MM );
-        mm_print_code_with_colors( tab_guess , NB_PIECE_MM );
-//        for( int i = 0; i < NB_PIECE_MM; i++ ) {
-//            printf("%c", tab_guess[i]);
-//        }
+        // mm_print_code( tab_guess , NbPIECE );
+        mm_print_code_with_colors( tab_guess , NbPIECE );
+        for( int i = 0; i < NbPIECE; i++ ) {
+            printf("%c", tab_guess[i]);
+        }
         printf("\n");
         // compute bnombre de ien et mal place
-        mm_algo_mastermind( tab_guess, tab_code_secret, NB_PIECE_MM, &nb_bien_place, &nb_mal_place );
+        mm_algo_mastermind( tab_guess, tab_code_secret, NbPIECE, &nb_bien_place, &nb_mal_place );
         // affiche résultat de cet essai
         mm_affiche_resultat_guess_colored( nb_bien_place, nb_mal_place );
 
         // check if secret has been found
-        if( nb_bien_place == NB_PIECE_MM ) {
+        if( nb_bien_place == NbPIECE ) {
             victoire = 1;
             break;
         }
     // sort si victoire ou tentative depasse MAX_TENTATIVE
     //} while( (! victoire) && (tentatives <= MAX_TENTATIVE) ); / /not so bad in fact
-    } while( !( victoire || (tentatives > MAX_TENTATIVE) ) ); // conditions de sortie plus 'lisible' avec OU ?? bof..
+    } while( !( victoire || (tentatives > MaxTENTATIVE) ) ); // conditions de sortie plus 'lisible' avec OU ?? bof..
 
-    // message de fin de partie gagné/perdu
-    if( victoire ) {
-        printf("gagne en %d tentatives sur %d", tentatives, MAX_TENTATIVE);
+    // message de fin de partie
+    if( victoire == 1 ) {
+        printf("Gagné !! en %d tentatives sur %d \n", tentatives, MaxTENTATIVE);
     } else {
-        printf("perdu : nbre de tentatives max atteinte\n");
-        printf("Le code était ");
+        printf("Perdu.. le nombre maximum de tentatives atteint\n");
+        printf("Le code secret était : \n");
+        mm_print_code_with_colors( tab_code_secret, NbPIECE);
+        printf("\n");
     }
-    return 0;
+    // code retour pour le gagnant
+    return (victoire == 1) ?  1
+                           :  2;
 }
 
 void mm_make_random_secret_code( char *secret, const int size_secret, const char* colors, const int size_colors )
@@ -169,18 +212,31 @@ void mm_affiche_resultat_guess_colored( const int nb_bien_place, const int nb_ma
 //    printf("Nbre de pieces mal placées  : %d\n", nb_mal_place);
 
     char p_string[400];
+    int at_least_one_output = 0;  // flag, sinon une ligne vide est imprimée
     //char p_tmp[100];
-    for(int i = 0; i < 25; i++ ) {
+    for(int i = 0; i < SHIFT_RESULTAT_PLACE; i++ ) {
         p_string[i] = ' ';
     }
-    p_string[25] = '\0';
+    p_string[SHIFT_RESULTAT_PLACE ] = '\0';
+
+    // affiche bien place et mal place
     for(int i = 0; i < nb_bien_place; i++ ) {
         strcat(p_string, "\033[97;1m\033[100m B \033[0m");
+        at_least_one_output = 1;
     }
     for(int i = 0; i < nb_mal_place; i++ ) {
         strcat(p_string,"\033[30;1m\033[100m M \033[0m");
+        at_least_one_output = 1;
     }
-    printf("résultat : %s\n", p_string);
+
+    // impression console
+    if( at_least_one_output ) {
+        printf("%s\n", p_string);
+    // mettre un message explicit s'il n'y a rien
+    } else {
+        printf("%*s nada... \n", SHIFT_RESULTAT_PLACE-1, " ");
+    }
+
 }
 
 void mm_print_code( char* p_code, const int size )

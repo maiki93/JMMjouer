@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "historique.h"
 #include "game_pendu.h"
@@ -10,20 +11,21 @@ int main()
 {
     printf("Hello world!\n");
 
+    // initalize pour random on peut l'appeler d'ici pour tous les jeux
+    srand(time(NULL));
+
     // demander le nom du joueur
     // rechercher dans son historique
-    Historique historique;
-    initialize_historique( &historique );
-    Joueur joueur = { "Toto" };
-    //joueur.nom = "Toto";
-    //char nom[50] = "Toto";
-    historique.nbre_victoire_total = 10;
-
-    int choice_game;            // choix du jeu
-
         // si present on recherche son historique
         // si premiere connexion on cree un nouveau
 
+// Une initialisation temporaire en attendant mieux
+    Historique historique;
+    initialize_historique( &historique );
+    Joueur joueur = { "Toto", false }; // nom Toto, type de jeu: 3_jeux false
+
+    int choice_game;            // choix du jeu
+    // int choice_style_game    // suite de 3 jeu, aleatoire...
  //1   // Proposer le style de jeu :
 
         // 3 a la suite
@@ -62,6 +64,5 @@ int main()
                                 // si fichier individuel, juste le fichier historique_nom.txt a écrire
 
     // fin
-
     return 0;
 }
