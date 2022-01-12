@@ -58,7 +58,7 @@ SCRUMBOARD
 |Écriture fonction export de l’historique du joueur dans un fichier externe .txt et choix de la démarche (un ou plusieurs fichiers)| | | |
 |Revue du Jeu du Morpion (en groupe ou peer programming)| | | |
 |Premier Merge branche Mathieu| | | |
-|Revue du Jeu du Pendu| | | |
+|| | |Revue du Jeu du Pendu **JMi** |
 || | | Premier Merge branche Jasmine **J**|
 |Revue sur l’utilisation des structures Joueur et Historique| | | |
 |Implémentation de la fonction ajouter points jeu du Morpion| | | |
