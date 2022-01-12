@@ -3,7 +3,9 @@
 mic
 mastermind: 10 5
 pendu: 2 1
+morpion: 1 3
 +++++
 toto
 mastermind: 2 2
-pendu: 3 5 
+pendu: 3 5
+morpion: 2 4

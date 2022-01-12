@@ -42,7 +42,7 @@ int search_joueur_in_historique( Historique*, const char *nom_joueur );
 // void write_historique( Joueur,   Historique* );
 
 // TODO a faire, rajouter dans le menu entre:: afficher votre historique
-void print_historique( Historique* );
+void print_historique( Historique* ); // Joueur
 
 
 
