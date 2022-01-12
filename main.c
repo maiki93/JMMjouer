@@ -75,6 +75,8 @@ int main()
         clean_stdin();
         printf("Vous avez choisi %d \n", choice_game);
 
+        // logique propre au jeu
+        // incrementer historique directement
         switch( choice_game ) {
             case 1 : start_game_pendu( joueur, historique );
                      break;
@@ -93,15 +95,9 @@ int main()
                      return 1;
         }
 
+    // voulez-vous rejouer/ ou quitter (retour à 1/)
     } while ( rejouer == true );
 
-    // valider entree et lancer le(s) jeu
-
-            // logique propiore au jeu du pendu
-            // incrementer historique directement , sauvegarder historiques
-            // dans pendu combien de points donner pour une victoire
-
-    // voulez-vous rejouer/ ou quitter (retour à 1/)
 
     // sauvegarder historique : // si fichier global, relire et reecrire tous les historiques
                                 // si fichier individuel, juste le fichier historique_nom.txt a écrire
