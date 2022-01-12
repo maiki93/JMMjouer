@@ -31,9 +31,112 @@ Les jeux peuvent être quitté depuis ce menu.
 
 ![UserCase UML Diagram](to/.png)
 
-# Installation
+# Documentation
 
-``` ```
+```
+
+```
+
+
+
+# Suivi de projet
+
+### SPRINT 2
+
+SCRUMBOARD
+**Mi** == Michael
+**Ma** == Mathieu
+**J** == Jasmine
+
+
+| to do | doing | to validate | done |
+|---|---|---|---|
+|Faire le point rapide sur l’avancée de chacun| | | |
+|Écriture fonction ajouter points| | | |
+|Écriture fonction sauvegarder| | | |
+|Écriture fonction export de l’historique du joueur dans un fichier externe .txt et choix de la démarche (un ou plusieurs fichiers)| | | |
+|Revue du Jeu du Morpion (en groupe ou peer programming)| | | |
+|Merge branche Mathieu| | | |
+|Revue du Jeu du Pendu| | | |
+|Merge branche Jasmine| | | |
+|Revue sur l’utilisation des structures Joueur et Historique| | | |
+|Implémentation de la fonction ajouter points jeu du Morpion| | | |
+|Implémentation de la fonction ajouter points jeu du pendu| | | |
+|Implémentation de la fonction ajouter points MasterMind| | | |
+|Implémentation de la fonction sauvegarder jeu du Morpion| | | |
+|Implémentation de la fonction sauvegarder Jeu du Pendu| | | |
+|Implémentation de la fonction sauvegarder MasterMind| | | |
+
+
+### L'ensemble des tâches/product backlog
+
+
+| taches | points | développeur | État de la tache |
+|---|---|---|---|
+|Choix des utilisations du jeu d’arcade En groupe | | | |
+| Écriture des structures Joueur et Hitorique en prévision du stock des datas dans un fichier data.txt ou joueur.txt | |en peerprogramming par Michael, suivi par Jasmine | done |
+|Cours sur les structures | |Michael | done|
+| Rangement des structures : création historique.h et historique.c | |Peer-progrmming Michael-Jas | done |
+| Rangement des structures : création utils.h et utils.c | | Michael | done |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+
+
+
+
+#### Liste des tâches sprint 1 :
+
+Choix des utilisations du jeu d’arcade En groupe
+Écriture des structures Joueur et Hitorique en prévision du stock des datas dans un fichier data.txt ou joueur.txt en peerprogramming par Michael, suivi par Jasmine
+Cours sur les structures par Michael
+Rangement des structures : création historique.h et historique.c
+Rangement des structures : création utils.h utils.c
+
+Revue du Master Mind : passage en fonctions par Michael
+Revue du jeu du pendu : passage en fonctions par Jasmine
+Écrire fonction pour affichage en couleurs des pions ♟ par Michael
+Écrire fonction pour proposer des indices par Jasmine
+Écriture du nouveau Jeu du Morpion par Mathieu
+
+
+
+
+
+
+
+
 
 
 
