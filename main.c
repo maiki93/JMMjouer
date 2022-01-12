@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #include "historique.h"
 #include "game_pendu.h"
@@ -11,18 +12,30 @@ int main()
 {
     printf("Hello world!\n");
 
+    // Une initialisation temporaire en attendant mieux
+    Historique historique;
+    initialize_historique( &historique );
+    Joueur joueur = { "Toto", false }; // nom Toto, type de jeu: 3_jeux false
+    // variable
+    char p_nom_joueur[50];
     // initalize pour random on peut l'appeler d'ici pour tous les jeux
     srand(time(NULL));
 
     // demander le nom du joueur
-    // rechercher dans son historique
+    printf("quel est votre nom ? ");
+    fgets( p_nom_joueur, 50, stdin);
+    //clean_stdin();
+    //if( strcspn(p_nom_joueur, "\n") == NB_LETTRE ) {
+    //clean_stdin(); // besoin si mot > NB_LETTER, petit bug sinon
+    //}
+    p_nom_joueur[strcspn(p_nom_joueur, "\n")] = 0; // <=> '\0'
+    printf("Welcome !%s!\n", p_nom_joueur);
+    // rechercher dans son historique, charge son historique
+        search_joueur_in_historique( &historique, p_nom_joueur );
         // si present on recherche son historique
         // si premiere connexion on cree un nouveau
 
-// Une initialisation temporaire en attendant mieux
-    Historique historique;
-    initialize_historique( &historique );
-    Joueur joueur = { "Toto", false }; // nom Toto, type de jeu: 3_jeux false
+
 
     int choice_game;            // choix du jeu
     // int choice_style_game    // suite de 3 jeu, aleatoire...
@@ -35,7 +48,7 @@ int main()
 
 // 1 ou 3 jeux
     // si 1 jeu
-    printf("A quel jeu voulez-lous jouer ?\n");
+    printf("A quel jeu voulez-vous jouer ?\n");
     printf("1. jeu du pendu\n");
     printf("2. une partie de Mastermind\n");
     printf("3. une bataille de morpion\n");
