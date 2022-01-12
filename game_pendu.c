@@ -167,7 +167,7 @@ int victoire(int lengthRandWord, int* indexCorrectLetters)
 }
 
 
-int start_game_pendu( Joueur joueur, Historique *histo ) {
+int start_game_pendu( Joueur joueur, Historique *historique ) {
 
 
     int victoire = 0;           // vainqueur de la partie
@@ -184,11 +184,11 @@ int start_game_pendu( Joueur joueur, Historique *histo ) {
         // victoire joueur
         if (victoire == 1) {
             printf("on incremente votre historique\n");
-            //historique->nbre_victoire_mm++;
-        // victoire == 2 ordinateur
+            historique->nbre_victoire_mm++;
+        victoire == 2; // ordinateur
         } else {
             printf("une defaite de plus %s et enregistrée dans votre historique \n", joueur.nom);
-            //historique->nbre_defaite_mm++;
+            historique->nbre_defaite_mm++;
         }
 
 
