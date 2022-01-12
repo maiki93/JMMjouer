@@ -15,8 +15,9 @@ int main()
     printf("Hello world!\n");
 
     // Une initialisation temporaire en attendant mieux
-    Historique historique;
-    initialize_historique( &historique );
+    Historique* historique = NULL;
+    historique = malloc( sizeof(Historique) );
+    //initialize_historique( &historique );
     Joueur joueur = { "Toto", false }; // nom Toto, type de jeu: 3_jeux false
     // variable
     char p_nom_joueur[50];
@@ -32,8 +33,14 @@ int main()
     //}
     p_nom_joueur[strcspn(p_nom_joueur, "\n")] = 0; // <=> '\0'
     printf("Welcome !%s!\n", p_nom_joueur);
+    strcpy( joueur.nom, p_nom_joueur );
+    joueur.serie_3_game = false;
+
+    //printf("joueur nom: %s \n", joueur.nom);
+    //printf("joueur serie 3 games : %d \n", joueur.serie_3_game);
+
     // rechercher dans son historique, charge son historique
-        search_joueur_in_historique( &historique, p_nom_joueur );
+        search_joueur_in_historique( historique, joueur.nom );
         // si present on recherche son historique
         // si premiere connexion on cree un nouveau
 
@@ -48,23 +55,34 @@ int main()
             // Proposer la liste de jeu
         // 1 au hasard
 
+
+    if( historique == NULL ) {
+        printf("ERROR !!");
+        return 1;
+    }
+
 // 1 ou 3 jeux
     // si 1 jeu
     printf("A quel jeu voulez-vous jouer ?\n");
     printf("1. jeu du pendu\n");
     printf("2. une partie de Mastermind\n");
     printf("3. une bataille de morpion\n");
+    printf("4. voir votre historique\n");
     scanf("%d", &choice_game);
     clean_stdin();
     printf("Vous avez choisi %d \n", choice_game);
 
     switch( choice_game ) {
-        case 1 : start_game_pendu( joueur, &historique );
+        case 1 : start_game_pendu( joueur, historique );
                  break;
-        case 2 : start_game_mastermind( joueur, &historique );
+        case 2 : start_game_mastermind( joueur, historique );
                  break;
         case 3 : lancer_morpion( joueur.nom );
                  break;
+        case 4 : printf("Vos performances : %s", joueur.nom);
+                 print_historique(  historique );
+                 break;
+
         default : printf("Error !");
                  return 1;
     }
