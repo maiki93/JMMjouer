@@ -31,7 +31,7 @@ Les jeux peuvent être quitté depuis ce menu.
 
 ![UserCase UML Diagram](to/.png)
 
-# Installation
+# Documentation
 
 ```
 
