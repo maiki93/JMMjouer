@@ -68,13 +68,13 @@ int lancer_morpion(char * pseudo){
 //Affiche le plateau de jeu proprement et le nombre de cases remplis
 void afficher_plateau(char * plateau, int *nb_jeu){
     printf("PLATEAU ACTUEL - %d CASES REMPLIS \n", *nb_jeu);
-    printf("/-----\ \n");
+    printf("/-----\\ \n");
     printf("|%c|%c|%c|\n",*plateau,*(plateau+1),*(plateau+2));
     printf("|-----| \n");
     printf("|%c|%c|%c|\n",*(plateau+3),*(plateau+4),*(plateau+5));
     printf("|-----| \n");
     printf("|%c|%c|%c|\n",*(plateau+6),*(plateau+7),*(plateau+8));
-    printf("\-----/ \n");
+    printf("\\-----/ \n");
 
 }
 
@@ -93,7 +93,6 @@ int test_plateau_rempli(char * plateau){
 
 //Test si le joueur/IA apres avoir joue son tour a gagne ou non
 int test_victoire(char * plateau, char * a_test){
-    printf("Entre dans test victoire\n");
     int victoire = 0;
 
     //Test premiere ligne horizontale (haut)
@@ -129,8 +128,6 @@ int test_victoire(char * plateau, char * a_test){
         victoire = 1;
     }
 
-    printf(" victoire = %d\n",victoire);
-    printf("Sort de test victoire\n");
 
     return victoire;
 }
@@ -164,7 +161,13 @@ void tour_joueur(int * nb_case_joue, char * plateau){
             saisie_correct=1;
             printf("Vous avez joue votre tour !\n");
         }else{
-            printf("Il y a une erreur dans votre saisie, veuillez recommencer.\n");
+            if(isdigit( tentative )){
+                printf("La case a deja ete prise !\nVeuillez en prendre une autre.\n");
+            }
+            else{
+                printf("Il y a une erreur dans votre saisie, veuillez recommencer.\n");
+            }
+
         }
 
     }while(!saisie_correct);
@@ -178,6 +181,7 @@ void tour_ia(int * nb_case_joue, char * plateau){
     int jeu_ordinateur=0;
     char tentative = '0';
 
+    printf("L'IA joue son tour !\n");
     //Boucle de generation de nombre aleatoire jusqu'a que ce soit valide
     do{
         jeu_ordinateur = (rand() % 9) + 1; // On génère un nombre entier entre 1 et 9
@@ -189,19 +193,14 @@ void tour_ia(int * nb_case_joue, char * plateau){
 
 //Test si la saisie en entre est correcte pour le plateau en entree
 int saisie_est_correct(char * plateau, char * tentative){
-    printf("Entrer dans saisie_est_correct\n");
+
     int est_correct = 0;
 
     for(int i=0;i<9;i++){
-        printf("tentative = %c\n",tentative);
-        printf("plateau[%d] = %c\n",i, *(plateau+i) );
-
         if( *(plateau+i) == tentative ){
             est_correct = 1;
         }
     }
-
-    printf("Fonction saisie_est_correct : est_correct = %d\n",est_correct);
 
     return est_correct;
 
@@ -214,14 +213,7 @@ void maj_plateau(char * plateau, char * tentative, char * symbole){
     //On le decremente de 1 aussi car notre tableau est de 0 a 8 et non de 1 a 9
     int i = tentative - '0' -1;
 
-    printf("Entre dans maj plateau.\n");
-    printf("tentative = %c\n",tentative);
-    printf("i = %d\n",i);
-    printf("Ce que l'on souhaite modifier : %c\n", *(plateau+i) );
-    printf("Le symbole %c\n",symbole);
-
     *(plateau + i) = symbole;
 
 
-    printf("Sort de maj plateau\n");
 }
