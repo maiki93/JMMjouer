@@ -13,4 +13,5 @@ void initialize_historique( Historique* histo)
     // Mastermind
     histo->nbre_victoire_mm = 0;
     histo->nbre_defaite_mm = 0;
+
 }

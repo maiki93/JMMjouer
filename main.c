@@ -50,7 +50,7 @@ int main()
                  break;
         case 2 : start_game_mastermind( joueur, &historique );
                  break;
-        case 3 : lancer_morpion( joueur.nom );
+        case 3 : lancer_morpion( joueur, &historique );
                  break;
         default : printf("Error !");
                  return 1;

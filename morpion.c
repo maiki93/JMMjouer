@@ -2,15 +2,11 @@
 #include <stdlib.h>
 #include <time.h>
 #include "morpion.h"
-
-//Pour voir si le header fonctionne
-void test(){
-    printf("Tout marche !");
-}
-
+#include "utils.h"
+#include "historique.h"
 
 //Lance le jeu morpion et renvoie le score du joueur en cas de victoire
-int lancer_morpion(char * pseudo){
+int lancer_morpion(Joueur joueur,Historique *historique){
 
     //Initialisation des variables
     char plateau [] = {'1','2','3','4','5','6','7','8','9','\0'};
@@ -22,7 +18,7 @@ int lancer_morpion(char * pseudo){
     int score = 0;
 
     //Bienvenue au joueur dans le jeu
-    printf("Bienvenue %s dans le jeu du morpion !\n",pseudo);
+    printf("Bienvenue %s dans le jeu du morpion !\n",joueur.nom);
     printf("C'est a vous de commencer le premier tour.\n");
     printf("Vous avez le symbole 'O' et l'IA surentraine aura le symbole 'X'.\n");
     printf("Bonne chance !");
@@ -33,20 +29,24 @@ int lancer_morpion(char * pseudo){
         //Le nombre de case joue paire -> tour du joueur
         //Sinon tour de l'ia
         if(nb_case_joue%2 == 0){
-            printf("C'est au tour de %s.\n",pseudo);
+            printf("C'est au tour de %s.\n",joueur.nom);
             tour_joueur(&nb_case_joue,plateau);
             if( test_victoire(plateau,'O') ){
                     printf("Bravo !\nVous avez gagne !!!\n");
                     jeu_en_cours = 0;
                     score = 1;
+                    afficher_plateau(plateau,nb_case_joue);
+                    historique->nbre_victoire_morpion++;
             }
         }else{
             printf("C'est au tour de l'IA.\n");
             tour_ia(&nb_case_joue,plateau);
             if( test_victoire(plateau,'X') ){
-                    printf("Oh non !\nL'IA vous a battu !!!");
+                    printf("Oh non !\nL'IA vous a battu !!!\n");
                     jeu_en_cours = 0;
                     score = 0;
+                    afficher_plateau(plateau,nb_case_joue);
+                    historique->nb_defaite_morpion++;
             }
         }
         //S'il n'y a pas de victoire a ce tour (le jeu est toujours en cours), on regarde si le tableau n'est pas rempli
@@ -55,6 +55,8 @@ int lancer_morpion(char * pseudo){
             printf("La teableau est rempli !\nC'est un match nul !\n");
             score = 0;
             jeu_en_cours = 0;
+            afficher_plateau(plateau,nb_case_joue);
+            historique->nb_defaite_morpion++;
         }
 
         nb_case_joue++;
