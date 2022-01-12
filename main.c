@@ -12,7 +12,7 @@
 
 int main()
 {
-    printf("Hello world!\n");
+    printf("\nJMMjouer vous accueille à son salon d'arcade \n");
 
     // Une initialisation temporaire en attendant mieux
     Historique* historique = NULL;
@@ -32,7 +32,7 @@ int main()
     //clean_stdin(); // besoin si mot > NB_LETTER, petit bug sinon
     //}
     p_nom_joueur[strcspn(p_nom_joueur, "\n")] = 0; // <=> '\0'
-    printf("Welcome !%s!\n", p_nom_joueur);
+    printf("\nWelcome %s\n", p_nom_joueur);
     strcpy( joueur.nom, p_nom_joueur );
     joueur.serie_3_game = false;
 
@@ -62,30 +62,38 @@ int main()
     }
 
 // 1 ou 3 jeux
-    // si 1 jeu
-    printf("A quel jeu voulez-vous jouer ?\n");
-    printf("1. jeu du pendu\n");
-    printf("2. une partie de Mastermind\n");
-    printf("3. une bataille de morpion\n");
-    printf("4. voir votre historique\n");
-    scanf("%d", &choice_game);
-    clean_stdin();
-    printf("Vous avez choisi %d \n", choice_game);
+    bool rejouer = true;
 
-    switch( choice_game ) {
-        case 1 : start_game_pendu( joueur, historique );
-                 break;
-        case 2 : start_game_mastermind( joueur, historique );
-                 break;
-        case 3 : lancer_morpion( joueur.nom );
-                 break;
-        case 4 : printf("Vos performances : %s", joueur.nom);
-                 print_historique(  historique );
-                 break;
+    do {
+        // si 1 jeu
+        printf("A quel jeu voulez-vous jouer ?\n");
+        printf("1. jeu du pendu\n");
+        printf("2. une partie de Mastermind\n");
+        printf("3. une bataille de morpion\n");
+        printf("4. voir votre historique\n Votre choix : ");
+        scanf("%d", &choice_game);
+        clean_stdin();
+        printf("Vous avez choisi %d \n", choice_game);
 
-        default : printf("Error !");
-                 return 1;
-    }
+        switch( choice_game ) {
+            case 1 : start_game_pendu( joueur, historique );
+                     break;
+            case 2 : start_game_mastermind( joueur, historique );
+                     break;
+            case 3 : lancer_morpion( joueur.nom );
+                     break;
+            case 4 : printf("Vos performances : %s \n", joueur.nom);
+                     print_historique(  historique );
+                     break;
+            case 5 : printf("Quitter le jeu \n");
+                     rejouer = false;
+                     break;
+
+            default : printf("Error !");
+                     return 1;
+        }
+
+    } while ( rejouer == true );
 
     // valider entree et lancer le(s) jeu
 
@@ -94,7 +102,6 @@ int main()
             // dans pendu combien de points donner pour une victoire
 
     // voulez-vous rejouer/ ou quitter (retour à 1/)
-
 
     // sauvegarder historique : // si fichier global, relire et reecrire tous les historiques
                                 // si fichier individuel, juste le fichier historique_nom.txt a écrire
