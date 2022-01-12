@@ -24,7 +24,7 @@ int main()
     srand(time(NULL));
 
     // demander le nom du joueur
-    printf("quel est votre nom ? ");
+    printf("Quel est votre nom ? ");
     fgets( p_nom_joueur, 50, stdin);
     //clean_stdin();
     //if( strcspn(p_nom_joueur, "\n") == NB_LETTRE ) {
