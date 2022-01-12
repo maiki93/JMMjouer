@@ -1,5 +1,5 @@
 bin/
 obj/
-JMMjouer.cbp
-JMMjouer.depend
-JMMjouer.layout
+*.cbp
+*.depend
+*.layout

@@ -14,4 +14,9 @@ void initialize_historique( Historique* histo)
     histo->nbre_victoire_mm = 0;
     histo->nbre_defaite_mm = 0;
 
+    // Morpion
+    histo->nbre_victoire_morpion = 0;
+    histo->nbre_defaite_morpion = 0;
+
+
 }
