@@ -1,0 +1,9 @@
+# pour chaque jeu : nbre de victoire / nbre de defaite [/nbre d'égalite]
++++++
+mic
+mastermind: 10 5
+pendu: 2 1
++++++
+toto
+mastermind: 2 2
+pendu: 3 5 
