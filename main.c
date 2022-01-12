@@ -5,6 +5,7 @@
 #include "historique.h"
 #include "game_pendu.h"
 #include "game_mastermind.h"
+#include "morpion.h"
 #include "utils.h"
 
 int main()
