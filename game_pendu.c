@@ -100,7 +100,6 @@ int start_game_pendu( Joueur joueur, Historique *histo ) {
                             break;
                         }
 
-<<<<<<< HEAD
                      /**
                      A RANGER DANS UNE FONCTION A VOTRE AVIS????? Je vois pas... c bien comme ça je trouve
                      **/
