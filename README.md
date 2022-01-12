@@ -48,31 +48,36 @@ SCRUMBOARD
 **Ma** == Mathieu
 **J** == Jasmine
 **A**== All
+**PP**==Peer Programming à déterminer
 
 
 | to do | doing | to validate | done |
 |---|---|---|---|
 || | |Faire le point rapide sur l’avancée de chacun **A**|
 |Écriture fonction ajouter points| | | |
-|Écriture fonction sauvegarder| | | |
-|Écriture fonction export de l’historique du joueur dans un fichier externe .txt et choix de la démarche (un ou plusieurs fichiers)| | | |
-|Revue du Jeu du Morpion (en groupe ou peer programming)| | | |
+|| Écriture fonction sauvegarder**Mi**| | |
+|| Écriture fonction export de l’historique (sauvegarde) du joueur dans un fichier externe .txt et choix de la démarche (un ou plusieurs fichiers) **pp** **A**| | |
+|Revue du Jeu du Morpion (en groupe ou peer programming?)| | | |
 |Premier Merge branche Mathieu| | | |
+|Première intégration Jeu du Morpion **Ma**| | | |
 || | |Revue du Jeu du Pendu **JMi** |
 || | | Premier Merge branche Jasmine **J**|
-|| Ajout fonctionnalité rejouer **J** | | |
-|| Ajout fonctionnalité ajouter les victoires **J** | | |
+|| | |Première intégration Jeu du Pendu **J** |
+||| | Ajout fonctionnalité rejouer **J**|
+||| |Ajout fonctionnalité ajouter les victoires **J**  |
+||Second Merge branche Jasmine **J** | | |
+||Seconde intégration Jeu du Pendu **J** | | |
 |Revue sur l’utilisation des structures Joueur et Historique| | | |
 |Implémentation de la fonction ajouter points jeu du Morpion| | | |
-|Implémentation de la fonction ajouter points jeu du pendu| | | |
-|Implémentation de la fonction ajouter points MasterMind| | | |
-|Implémentation de la fonction sauvegarder jeu du Morpion| | | |
-|Implémentation de la fonction sauvegarder Jeu du Pendu| | | |
+|Implémentation de la fonction sauvegarder jeu du Morpion **Ma**| | | |
+||Implémentation de la fonction ajouter points jeu du pendu (update victoire) **J** | | |
+|Implémentation de la fonction ajouter points MasterMind **Mi**| | | |
+||Implémentation de la fonction sauvegarder Jeu du Pendu **J**| | |
 |Implémentation de la fonction sauvegarder MasterMind| | | |
 |Integration finale Jeu du Pendu **J**| | | |
-|Merge Final Jeu du Pendu **J**| | | |
+|Integration finale Jeu du Pendu **J**| | | |
 |Merge Final Jeu du Morpion **Ma**| | | |
-|Merge Final Jeu du Morpion **Mi**| | | |
+|Merge Final Jeu du MasteMind **Mi**| | | |
 
 
 ### SPRINT 1
@@ -87,10 +92,10 @@ de lundi 10/01 vers 15h40 jusqu'au mercredi 12/01 11h20
 | | | | Rangement des structures : création utils.h et utils.c **Mi**|
 | | | | Revue du Master Mind : passage en fonctions| **Mi** |
 | | | | Écriture du nouveau Jeu du Morpion **Ma** __ |
-| | | | Revue du jeu du pendu : passage en fonctions | | Jasmine | done |
-| | | | Écrire fonction pour affichage en couleurs des pions ♟ (MasterMind) | | Michael | done |
-| | | |Écrire fonction pour proposer des indices (pendu) | | Jasmine | done |
-
+| | | | Revue du jeu du pendu : passage en fonctions **J**|
+| | | | Écrire fonction pour affichage en couleurs des pions ♟ (MasterMind) **Mi**|
+| | | |Écrire fonction pour proposer des indices (pendu) **J** |
+| | Revue/utilisation code fourni pour écriture `datas.txt` **A** ||doing |
 
 ### L'ensemble des tâches/product backlog
 
@@ -110,29 +115,29 @@ de lundi 10/01 vers 15h40 jusqu'au mercredi 12/01 11h20
 |Faire le point rapide sur l’avancée de chacun|_1_ | **A** |done/to do (iteration) |
 |Écriture fonction ajouter points| _55_ | | |
 |Écriture fonction sauvegarder| _55_ | | |
-|Écriture fonction export de l’historique du joueur dans un fichier externe .txt et choix de la démarche (un ou plusieurs fichiers)| _89_ | | **A**|
+|Écriture fonction export de l’historique du joueur dans un fichier externe .txt et choix de la démarche (un ou plusieurs fichiers)| _89_ | **A** | doing |
 |Ranger le Jeu du Morpion en fonctions| | Mathieu | doing |
-|1er Merge branche Mathieu| | Mathieu | |
+|1er Merge branche Mathieu| | Mathieu | **to do**|
 |Revue du Jeu du Pendu| _21_|Jasmine et Michael |done |
 |1er Merge branche Jasmine| _1_| Jasmine | done |
-|Revue sur l’utilisation des structures Joueur et Historique|_5_ | | |
-|Implémentation de la fonction ajouter points jeu du Morpion| | | |
-|Implémentation de la fonction ajouter points jeu du pendu|_13_ | | |
-|Implémentation de la fonction ajouter points MasterMind| | | |
-|Implémentation de la fonction sauvegarder jeu du Morpion| | | |
-|Implémentation de la fonction sauvegarder Jeu du Pendu|_13_ | | |
-|Implémentation de la fonction sauvegarder MasterMind| | | |
+|Revue sur l’utilisation des structures Joueur et Historique|_5_ |**A** |**to do** |
+|Implémentation de la fonction ajouter points jeu du Morpion| | | **to do**|
+|Implémentation de la fonction ajouter points jeu du pendu|_13_ | |**to do** |
+|Implémentation de la fonction ajouter points MasterMind| | |**to do** |
+|Implémentation de la fonction sauvegarder jeu du Morpion| | |**to do** |
+|Implémentation de la fonction sauvegarder Jeu du Pendu|_13_ | | **to do**|
+|Implémentation de la fonction sauvegarder MasterMind| | | **to do**|
 | 1ere Integration du jeu du pendu|_1_|Jasmine |done |
-| 1ere Integration du mastermind | | Michael| done|
-| 1ere Integration du jeu du morpion | |Mathieu | |
-| Integration FINALE du jeu du pendu| |Jasmine | |
-| Integration FINALE du mastermind | | Michael| |
-| Integration FINALE du jeu du morpion | | Mathieu| |
+| 1ere Integration du mastermind | _1_ | Michael| done|
+| 1ere Integration du jeu du morpion | _1_ |Mathieu | **to do** |
+| Integration FINALE du jeu du pendu| _5_ |Jasmine | **to do**|
+| Integration FINALE du mastermind | _5_ | Michael| **to do**|
+| Integration FINALE du jeu du morpion | _5_ | Mathieu| **to do**|
+| Revue/utilisation code fourni pour écriture datas.txt| _13_ |**A** |doing |
 | | | | |
 | | | | |
 | | | | |
 | | | | |
-| | | | |
-
+Ajouter des tâches si besoin, actualiser si possible ou prevenir ScrumMaster pour reporter les avancées pour suivi de projet optimisé
 
 _Estimation des charges avec un poker planning basé sur la suite de Fibonacci : 0 1 1 2 3 5 8 13 21 34 55 89._
