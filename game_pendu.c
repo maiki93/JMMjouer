@@ -5,10 +5,10 @@
 #include "game_pendu.h"
 
 
-int start_game_pendu( Joueur joueur, Historique histo ) {
+int start_game_pendu( Joueur joueur, Historique *histo ) {
 
-    printf("start jeu du pendu");
-    printf("nom %s \n\n", joueur.nom);}
+    //printf("start jeu du pendu\n");
+    printf("Joueur : %s \n\n", joueur.nom);
 
     srand(time(NULL));
 
