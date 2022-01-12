@@ -4,6 +4,7 @@
 #include <time.h>
 #include "game_pendu.h"
 
+
 void dessiner( int dessin_tours)
 {
     char pendu[11][15]=
@@ -167,58 +168,6 @@ int victoire(int lengthRandWord, int* indexCorrectLetters)
 }
 
 
-int start_game_pendu( Joueur joueur, Historique *historique ) {
-
-
-    int victoire = 0;           // vainqueur de la partie
-    bool rejouer = false;
-
-
-    //printf("start jeu du pendu\n");
-    printf("Joueur : %s \n\n", joueur.nom);
-        do {
-        printf("vous etes bien arrive dans le pendu\n");
-        victoire = p_make_one_pendu();
-        printf("vous avez joue 1 partie");
-
-        // victoire joueur
-        if (victoire == 1) {
-            printf("on incremente votre historique\n");
-            historique->nbre_victoire_mm++;
-        victoire == 2; // ordinateur
-        } else {
-            printf("une defaite de plus %s et enregistrée dans votre historique \n", joueur.nom);
-            historique->nbre_defaite_mm++;
-        }
-
-
-        if( joueur.serie_3_game == false ) {
-            rejouer = rejouer_une_partie();
-        }
-
-    } while ( (rejouer == true) && (joueur.serie_3_game == false) );
-
-    printf("Le Jeu du Pendu vous dit à bientôt %s, revenez vite\n\n", joueur.nom);
-    return 0;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 int p_make_one_pendu()
 
 {
@@ -361,3 +310,38 @@ int p_make_one_pendu()
                            :  2;
 }
 
+
+int start_game_pendu( Joueur joueur, Historique *historique ) {
+
+
+    int victoire = 0;           // vainqueur de la partie
+    bool rejouer = false;
+
+
+    //printf("start jeu du pendu\n");
+    printf("Joueur : %s \n\n", joueur.nom);
+        do {
+        printf("vous etes bien arrive dans le pendu\n");
+        victoire = p_make_one_pendu();
+        printf("vous avez joue 1 partie");
+
+        // victoire joueur
+        if (victoire == 1) {
+            printf("on incremente votre historique\n");
+            historique->nbre_victoire_pendu++;
+        victoire == 2; // ordinateur
+        } else {
+            printf("une defaite de plus %s et enregistrée dans votre historique \n", joueur.nom);
+            historique->nbre_defaite_pendu++;
+        }
+
+
+        if( joueur.serie_3_game == false ) {
+            rejouer = rejouer_une_partie();
+        }
+
+    } while ( (rejouer == true) && (joueur.serie_3_game == false) );
+
+    printf("Le Jeu du Pendu vous dit à bientôt %s, revenez vite\n\n", joueur.nom);
+    return 0;
+}
