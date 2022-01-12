@@ -54,6 +54,7 @@ int main()
     printf("1. jeu du pendu\n");
     printf("2. une partie de Mastermind\n");
     printf("3. une bataille de morpion\n");
+    printf("4. voir votre historique");
     scanf("%d", &choice_game);
     clean_stdin();
     printf("Vous avez choisi %d \n", choice_game);

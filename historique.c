@@ -98,10 +98,16 @@ int read_historique(Historique *histo, FILE* pt_fichier)
     sscanf( ++p_data, "%d %d\n", &(histo->nbre_victoire_pendu), &(histo->nbre_defaite_pendu));
 
     // morpion
-    printf("defaite mastermind %d \n", histo->nbre_victoire_mm);
+    fgets( line2, LINE_SIZE, pt_fichier );
+    p_data = strchr( line2, ':' );
+    sscanf( ++p_data, "%d %d\n", &(histo->nbre_victoire_morpion), &(histo->nbre_defaite_morpion));
+
+    printf("victoire mastermind %d \n", histo->nbre_victoire_mm);
     printf("defaite mastermind %d \n", histo->nbre_defaite_mm);
-    printf("defaite mastermind %d \n", histo->nbre_victoire_pendu);
-    printf("defaite mastermind %d \n", histo->nbre_defaite_pendu);
+    printf("victoire pendu %d \n", histo->nbre_victoire_pendu);
+    printf("defaite pendu %d \n", histo->nbre_defaite_pendu);
+    printf("victoire morpion %d \n", histo->nbre_victoire_morpion);
+    printf("defaite morpion %d \n", histo->nbre_defaite_morpion);
 
     return 0;
 }
