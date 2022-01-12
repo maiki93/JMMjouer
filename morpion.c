@@ -46,7 +46,7 @@ int lancer_morpion(Joueur joueur,Historique *historique){
                     jeu_en_cours = 0;
                     score = 0;
                     afficher_plateau(plateau,nb_case_joue);
-                    historique->nb_defaite_morpion++;
+                    historique->nbre_defaite_morpion++;
             }
         }
         //S'il n'y a pas de victoire a ce tour (le jeu est toujours en cours), on regarde si le tableau n'est pas rempli
@@ -56,7 +56,7 @@ int lancer_morpion(Joueur joueur,Historique *historique){
             score = 0;
             jeu_en_cours = 0;
             afficher_plateau(plateau,nb_case_joue);
-            historique->nb_defaite_morpion++;
+            historique->nbre_defaite_morpion++;
         }
 
         nb_case_joue++;
