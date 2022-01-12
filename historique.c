@@ -23,6 +23,9 @@ void initialize_historique( Historique* histo)
     histo->nbre_defaite_mm = 0;
     histo->nbre_victoire_pendu = 0;
     histo->nbre_defaite_pendu = 0;
+
+    histo->nbre_victoire_morpion = 0;
+    histo->nbre_defaite_morpion =0;
 }
 
 
