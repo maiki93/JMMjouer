@@ -36,6 +36,7 @@ int lancer_morpion(Joueur joueur,Historique *historique){
                     jeu_en_cours = 0;
                     score = 1;
                     afficher_plateau(plateau,nb_case_joue);
+                    printf("historique nb victoire -> %d",historique->nbre_victoire_morpion);
                     historique->nbre_victoire_morpion++;
             }
         }else{
@@ -46,6 +47,7 @@ int lancer_morpion(Joueur joueur,Historique *historique){
                     jeu_en_cours = 0;
                     score = 0;
                     afficher_plateau(plateau,nb_case_joue);
+                    printf("historique -> %d",historique->nbre_defaite_morpion);
                     historique->nbre_defaite_morpion++;
             }
         }
