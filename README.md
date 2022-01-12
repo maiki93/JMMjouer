@@ -60,6 +60,8 @@ SCRUMBOARD
 |Premier Merge branche Mathieu| | | |
 || | |Revue du Jeu du Pendu **JMi** |
 || | | Premier Merge branche Jasmine **J**|
+|| Ajout fonctionnalité rejouer **J** | | |
+|| Ajout fonctionnalité ajouter les victoires **J** | | |
 |Revue sur l’utilisation des structures Joueur et Historique| | | |
 |Implémentation de la fonction ajouter points jeu du Morpion| | | |
 |Implémentation de la fonction ajouter points jeu du pendu| | | |
