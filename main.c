@@ -5,8 +5,9 @@
 #include "historique.h"
 #include "game_pendu.h"
 #include "game_mastermind.h"
-#include "morpion.h"
 #include "utils.h"
+#include "morpion.h"
+
 
 int main()
 {
@@ -36,7 +37,7 @@ int main()
 
 // 1 ou 3 jeux
     // si 1 jeu
-    printf("A quel jeu voulez-lous jouer ?\n");
+    printf("A quel jeu voulez-vous jouer ?\n");
     printf("1. jeu du pendu\n");
     printf("2. une partie de Mastermind\n");
     printf("3. une bataille de morpion\n");
@@ -49,9 +50,12 @@ int main()
                  break;
         case 2 : start_game_mastermind( joueur, &historique );
                  break;
+        case 3 : lancer_morpion( joueur.nom );
+                 break;
         default : printf("Error !");
                  return 1;
     }
+
     // valider entree et lancer le(s) jeu
 
             // logique propiore au jeu du pendu
@@ -67,3 +71,4 @@ int main()
     // fin
     return 0;
 }
+
