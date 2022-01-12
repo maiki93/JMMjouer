@@ -4,6 +4,145 @@
 #include <time.h>
 #include "game_pendu.h"
 
+int start_game_pendu( Joueur joueur, Historique *histo ) {
+
+    //printf("start jeu du pendu\n");
+    printf("Joueur : %s \n\n", joueur.nom);
+
+    srand(time(NULL));
+
+    //declaration des constantes
+    const int NOMBRE_MOTS_MYSTERES = 13;
+    const char mots_mysteres[][200]={"TOTO", "LOL", "FLEUR", "FLAGEOLET","COEUR", "CODE", "LANGAGE", "PROGRAMMATION","BATON", "BROCOLI", "LINUX", "SCANF", "SHELL"};    //liste de mot_mystere:
+
+    //declaration des variables
+    char saisie[16];
+    char lettre_saisie;
+    int nbTourRestant=10;
+    int correct_char_counter=0, correct_char_counter_special=0,oldCorrect=0, quit=0;
+    int randomIndex=rand() % NOMBRE_MOTS_MYSTERES;
+    int lengthRandWord=strlen(mots_mysteres[randomIndex]);
+    int indexCorrectLetters[13]={0,0,0,0,0,0,0,0,0,0,0,0,0};// pour memoriser les index des entrees correctes et ignorer ensuite les saisies correctes deja entrees
+    int win;
+    char mot_mystere[200];
+    strcpy(mot_mystere, mots_mysteres[randomIndex]);
+
+    // Accueil de l'utilisateur
+    printf("Licensed by Jasmine Banchereau - 01/2022\n\n");
+    printf("###############################\n");
+    printf("\n");
+    printf("Bienvenue dans le jeu du pendu !\n");
+    printf("\n");
+    printf("###############################\n\n\n");
+    //printf("Mot mystère : %s \n, index du mot dans la liste : %d,\n longueur du mot : %d,\n\n", mots_mysteres[randomIndex], randomIndex, lengthRandWord); // POUR LES TESTS
+    printf("______________ \n");
+    printf("Regles du jeu \n");
+    printf("Votre mission est de deviner le mot mystere.\n");
+    printf("Les undercores entre espaces representent chaque lettre du mot mystere.\n");
+    printf("Pour jouer, entrez vos lettres en CAPITALES s'il vous plait. \n");
+    printf("Pour quitter, tapez \"quit\" ou \"q\" \n");
+    printf("Pour proposer un mot, tapez \"mot\" ou \"w\" \n\n");
+    printf("Attention !\n");
+    printf("Quelques mots de vocabulaire en programmation C parmi les mots mysteres. \n");
+    printf("_____________ \n\n");
+    printf("Debut de la partie\n\n");
+
+    // Algorithme du jeu :
+    while (victoire(lengthRandWord, indexCorrectLetters)==0)
+        {
+            printWord(mot_mystere, lengthRandWord, indexCorrectLetters);
+            printf(" \n\n "); //printf("Nombre de lettres trouvees : %d\n", correct_char_counter); // on ne met plus a jour la variable correct_char_counter
+            printf("Nombre de tours restant : %d\n\n", nbTourRestant);
+            printf("Quelle lettre choisissez-vous ? ");
+            if (fgets(saisie, 16, stdin) == NULL) //fgets(saisie,16,stdin) rend un warning;
+                {
+                    printf("error fgets");
+                }
+            saisie[strcspn(saisie, "\n")] = 0;
+            if((strncmp(saisie,"quit",4)==0)||(strncmp(saisie,"q",1)==0)) // pour les laches qui souhaitent abandonner avant de perdre, voici le parachute !
+                {
+                    quit=1;
+                    break;
+                }
+            else if ((strncmp(saisie,"mot",3)==0)||(strncmp(saisie,"w",1)==0))  //pour les courageux souhaitant entrer le mot complet directement nous allons parcourir les deux tableaux de caractères
+               {
+                    printf("Entrez votre mot : \n");
+                    if (fgets(saisie, 16, stdin) == NULL)
+                        {
+                            printf("error fgets");
+                        }
+                    saisie[strcspn(saisie, "\n")] = 0;
+
+                    // TODO: il faudrait peut-etre avoir une autre approche afin de reutiliser la fonction victoire()
+                    win=loopSecretWord(saisie, lengthRandWord, mot_mystere, &correct_char_counter_special, &nbTourRestant);//pour gagner ou pas lors de la saisie d'un mot
+                    if (win==1)
+                        {
+                            //printf("Bravo ! La sortie de loopSecretWord est 1.\n");
+                            printf("Bravo !\n");
+                            break;
+                        }
+                }
+            else // si la saisie n'est ni "w" ni "mot" ni "q" ni "quit"
+                {
+                    lettre_saisie=saisie[0]; // pour catch la premiere lettre saisie
+                    oldCorrect=correct_char_counter;
+                    //printf("avant countRightCounter : correct char counter =%d, oldCorrect=%d\n", correct_char_counter, oldCorrect);
+                    printf("Lettre : %c\n",lettre_saisie);
+                    countRightChar(mot_mystere, lengthRandWord, indexCorrectLetters, saisie, &correct_char_counter);
+                    //printf("apres countRightCounter : correct char counter =%d, oldCorrect=%d\n", correct_char_counter, oldCorrect);
+                    win=victoire(lengthRandWord, indexCorrectLetters);
+                    if(win==1)
+                        {
+                            for(int i=0;i<lengthRandWord;i++)
+                            {
+                                printf(" %c ", mot_mystere[i]);
+                            }
+                            break;
+                        }
+
+                     /**
+                     A RANGER DANS UNE FONCTION A VOTRE AVIS????? Je vois pas... c bien comme ça je trouve
+                     **/
+                    if(oldCorrect==correct_char_counter) // perdre des points a chaque fois que le nombre d'entree corectes n'a pas augmente une fois l'iteration terminee
+                        {
+                            //printf("IF CORR_COUNER ==OLD : correct char counter =%d, oldCorrect=%d\n\n", correct_char_counter, oldCorrect);
+                            nbTourRestant--;
+                            printf("Entree incorrecte...");
+                            printf("Vous pouvez encore vous trompez %d fois ;-) \n\n", nbTourRestant);
+                            dessiner(10-nbTourRestant); // dessin ASCII
+                            if (nbTourRestant==0)
+                                {
+                                    printf("Vous avez perdu. Le mot etait : %s.", mots_mysteres[randomIndex]);
+                                    break;
+                                }
+                        }
+                    else
+                        {
+                            printf("Super, la lettre %c est bien presente dans le mot. \n\n", lettre_saisie);
+                        }
+                    /**
+                    FIN DE LA DERNIERE FONCTION A RANGER EVENTUELLEMENT si possible
+                    **/
+                }
+        if (nbTourRestant==1)
+                {
+                    indice(&mot_mystere);
+                }
+
+        } // END WHILE victory==0
+
+    if(quit==1) // on a maj le quit a 1 lorsque l'input de l'utilisateur est "quit"
+        {
+            printf("L'utilisateur a quitte la partie avant la fin. A bientot.");
+        }
+
+    //histo.nbre_defaite_total ++;
+    //write_historique( histo );
+
+    return 0;
+}
+
+
 
 void dessiner( int dessin_tours)
 {
