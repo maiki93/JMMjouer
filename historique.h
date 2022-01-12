@@ -18,7 +18,7 @@ typedef struct struct_historique {
 
     int nbre_victoire_mm, nbre_defaite_mm;                         // pas d"égalite
     int nbre_victoire_morpion, nbre_defaite_morpion;
-    int nbre_points_pendu, nbre_parties_pendu ;
+    int nbre_victoire_pendu, nbre_defaite_pendu ;
 
 } Historique;
 

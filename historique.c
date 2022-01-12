@@ -106,7 +106,7 @@ int read_historique(Historique *histo, FILE* pt_fichier)
     return 0;
 }
 
-void print_historique( Historique* ) {
+void print_historique( Historique* histo ) {
 
     // Morpion
     histo->nbre_victoire_morpion = 0;
