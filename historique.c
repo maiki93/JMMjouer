@@ -23,54 +23,41 @@ void initialize_historique( Historique* histo)
     histo->nbre_defaite_mm = 0;
     histo->nbre_victoire_pendu = 0;
     histo->nbre_defaite_pendu = 0;
+    histo->nbre_victoire_morpion = 0;
+    histo->nbre_defaite_morpion = 0;
 }
 
 
-int search_joueur_in_historique( Historique* historique, const char *nom_joueur ) {
-
-    printf("Entree read_historique avec nom %s \n", nom_joueur );
+bool search_joueur_in_historique( Historique* historique, const char *nom_joueur )
+{
     // open file
-    // ouverture du fichier
     FILE* pt_fichier = fopen( FILENAME, "r"); //+");
     char line[LINE_SIZE];
-
-    //char line2[LINE_SIZE];
-    bool new_joueur = true;
+    bool new_joueur = true;       // default nouveau, switch if found in file
 
     if( pt_fichier == NULL ) {
         printf("Impossible d'ouvrir le fichier %s", FILENAME);
         return -1; //RETURN_KO;
     }
 
-    //char *p_retour_fgets;
     // loop into the file until find '+++++' new_record
     while( fgets( line, LINE_SIZE, pt_fichier ) != NULL )
     {
-        //line[strcspn(line, "\n")] = 0;
-        // new record
+        // reach a new record
         if( line[0] == '+' ) {
             // read the next line
-            fscanf( pt_fichier, "\n%s\n", line );  // besoin du slash \n !!
+            fscanf( pt_fichier, "\n%s\n", line );  // ACHTUNG besoin du slash \n !!
             //printf("scanf = %s \n", line);
-
+            // match  name player
             if( strcmp( line, nom_joueur ) == 0 ) {
-                //printf("trouvé joueur %s !! pt_fichier %p \n", nom_joueur, pt_fichier);
                 new_joueur = false;
                 read_historique( historique, pt_fichier );
-                fclose( pt_fichier );
-                //break;
-                return 0;
+                break;
             }
         }
     }
-
-    if( new_joueur == true )  {
-        //printf("Trouve nouveau joueur, cree un nouvel historique\n");
-        historique = malloc( sizeof(Historique) );
-        initialize_historique( historique );
-    }
     fclose( pt_fichier );
-    return 0;
+    return new_joueur;
 }
 
 int read_historique(Historique *histo, FILE* pt_fichier)
@@ -97,23 +84,18 @@ int read_historique(Historique *histo, FILE* pt_fichier)
     p_data = strchr( line2, ':' );
     sscanf( ++p_data, "%d %d\n", &(histo->nbre_victoire_morpion), &(histo->nbre_defaite_morpion));
 
-    printf("victoire mastermind %d \n", histo->nbre_victoire_mm);
-//    printf("defaite mastermind %d \n", histo->nbre_defaite_mm);
-//    printf("victoire pendu %d \n", histo->nbre_victoire_pendu);
-//    printf("defaite pendu %d \n", histo->nbre_defaite_pendu);
-//    printf("victoire morpion %d \n", histo->nbre_victoire_morpion);
-//    printf("defaite morpion %d \n", histo->nbre_defaite_morpion);
-
+    //printf("victoire mastermind %d \n", histo->nbre_victoire_mm);
     return 0;
 }
 
-void print_historique( Historique* histo)
+void print_historique( Historique* histo )
  {
     printf("\nHistorique de vos performances\n\n");
-    printf("victoire mastermind %d \n", histo->nbre_victoire_mm);
-    printf("defaite mastermind %d \n", histo->nbre_defaite_mm);
-    printf("victoire pendu %d \n", histo->nbre_victoire_pendu);
-    printf("defaite pendu %d \n", histo->nbre_defaite_pendu);
-    printf("victoire morpion %d \n", histo->nbre_victoire_morpion);
-    printf("defaite morpion %d \n", histo->nbre_defaite_morpion);
+    printf("-----------------------------------\n");
+    printf("Jeu             | Gagné  |  Perdu |\n");
+    printf("-----------------------------------\n");
+    printf("%-15s | %6d | %6d |\n", "MasterMind", histo->nbre_victoire_mm,      histo->nbre_defaite_mm);
+    printf("%-15s | %6d | %6d |\n", "Pendu",      histo->nbre_victoire_pendu,   histo->nbre_defaite_pendu);
+    printf("%-15s | %6d | %6d |\n", "Morpion",    histo->nbre_victoire_morpion, histo->nbre_defaite_morpion);
+    printf("-----------------------------------\n");
 }

@@ -29,9 +29,10 @@ typedef struct struct_joueur {
 
 void initialize_historique( Historique* );
 /** lit le fichier et recherche le nom du joueur
-    param historique == NULL nouveau joueur, sinon pointe sur une structure historique valide
+    param historique inout, pointe sur une structure historique lue à partir du fichier de backup
+    return bool nouveau_joueur, true if not present in the backup
 **/
-int search_joueur_in_historique( Historique*, const char *nom_joueur );
+bool search_joueur_in_historique( Historique*, const char *nom_joueur );
 //int read_historique( historique* );
 //
 
@@ -40,7 +41,7 @@ int search_joueur_in_historique( Historique*, const char *nom_joueur );
 // void write_historique( Joueur,   Historique* );
 
 // TODO a faire, rajouter dans le menu entre:: afficher votre historique
-void print_historique( Historique* ); // Joueur
+void print_historique( Historique* histo ); // Joueur
 
 
 
