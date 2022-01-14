@@ -13,6 +13,9 @@
 int main()
 {
     printf("\nJMMjouer vous accueille à son salon d'arcade \n");
+#ifdef DEBUG_CODE
+	printf("compilé avec DEBUG_CODE \n");
+#endif
 
     // allocation of variables, default to an empty historique
     Historique * historique = malloc( sizeof(Historique) );
