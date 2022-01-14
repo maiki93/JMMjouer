@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include "game_pendu.h"
+#include "utils.h"
 
 
 void dessiner( int dessin_tours)
@@ -126,6 +127,7 @@ int loopSecretWord(char* saisie, int lengthRandWord, char* mot_mystere, int* cor
                             return 0;
                         }
         }
+    return 0; // warning a return is necessary
 }
 
 void countRightChar(char* mot_mystere, int lengthRandWord, int* indexCorrectLetters, char* saisie, int* correct_char_counter)
@@ -292,7 +294,7 @@ int p_make_one_pendu()
                 }
         if (nbTourRestant==1)
                 {
-                    indice(&mot_mystere);
+                    indice(mot_mystere);
                 }
 
         } // END WHILE victory==0
@@ -329,7 +331,7 @@ int start_game_pendu( Joueur joueur, Historique *historique ) {
         if (victoire == 1) {
             printf("on incremente votre historique\n");
             historique->nbre_victoire_pendu++;
-        victoire == 2; // ordinateur
+        // victoire == 2; // ordinateur // ??????
         } else {
             printf("une defaite de plus %s et enregistrée dans votre historique \n", joueur.nom);
             historique->nbre_defaite_pendu++;

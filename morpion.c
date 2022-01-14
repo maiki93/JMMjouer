@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <ctype.h>
 #include "morpion.h"
 
 //Pour voir si le header fonctionne
@@ -16,7 +17,7 @@ int lancer_morpion(Joueur joueur,  Historique *histo) {
     //Initialisation des variables
     char plateau [] = {'1','2','3','4','5','6','7','8','9','\0'};
     int jeu_en_cours = 1;
-    int plateau_rempli = 0;
+    //int plateau_rempli = 0;
     int nb_case_joue = 0;
     //score = 1 si joueur gagne
     //score = 0 si match nul ou victoire de l'IA
@@ -45,7 +46,8 @@ int lancer_morpion(Joueur joueur,  Historique *histo) {
             }
         }else{
             printf("C'est au tour de l'IA.\n");
-            tour_ia(&nb_case_joue,plateau);
+            //tour_ia(&nb_case_joue,plateau);
+            tour_ia(plateau);
             if( test_victoire(plateau,'X') ){
                     printf("Oh non !\nL'IA vous a battu !!!");
                     jeu_en_cours = 0;
@@ -95,7 +97,7 @@ int test_plateau_rempli(char * plateau){
 }
 
 //Test si le joueur/IA apres avoir joue son tour a gagne ou non
-int test_victoire(char * plateau, char * a_test){
+int test_victoire(char * plateau, char a_test){
     int victoire = 0;
 
     //Test premiere ligne horizontale (haut)
@@ -179,7 +181,8 @@ void tour_joueur(int * nb_case_joue, char * plateau){
 }
 
 //Saisie de l'IA
-void tour_ia(int * nb_case_joue, char * plateau){
+//void tour_ia(int * nb_case_joue, char * plateau){
+void tour_ia(char * plateau){
 
     int jeu_ordinateur=0;
     char tentative = '0';
@@ -195,7 +198,7 @@ void tour_ia(int * nb_case_joue, char * plateau){
 }
 
 //Test si la saisie en entre est correcte pour le plateau en entree
-int saisie_est_correct(char * plateau, char * tentative){
+int saisie_est_correct(char * plateau, char tentative){
 
     int est_correct = 0;
 
@@ -210,11 +213,11 @@ int saisie_est_correct(char * plateau, char * tentative){
 }
 
 //Mettre a jour le plateau avec une saisie correct
-void maj_plateau(char * plateau, char * tentative, char * symbole){
+void maj_plateau(char * plateau, char tentative, char symbole){
 
     // Instruction qui permet de convertir un caractere de 0 a 9 en entier
     //On le decremente de 1 aussi car notre tableau est de 0 a 8 et non de 1 a 9
-    int i = tentative - '0' -1;
+    int i = (int)tentative - '0' -1;  // warning to the next line if cast is not explicit
 
     *(plateau + i) = symbole;
 

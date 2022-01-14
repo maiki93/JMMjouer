@@ -12,16 +12,17 @@ void afficher_plateau(char *, int *);
 
 int test_plateau_rempli(char *);
 
-int test_victoire(char *, char *);
+int test_victoire(char *, char );
 
 int test_case_libre(char *, int *);
 
 void tour_joueur(int *, char *);
 
-void tour_ia(int *, char *);
+//void tour_ia(int *, char *);
+void tour_ia(char *);
 
-int saisie_est_correct(char *, char *);
+int saisie_est_correct(char *, char );
 
-void maj_plateau(char *, char *, char *);
+void maj_plateau(char *, char, char );
 
 #endif // MORPION_H_INCLUDED
