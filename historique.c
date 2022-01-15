@@ -28,12 +28,14 @@ void initialize_historique( Historique* histo)
 }
 
 
-bool search_joueur_in_historique( Historique* historique, const char *nom_joueur )
+bool search_joueur_in_historique( Historique* historique, Joueur* joueur)
 {
     // open file
     FILE* pt_fichier = fopen( FILENAME, "r"); //+");
     char line[LINE_SIZE];
     bool new_joueur = true;       // default nouveau, switch if found in file
+    // tricks for reading bool value
+    int is_daltonien = false;
 
     if( pt_fichier == NULL ) {
         printf("Impossible d'ouvrir le fichier %s", FILENAME);
@@ -46,11 +48,24 @@ bool search_joueur_in_historique( Historique* historique, const char *nom_joueur
         // reach a new record
         if( line[0] == '+' ) {
             // read the next line
-            fscanf( pt_fichier, "\n%s\n", line );  // ACHTUNG besoin du slash \n !!
-            //printf("scanf = %s \n", line);
-            // match  name player
-            if( strcmp( line, nom_joueur ) == 0 ) {
+            fscanf( pt_fichier, "\n%s %d\n", line, &is_daltonien );  // ACHTUNG besoin du slash \n !!
+#ifdef DEBUG_CODE
+            printf("scanf = %s \n", line);
+            printf("strlen(joueur->nom) %ld  \n", strlen(joueur->nom));
+            printf("is daltonien = %d \n", is_daltonien);
+#endif
+            // match  the player name : retrieve info player and load the historic record
+
+// BUG !! mic and michael in history, stop to the first
+            //if( strcmp( line, joueur->nom ) == 0 ) {
+            if ( strncmp( joueur->nom, line, strlen(joueur->nom) ) == 0 ) { // same problem
+#ifdef DEBUG_CODE
+                printf("match joueur.name \n");
+#endif
                 new_joueur = false;
+                // do not compile ?? ok need parenthesis around  (joueur..= false)...??
+                is_daltonien == 1 ? (joueur->is_daltonien = true)
+                                  : (joueur->is_daltonien = false) ;
                 read_historique( historique, pt_fichier );
                 break;
             }
@@ -98,4 +113,12 @@ void print_historique( Historique* histo )
     printf("%-15s | %6d | %6d |\n", "Pendu",      histo->nbre_victoire_pendu,   histo->nbre_defaite_pendu);
     printf("%-15s | %6d | %6d |\n", "Morpion",    histo->nbre_victoire_morpion, histo->nbre_defaite_morpion);
     printf("-----------------------------------\n");
+}
+
+////////// Joueur //////////
+void print_info_joueur(Joueur *joueur)
+{
+    printf("\n----- Joueur informations -----\n");
+    printf("\tPseudonyme : %s\n", joueur->nom);
+    printf("\tDaltonien : %s\n", (joueur->is_daltonien) ? "yes" : "no" );
 }

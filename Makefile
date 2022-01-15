@@ -4,8 +4,8 @@
 # debug option,
 # yes, use in code of DEBUG_CODE (example in main.c), and -g four building in debug mode( possible to use a debugger)
 # no, compile with optimization -O2
-debug = yes
-#debug = no
+#debug = yes
+debug = no
 
 # compilers, may give different errors/warning
 CC = gcc

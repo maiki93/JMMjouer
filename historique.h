@@ -13,7 +13,7 @@
     Après création d'un Historique vide, la fonction initialize_historique doit être OBLIGATOIREMENT appelée
     A chaque ajout de variable dans la structure, mettre a jour la function d'initialisation.
 **/
-typedef struct struct_historique {
+typedef struct /*struct_historique*/ {                                      // ps besoin de nommer struct_historique avec typedef !
     int nbre_victoire_total, nbre_defaite_total, nbre_egalite_total;   // peut-être pas necessaire, la somme peut etre recalculée
     int nbre_victoire_mm, nbre_defaite_mm;                             // pas d"égalite
     int nbre_victoire_morpion, nbre_defaite_morpion;                   //  égalité ?
@@ -22,9 +22,9 @@ typedef struct struct_historique {
 
 typedef struct struct_joueur {
     char nom[50];
+    bool is_daltonien;                      // for use of colors in the game console
     bool serie_3_game;                      // true : indicate if the player participe to a serie of all games, maximum one of each game)
                                             // false : ask to make again a game
-    //Historique p_historique; possible...
 } Joueur;
 
 void initialize_historique( Historique* );
@@ -32,7 +32,8 @@ void initialize_historique( Historique* );
     param historique inout, pointe sur une structure historique lue à partir du fichier de backup
     return bool nouveau_joueur, true if not present in the backup
 **/
-bool search_joueur_in_historique( Historique*, const char *nom_joueur );
+//bool search_joueur_in_historique( Historique*, const char *nom_joueur );
+bool search_joueur_in_historique( Historique* historique, Joueur* joueur );
 //int read_historique( historique* );
 //
 
@@ -43,6 +44,7 @@ bool search_joueur_in_historique( Historique*, const char *nom_joueur );
 // TODO a faire, rajouter dans le menu entre:: afficher votre historique
 void print_historique( Historique* histo ); // Joueur
 
-
+//////////// Joueur ///////////:
+void print_info_joueur(Joueur *joueur);
 
 #endif // HISTORIQUE_H_INCLUDED

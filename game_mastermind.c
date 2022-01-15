@@ -81,7 +81,8 @@ int start_game_mastermind(Joueur joueur, Historique *historique)
         }
 
         if( joueur.serie_3_game == false ) {
-            rejouer = rejouer_une_partie();
+            //rejouer = rejouer_une_partie();
+            rejouer = ask_yesno_question("Voulez-vous refaire une partie [y/Y/n/N] > ");
         }
 
     } while ( (rejouer == true) && (joueur.serie_3_game == false) );

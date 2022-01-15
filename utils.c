@@ -6,25 +6,31 @@
 
 /***** Functions ******/
 
-
+// to delete
 bool rejouer_une_partie() {
 
-    char rejouer_char;
     bool b_rejouer;
-    bool valid = false;
+    b_rejouer = ask_yesno_question("Voulez-vous refaire une partie [y/Y/n/N] > ");
+    return b_rejouer;
+}
+
+bool ask_yesno_question(const char* message)
+{
+    char answer_char;
+    bool valid = false, answer_yes;
 
     do {
-        printf("Voulez-vous refaire une partie [y/Y/n/N] > " );
-        scanf("%c", &rejouer_char );
+        printf("%s", message );
+        scanf("%c", &answer_char );
         clean_stdin();
 
-        switch( rejouer_char ) {
+        switch( answer_char ) {
             case 'Y'  :
-            case 'y'  : b_rejouer = true;
+            case 'y'  : answer_yes = true;
                         valid = true;
                         break;
             case 'N'  :
-            case 'n'  : b_rejouer = false;
+            case 'n'  : answer_yes = false;
                         valid = true;
                         break;
             default   : valid = false;
@@ -36,7 +42,7 @@ bool rejouer_une_partie() {
 
     } while( valid == false );
 
-    return b_rejouer;
+    return answer_yes;
 }
 
 void clean_stdin(void)

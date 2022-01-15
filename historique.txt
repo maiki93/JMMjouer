@@ -1,11 +1,19 @@
+# HEADER
+# +++++  delimit a new historique record
+# pseudonyme : nom is_daltonien
 # pour chaque jeu : nbre de victoire / nbre de defaite [/nbre d'égalite]
 +++++
-mic
+michael 1 
 mastermind: 10 5
 pendu: 2 1
 morpion: 1 3
 +++++
-toto
+toto 0
 mastermind: 2 2
 pendu: 3 5
-morpion: 2 4
+morpion: 1 3
++++++
+mic 0
+mastermind: 10 5
+pendu: 2 1
+morpion: 1 3
