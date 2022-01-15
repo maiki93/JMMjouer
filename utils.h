@@ -4,6 +4,8 @@
 #include <stdbool.h>
 
 void clean_stdin();
+// https://stackoverflow.com/questions/2347770/how-do-you-clear-the-console-screen-in-c
+void clear_screen();
 
 
 /** Demande au joueur s'il veut refaire une partie

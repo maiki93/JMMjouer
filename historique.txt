@@ -3,7 +3,7 @@
 # pseudonyme : nom is_daltonien
 # pour chaque jeu : nbre de victoire / nbre de defaite [/nbre d'égalite]
 +++++
-michael 1 
+michael 0 
 mastermind: 10 5
 pendu: 2 1
 morpion: 1 3

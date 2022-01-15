@@ -12,12 +12,16 @@
 
 /** Demande le nom du joueur, recherche dans le fichier historique
   si present on charge son historique dans historique
-  si absent on en cree un nouveau qu sera sauvegardé en fin de partie **/
+  si absent on en cree un nouveau qu sera sauvegardé en fin de partie
+  Historique alloué dynamiquement dans la fonction **/
 void set_joueur_and_historique(Joueur *joueur, Historique **historique, bool *new_joueur);
 
 int main()
 {
-    printf("\nJMMjouer vous accueille à son salon d'arcade \n");
+    clear_screen();
+    printf("\n---------------------------------\n");
+    printf("JMMjouer \U00002764 vous accueille à son salon d'arcade\n");
+    printf("Un choix de jeux un peu ..\U00001F47E.. de réflexion \U0001F9D0 \n\n");
 #ifdef DEBUG_CODE
 	printf("compilé avec DEBUG_CODE \n");
 #endif

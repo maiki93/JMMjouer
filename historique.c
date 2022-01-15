@@ -118,7 +118,7 @@ void print_historique( Historique* histo )
 ////////// Joueur //////////
 void print_info_joueur(Joueur *joueur)
 {
-    printf("\n----- Joueur informations -----\n");
+    printf("\n------- Joueur informations -------\n");
     printf("\tPseudonyme : %s\n", joueur->nom);
     printf("\tDaltonien : %s\n", (joueur->is_daltonien) ? "yes" : "no" );
 }

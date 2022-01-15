@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include <unistd.h> // for clear_screen
+
 #include "utils.h"
 
 /***** Functions ******/
@@ -51,4 +53,12 @@ void clean_stdin(void)
     do {
         c = getchar();
     } while (c != '\n' && c != EOF);
+}
+
+// https://stackoverflow.com/questions/2347770/how-do-you-clear-the-console-screen-in-c
+void clear_screen()
+{
+  const char *CLEAR_SCREEN_ANSI = "\e[1;1H\e[2J";
+  //write(STDOUT_FILENO, CLEAR_SCREEN_ANSI, 12);
+  printf("%s", CLEAR_SCREEN_ANSI);
 }

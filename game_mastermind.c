@@ -14,10 +14,9 @@
 /*** functions declaration, definition below ****/
 
 /** Toute la logique pour une partie de mastermind
-
     return int vainqueur : 1-le joueur, 2-l'ordinateur
 **/
-int mm_make_one_game( const char* colors, const int SizeColor, const int NbPIECE, const int MaxTENTATIVE );
+int mm_make_one_game( const char* colors, const int SizeColor, const int NbPIECE, const int MaxTENTATIVE, const bool mode_daltonien );
 /** genere un code secret aléatoire **/
 void mm_make_random_secret_code( char *secret, const int size_code, const char* colors, const int SizeColor);
 /** demande une proposition du code à deviner au joueur
@@ -28,15 +27,18 @@ int mm_ask_guess_user( char * p_tab_guess, const int size_code, const char* colo
 void mm_algo_mastermind(const char* const p_tab_guess, const char* const p_tab_code_secret, const int size, int *nb_bien_place, int *nb_mal_place );
 
 /**  affiche les resultats du jeu de test, version colored with grpahics **/
-void mm_affiche_resultat_guess( const int nb_bien_place, const int nb_mal_place );
-void mm_affiche_resultat_guess_colored( const int nb_bien_place, const int nb_mal_place );
+void mm_affiche_resultat_guess( const int nb_bien_place, const int nb_mal_place, const bool mode_daltonien );
+void mm_affiche_resultat_guess_blackwhite( char* p_string, const int nb_bien_place, const int nb_mal_place );
+void mm_affiche_resultat_guess_colored( char* p_string, const int nb_bien_place, const int nb_mal_place );
 
 /** affiche les pieces joues par le joueur, colored with graphic shift by SHIFT_DRAW_PIECE **/
-void mm_print_code( char* p_code, const int size );
-void mm_print_code_with_colors( char* p_code, const int size );
+//void mm_print_code( char* p_code, const int size, const bool mode_daltonien );
+void mm_print_code( const char* p_code, const int size_code, const bool mode_daltonien);
+void mm_print_code_blackwhite( char* p_string, const char* p_code, const int size_code);
+void mm_print_code_with_colors( char* p_string, const char* p_code, const int size_code );
 
-/** helper function for colors **/
-void mm_get_formatted_string_colored( char code, char* p_out);
+/** helper function for colors, validation... **/
+void mm_helper_formatted_string_colored( const char code, char* p_out);
 int mm_valid_code_input(const char * const p_tab_guess, const int size_code, const char *colors, const int SizeColor);
 
 /*** globale definitions ***/
@@ -47,13 +49,15 @@ const int colorCode[][3] = { { (int)'R', 31, 41 },   // rouge, Foreground color,
                               {(int)'B', 34, 44 },   // bleu
                               {(int)'W', 97, 107}    // white for background
                            }; */
-//  for 'CUI'
+//  for 'CUI', strange LINE_SIZE available from IDE
+const int LINE_SIZE_ON_SCREEN = 300;    // longueur de chaine pour l'impression écran, contient aussi ansi code pour les couleurs
 const int SHIFT_DRAW_PIECE = 50;        // shift right on screen for printing the pieice
-const int SHIFT_RESULTAT_PLACE = 25;    // fir printing results bien / mal place
+const int SHIFT_RESULTAT_PLACE = 35;    // fir printing results bien / mal place
 /** main entry **/
 int start_game_mastermind(Joueur joueur, Historique *historique)
 {
     // message d'intro au jeu
+    clear_screen();
     printf("Entrée Mastermind\nBienvenue %s\n", joueur.nom);
     ( joueur.serie_3_game == true ) ? printf("C'est du sérieux, on est dans une série de 3 jeux\n")
                                     : printf("Mode détente, qq parties pour s'entraîner\n");
@@ -67,9 +71,8 @@ int start_game_mastermind(Joueur joueur, Historique *historique)
     int victoire = 0;           // vainqueur de la partie
     bool rejouer = false;
 
-
     do {
-        victoire = mm_make_one_game( colors, SIZE_COLOR, NB_PIECE_MM, MAX_TENTATIVE );
+        victoire = mm_make_one_game( colors, SIZE_COLOR, NB_PIECE_MM, MAX_TENTATIVE, joueur.is_daltonien );
         // victoire joueur
         if (victoire == 1) {
             printf("on incremente votre historique\n");
@@ -81,7 +84,6 @@ int start_game_mastermind(Joueur joueur, Historique *historique)
         }
 
         if( joueur.serie_3_game == false ) {
-            //rejouer = rejouer_une_partie();
             rejouer = ask_yesno_question("Voulez-vous refaire une partie [y/Y/n/N] > ");
         }
 
@@ -93,19 +95,20 @@ int start_game_mastermind(Joueur joueur, Historique *historique)
 
 // color[] copy de tableau par référence
 // pointer char  color, pass the premier , besoin de la taille
-int mm_make_one_game( const char* colors, const int SizeColor, const int NbPIECE, const int MaxTENTATIVE )
+int mm_make_one_game( const char* colors, const int SizeColor, const int NbPIECE, const int MaxTENTATIVE, const bool mode_daltonien )
 {
     // déclare les tableaux : pieces et internal pour l'alrithme de match
     char tab_code_secret[NbPIECE];            // code secret de l'ordinateur
-    char tab_guess[NbPIECE];
+    char tab_guess[NbPIECE];                  // code propose par le joueur
 
     mm_make_random_secret_code( tab_code_secret, NbPIECE, colors, SizeColor );
+#ifdef DEBUG_CODE
     // affiche pour tests
     for(int i = 0; i < NbPIECE; i++ ) {
         printf("%c", tab_code_secret[i]);
     }
     printf("\n");
-
+#endif
     // flag to end the game : victoire or maximum of tentatives
     int victoire = 0;
     int tentatives = 0;
@@ -116,27 +119,25 @@ int mm_make_one_game( const char* colors, const int SizeColor, const int NbPIECE
     do {
         // incremente tentatives
         tentatives++;
-
+        // demande un code au joueur
         while( mm_ask_guess_user( tab_guess, NbPIECE, colors, SizeColor ) != 0 ) {
             printf("votre entrée n'est pas valide\n");
         }
-
-        // afficher tableau joueur pour test
-        // mm_print_code( tab_guess , NbPIECE );
-        mm_print_code_with_colors( tab_guess , NbPIECE );
+#ifdef DEBUG_CODE
         for( int i = 0; i < NbPIECE; i++ ) {
             printf("%c", tab_guess[i]);
         }
         printf("\n");
-        // compute bnombre de ien et mal place
+#endif
+        // afficher le code du joueur
+        mm_print_code( tab_guess , NbPIECE, mode_daltonien );
+        // compute le nombre de bien et mal place
         mm_algo_mastermind( tab_guess, tab_code_secret, NbPIECE, &nb_bien_place, &nb_mal_place );
         // affiche résultat de cet essai
-        mm_affiche_resultat_guess_colored( nb_bien_place, nb_mal_place );
-
-        // check if secret has been found
+        mm_affiche_resultat_guess( nb_bien_place, nb_mal_place, mode_daltonien );
+        // check if code secret has been found
         if( nb_bien_place == NbPIECE ) {
             victoire = 1;
-            break;
         }
     // sort si victoire ou tentative depasse MAX_TENTATIVE
     //} while( (! victoire) && (tentatives <= MAX_TENTATIVE) ); / /not so bad in fact
@@ -144,13 +145,13 @@ int mm_make_one_game( const char* colors, const int SizeColor, const int NbPIECE
 
     // message de fin de partie
     if( victoire == 1 ) {
-        printf("Gagné le code secret était bien : ");
-        mm_print_code_with_colors( tab_code_secret, NbPIECE );
+        printf("Gagné le code secret était bien :\n");
+        mm_print_code( tab_code_secret, NbPIECE, mode_daltonien);
         printf("Trouvé en %d tentatives sur %d \n", tentatives, MaxTENTATIVE);
     } else {
         printf("Perdu.. le nombre maximum de tentatives atteint\n");
         printf("Le code secret était : \n");
-        mm_print_code_with_colors( tab_code_secret, NbPIECE);
+        mm_print_code( tab_code_secret, NbPIECE, mode_daltonien);
         printf("\n");
     }
     // code retour pour le gagnant
@@ -169,7 +170,6 @@ void mm_make_random_secret_code( char *secret, const int size_code, const char* 
 
 int mm_ask_guess_user( char* p_tab_guess, const int size_code, const char *colors, const int SizeColor )
 {
-
     // demander la saisie à l'utilisateur. TODO verify valid entries
     printf("Proposez une combinaison > ");
     for( int i=0; i < size_code; i++ ) { // best way found to read a line for the moment
@@ -196,7 +196,7 @@ void mm_algo_mastermind(const char* const p_tab_guess, const char* const p_tab_c
     for(int piece = 0; piece < size_piece; piece++ ) {
         // second loop over the secret code, start at piece => check bien place first autre_pice need modulo
         // maintain the priority of bien place
-        for( int autre_piece = piece; autre_piece < piece+size_piece; autre_piece++ ) {
+        for( int autre_piece = piece; autre_piece < piece + size_piece; autre_piece++ ) {
             // assure to stay in the range [0,NB-PIECE[
             autre_piece_modulo = autre_piece % size_piece;
 
@@ -216,53 +216,102 @@ void mm_algo_mastermind(const char* const p_tab_guess, const char* const p_tab_c
     }
 }
 
-void mm_affiche_resultat_guess( const int nb_bien_place, const int nb_mal_place ) {
-    printf("Nbre de pieces bien placées : %d\n", nb_bien_place);
-    printf("Nbre de pieces mal placées  : %d\n", nb_mal_place);
+void mm_affiche_resultat_guess( const int nb_bien_place, const int nb_mal_place, const bool mode_daltonien)
+{
+    // shift to right with withespace character pour l'impression console
+    char p_string[LINE_SIZE_ON_SCREEN];
+    memset( p_string, (int)' ', SHIFT_RESULTAT_PLACE );
+    p_string[SHIFT_RESULTAT_PLACE] = '\0';  // must use SHIFT.. not SHIFT + 1
+
+    // cat the specific output to p_string
+    if( mode_daltonien == true ) {
+        mm_affiche_resultat_guess_blackwhite( p_string, nb_bien_place, nb_mal_place );
+    } else {
+        mm_affiche_resultat_guess_colored( p_string, nb_bien_place, nb_mal_place );
+    }
+    // print to the console
+    printf("%s\n", p_string );
 }
 
-void mm_affiche_resultat_guess_colored( const int nb_bien_place, const int nb_mal_place ) {
+void mm_affiche_resultat_guess_blackwhite( char* p_string, const int nb_bien_place, const int nb_mal_place )
+{
+    //from devdocs.io
+    const char *fmt = "B:%d / M:%d";
+    int sz = snprintf(NULL, 0, fmt, nb_bien_place, nb_mal_place);
+    char buffer[ sz+1 ]; // +1 fior null caracheter
+    snprintf(buffer, sizeof(buffer), fmt, nb_bien_place, nb_mal_place);
 
-    char p_string[400];
+    printf("buffer:%s\n", buffer);
+    // cat original and buffer
+    strcat( p_string, buffer );
+}
+
+void mm_affiche_resultat_guess_colored( char* p_string, const int nb_bien_place, const int nb_mal_place ) {
+
     int at_least_one_output = 0;  // flag, sinon une ligne vide est imprimée
-    //char p_tmp[100];
-    for(int i = 0; i < SHIFT_RESULTAT_PLACE; i++ ) {
-        p_string[i] = ' ';
-    }
-    p_string[SHIFT_RESULTAT_PLACE ] = '\0';
+    char buffer[LINE_SIZE_ON_SCREEN]; // cannot initialize = "";
+    buffer[0] = '\0'; // <=> strcpy( buffer, "");
 
-    // affiche bien place et mal place
+    // construit la ligne de resultats dans buffer
     for(int i = 0; i < nb_bien_place; i++ ) {
-        strcat(p_string, "\033[30;1m\033[100m B \033[0m");
+        strcat( buffer, "\033[30;1m\033[100m O \033[0m"); // Bien placé en noir
         at_least_one_output = 1;
     }
     for(int i = 0; i < nb_mal_place; i++ ) {
-        strcat(p_string,"\033[97;1m\033[100m M \033[0m");
+        strcat( buffer, "\033[97;1m\033[100m O \033[0m");  // Mal placé en blanc
         at_least_one_output = 1;
     }
-
-    // impression console
+    // cat to p_string
     if( at_least_one_output ) {
-        printf("%s\n", p_string);
-    // mettre un message explicit s'il n'y a rien
+        strcat( p_string, buffer );
+    // met un message explicit s'il n'y a rien
     } else {
-        printf("%*s nada... \n", SHIFT_RESULTAT_PLACE-1, " ");
+        strcat( p_string, "nada...");
     }
-
 }
 
-void mm_print_code( char* p_code, const int size )
+void mm_print_code( const char* p_code, const int size_code, const bool mode_daltonien )
 {
-    for( int i = 0; i < size; i++ ) {
-        printf("%c", p_code[i]);
+    char p_string[LINE_SIZE_ON_SCREEN];
+    memset( p_string, (int)' ', SHIFT_DRAW_PIECE );
+    p_string[SHIFT_DRAW_PIECE] = '\0';  // must use SHIFT.. not SHIFT + 1
+
+    if( mode_daltonien == true ) {
+        mm_print_code_blackwhite( p_string, p_code, size_code );
+    } else {
+        mm_print_code_with_colors( p_string, p_code, size_code );
     }
-    printf("\n");
-    printf("\033[31;1;4mHello\033[0m");
+    // affiche well formatted string
+    printf("%s\n", p_string);
 }
 
-void mm_get_formatted_string_colored( char code, char* p_out)
+void mm_print_code_blackwhite( char* p_string, const char* p_code, const int size_code )
 {
+    char buffer[ 2*size_code + 1]; // minimum size to contain the full code
+    char buffer_letter[3]; // contains one letter
+    buffer[0] = '\0';
+    // build the code in buffer
+    for( int i = 0; i < size_code; i++ ) {
+        sprintf( buffer_letter, "%c ", p_code[i]); // intermediate for formatting
+        strcat( buffer, buffer_letter );
+    }
+    // cat to p_string
+    strcat( p_string, buffer );
+}
 
+void mm_print_code_with_colors( char *p_string, const char* p_code, const int size_code )
+{
+    char buffer[100];          // many caracteres for encoding colors
+    buffer[0] = '\0';
+    // other
+    for( int i = 0; i < size_code; i++ ) {
+        mm_helper_formatted_string_colored( p_code[i], buffer );
+        strcat( p_string, buffer );
+    }
+}
+
+void mm_helper_formatted_string_colored( const char code, char* p_out)
+{
     switch( code ) {
         case 'R' : strcpy( p_out, "\033[31;1m\033[107m O \033[0m");
                    break;
@@ -276,28 +325,8 @@ void mm_get_formatted_string_colored( char code, char* p_out)
                    break;
         default  : strcpy( p_out, "?");
     }
-
 }
 
-void mm_print_code_with_colors( char* p_code, const int size )
-{
-    char p_string[400];
-    char p_tmp[100];
-    for(int i = 0; i < SHIFT_DRAW_PIECE; i++ ) {
-        p_string[i] = ' ';
-    }
-    p_string[SHIFT_DRAW_PIECE] = '\0';
-
-    // for first indice
-    mm_get_formatted_string_colored( p_code[0], p_tmp );
-    strcat( p_string, p_tmp );
-    // other
-    for( int i = 1; i < size; i++ ) {
-        mm_get_formatted_string_colored( p_code[i], p_tmp );
-        strcat( p_string, p_tmp );
-    }
-    printf("%s\n", p_string);
-}
 
 int mm_valid_code_input(const char * const p_tab_guess, const int size_code, const char* colors, const int SizeColor)
 {
