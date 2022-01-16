@@ -24,6 +24,8 @@ void mm_make_random_secret_code( char *secret, const int size_code, const char* 
  **/
 int mm_ask_guess_user( char * p_tab_guess, const int size_code, const char* colors, const int SizeColor );
 /** algorithme pour indiquer bien place et mal **/
+// if static indicated in declaration only, gcc -Wall is happy, and test cannot access
+// if non static, warning can be deleted with -Wno-implicit-function-declaration
 void mm_algo_mastermind(const char* const p_tab_guess, const char* const p_tab_code_secret, const int size, int *nb_bien_place, int *nb_mal_place );
 
 /**  affiche les resultats du jeu de test, version colored with grpahics **/
