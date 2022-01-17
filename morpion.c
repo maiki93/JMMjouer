@@ -10,7 +10,8 @@ void test(){
 
 
 //Lance le jeu morpion et renvoie le score du joueur en cas de victoire
-int lancer_morpion(char * pseudo){
+//int lancer_morpion(char * pseudo){
+int lancer_morpion(Joueur joueur,  Historique *histo) {
 
     //Initialisation des variables
     char plateau [] = {'1','2','3','4','5','6','7','8','9','\0'};
@@ -20,6 +21,8 @@ int lancer_morpion(char * pseudo){
     //score = 1 si joueur gagne
     //score = 0 si match nul ou victoire de l'IA
     int score = 0;
+    // get pseudo from the joueur
+    const char* pseudo = joueur.nom;
 
     //Bienvenue au joueur dans le jeu
     printf("Bienvenue %s dans le jeu du morpion !\n",pseudo);

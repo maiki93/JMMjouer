@@ -1,6 +1,6 @@
 ## Define a module to compile the tests
-# third version, make a general rule for all tests
-#       todo, make info printing optional, use of function..
+# third version, make a general rule for all tests. just need to create a new test_X.c file in the directory
+#                recompile only minimimum, and for any changes (modif test_X.c or delete test_X executable)
 #
 # second version :
 # include *.c file directly in test (adviced with cmocka )
@@ -21,34 +21,26 @@ SRCS_TESTS := $(wildcard $(MODDIR_TESTS)/*.c) # keep full path tests/test_master
 # $(info $$SRCS_TESTS is [$(SRCS_TESTS)])
 OBJS_TESTS := $(patsubst %.c, %.o, $(SRCS_TESTS)) # keep full path tests/test_mastermind.o
 # $(info $$OBJS_TESTS is [$(OBJS_TESTS)] )
-# take away extension
-EXE_TESTS := $(patsubst %.c, %, $(SRCS_TESTS)) # keep full path tests/test_mastermind.o
-# $(info $$EXE_TESTS is [$(EXE_TESTS)] )
+# take away extension (patsubst), and all directories  (notdir)
+EXE_TESTS_BIN := $(notdir $(patsubst %.c, %, $(SRCS_TESTS) ))
+$(info $$EXE_TESTS_BIN is [$(EXE_TESTS_BIN)] ) # list test_mastermind, test_historique
 
-
-#! yes, working as expected, override generic rules for this directory
+# override generic rules for this directory, all format tests/*.c *.o 
 $(OBJS_TESTS): %.o: %.c
 	@echo "Build *.o overriden generic rules in tests:   $@"
 	$(CC) $(OPTION_CC_TESTS) -c $< -o $@
 
-# everything is imported in root directory, use OBJS constructued in root
-# this one dpendends on clear_screen to compile : utils.o
-#test_mastermind :  $(MODDIR_TESTS)/test_mastermind.o utils.o
-#	@echo "Building unit tests :    $@"
-#	$(CC) $(MODDIR_TESTS)/test_mastermind.o utils.o -l cmocka -o test_mastermind
+# check existence of target(root)/test_X, avoid to rebuild all tests each time called
+unit_test:: $(EXE_TESTS_BIN)
 
-# define the list of executable tests in unit_test target
-unit_test:: $(EXE_TESTS)
-
-# called only  for test_X, not sure why. trick use notdir to create executable in root/
-%: %.o utils.o
+# check existence of root/test_X executable, dependence in tests/text_x.o, 
+$(EXE_TESTS_BIN): %: $(MODDIR_TESTS)/%.o utils.o
 	@echo "Building generic test_X @ :    $@"  # target name
 #	@echo "Building generic test_X < :    $<"  # test_X.o
 #	@echo "Building generic test_X ^ :    $^"  # test_X.o utils.o (ok for compil)
-	$(CC) -o $(notdir $@) $^ -l cmocka
+	$(CC) -o $@ $^ -l cmocka
 
 clean::
 	@echo "Clean unit tests in MODDIR_C = $(MODDIR_TESTS) "
 	rm -f $(OBJS_TESTS)
-# rm $(MODDIR_TESTS)/*.o
-	rm -f $(notdir $(EXE_TESTS))
+	rm -f $(EXE_TESTS_BIN)

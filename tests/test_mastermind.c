@@ -69,6 +69,20 @@ static void test_VRVJ_JVJR(void **state) {
     assert_int_equal( 3, nb_mal);
 }
 
+static void test_BRBB_BBBB(void **state) {
+    (void) state; /*  for setup, fixture  */
+    // given
+    char secret[4] = {'B','R','B','B'};
+    char guess[4] =  {'B','B','B','B'};
+    int nb_bien=0, nb_mal=0;
+    // when
+    mm_algo_mastermind(guess, secret, 4, &nb_bien, &nb_mal );
+    // then
+    printf("BRBB-BBBB B=%d M=%d", nb_bien, nb_mal);
+    assert_int_equal( 3, nb_bien );
+    assert_int_equal( 0, nb_mal);
+}
+
 /****************
     Main fonction
 ****/
@@ -80,6 +94,7 @@ int main()
         cmocka_unit_test(test_RRVB_RRBM),
         cmocka_unit_test(test_RRRJ_JRRR),
         cmocka_unit_test(test_VRVJ_JVJR),
+        cmocka_unit_test(test_BRBB_BBBB),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }

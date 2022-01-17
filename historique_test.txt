@@ -15,5 +15,5 @@ morpion: 1 3
 +++++
 mic 1
 mastermind: 4 5
-pendu: 2 1
+pendu: 2 3
 morpion: 1 2

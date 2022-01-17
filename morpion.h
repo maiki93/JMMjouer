@@ -1,9 +1,12 @@
 #ifndef MORPION_H_INCLUDED
 #define MORPION_H_INCLUDED
 
+#include "historique.h"
+
 void test();
 
-int lancer_morpion(char*);
+//int lancer_morpion(char*);
+int lancer_morpion(Joueur joueur,  Historique *histo);
 
 void afficher_plateau(char *, int *);
 

@@ -7,8 +7,8 @@
 #include <cmocka.h>
 
 // project dependence
-// #include "../historique.h" included by *.c
-// adviced by cmocka, can test static function without problems. no need of Wno-implicit-function-declaration
+// adviced by cmocka, can test static function without problems.
+// no need of Wno-implicit-function-declaration, include  *.h by
 #include "../historique.c"
 
 // global values, can be managed by **state ? good, bad ??
@@ -17,19 +17,33 @@ Historique* histo;
 //extern const char * FILENAME;  // without historique.c include can change the filename of the backup file, nice !
                                  // with include : in setup (or to test in FixtureSetup )
 
-// setup and teardown, allocate memory for Historique
-// some examples use state to pass the value between setup and teardown. Allow to avoid global data in the file ?
-// https://www.linuxtut.com/en/c287eb805c7c56c88dbb/
-static int setup(void **state) {
-    (void) state; // avoid warning not used variable
-    histo = malloc( sizeof(Historique) );
-    initialize_historique( histo );
+// run only once, before all tests
+static int group_setup(void **state)
+{
+    (void) state;
     // will pick the file for testing only
     FILENAME = "historique_test.txt";
     return 0;
 }
 
-static int teardown(void **state) {
+static int group_teardown(void **state)
+{
+    (void) state;
+    FILENAME = "historique.txt";
+    return 0;
+}
+
+// setup and teardown, allocate memory for Historique
+// some examples use state to pass the value between setup and teardown. Allow to avoid global data in the file ?
+// https://www.linuxtut.com/en/c287eb805c7c56c88dbb/
+static int test_setup(void **state) {
+    (void) state; // avoid warning not used variable
+    histo = malloc( sizeof(Historique) );
+    initialize_historique( histo );
+    return 0;
+}
+
+static int test_teardown(void **state) {
     (void) state; // avoid warning not used variable
     free(histo);
     histo = NULL;
@@ -68,6 +82,7 @@ static void search_joueur_mic_and_not_michael(void **state) {
     assert_true( joueur.is_daltonien);
     assert_int_equal( histo->nbre_victoire_mm, 4);
     assert_int_equal( histo->nbre_defaite_morpion, 2);
+    assert_int_equal( histo->nbre_defaite_pendu, 3);
 }
 
 /****************
@@ -77,12 +92,10 @@ int main()
 {
     // can be inside main, or as global. here no problem with identical name
     const struct CMUnitTest tests_historique[] = {
-        cmocka_unit_test_setup_teardown(search_existing_joueur_load_historique, setup, teardown),
-        cmocka_unit_test_setup_teardown(search_a_new_joueur_provide_default_historique, setup, teardown),
-        cmocka_unit_test_setup_teardown(search_joueur_mic_and_not_michael, setup, teardown),
+        cmocka_unit_test_setup_teardown(search_existing_joueur_load_historique, test_setup, test_teardown),
+        cmocka_unit_test_setup_teardown(search_a_new_joueur_provide_default_historique, test_setup, test_teardown),
+        cmocka_unit_test_setup_teardown(search_joueur_mic_and_not_michael, test_setup, test_teardown),
     };
-
     // apply only setup and teardown at the beginning and end : e.g. change the FILENAME
-    //return cmocka_run_group_tests(tests_historique, setup, teardown);
-    return cmocka_run_group_tests(tests_historique, NULL, NULL);
+    return cmocka_run_group_tests(tests_historique, group_setup, group_teardown);
 }
