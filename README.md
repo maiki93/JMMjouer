@@ -38,7 +38,8 @@ Les jeux peuvent être quitté depuis ce menu.
 il y a quelques options (compilateur, debug mode..) in the Makefile
 
 - make clean
-- make
+- make or make JMMjouer : principal executable
+- make unit_test : génère une série de tests executables test_X (requiert la librairie CMocka sur le système) 
 
 # Documentation
 
