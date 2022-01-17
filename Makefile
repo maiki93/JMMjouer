@@ -35,12 +35,12 @@ EXE  := JMMjouer
 $(info $$OBJS is [$(OBJS)] )
 
 # alternative to target as files
-.PHONY : all clean #unit_test
+.PHONY : all clean unit_test
 
 # make all, generic way to use make produce executable JMMjouer
 all: $(EXE)
 # specific target for unit testing in tests/ , dependencies with CMocka
-unit_test : test_mastermind #test_file_historique
+unit_test::  
 
 # general rule for compiling c files
 %.o:  %.c
@@ -48,9 +48,8 @@ unit_test : test_mastermind #test_file_historique
 	$(CC) $(OPTION_CC) -c $< -o $@
 
 $(EXE): $(OBJS) main.o
-# @echo "OBJS  $(OBJS)"
 	@echo "Build $(EXE): all dependencies $^"
-	$(CC) $(OPTION_CC) $^ -o $@ 
+	$(CC) $(OPTION_CC) $^ -o $@
 
 # include the description for each module
 include $(patsubst %,%/Module.mk,$(MODULES))

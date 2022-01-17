@@ -8,8 +8,9 @@
 
 #include <cmocka.h>
 
-// declare enum ELT_JEU and fonction to test
-#include "../game_mastermind.h"
+// in  fact not used, mm_algo not declared in header
+// 2nde version, include directly *.c file
+#include "../game_mastermind.c"
 
 /***************
     Found 2 librairies for specific C testing and active maintenance/dev :
@@ -54,25 +55,31 @@ static void test_RRRJ_JRRR(void **state) {
     assert_int_equal( 2, nb_bien );
     assert_int_equal( 2, nb_mal);
 }
-//void ciseau_gagne_contre_feuille() {
-//    enum ELT_JEU user_choice = CISEAU;
-//    enum ELT_JEU computer_choice = FEUILLE;
-//
-//    int gagnant = designe_gagnant( user_choice, computer_choice );
-//    assert_int_equal( 1, gagnant);
-//}
+
+static void test_VRVJ_JVJR(void **state) {
+    (void) state; /*  for setup, fixture  */
+    // given
+    char secret[4] = {'V','R','J','V'};
+    char guess[4] =  {'J','V','J','R'};
+    int nb_bien=0, nb_mal=0;
+    // when
+    mm_algo_mastermind(guess, secret, 4, &nb_bien, &nb_mal );
+    // then
+    assert_int_equal( 0, nb_bien );
+    assert_int_equal( 3, nb_mal);
+}
 
 /****************
     Main fonction
 ****/
 int main()
 {
-    // this can be moved, maybe shared amongst *c file ?
+    // this can be moved, maybe shared amongst *c file ? seems not so easy. not expected it seems
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(null_test_success),
         cmocka_unit_test(test_RRVB_RRBM),
         cmocka_unit_test(test_RRRJ_JRRR),
+        cmocka_unit_test(test_VRVJ_JVJR),
     };
-
     return cmocka_run_group_tests(tests, NULL, NULL);
 }

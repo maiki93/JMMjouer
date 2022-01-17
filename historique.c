@@ -7,8 +7,8 @@
 
 /** function déclaration **/
 int read_historique(Historique *histo, FILE* pt_fichier);
-
-const char *FILENAME="historique.txt";
+// text is constant, but FILENAME is modifiable from test_historique
+const char * FILENAME="historique.txt";
 const int LINE_SIZE = 100;
 
 void initialize_historique( Historique* histo)
@@ -30,6 +30,9 @@ void initialize_historique( Historique* histo)
 
 bool search_joueur_in_historique( Historique* historique, Joueur* joueur)
 {
+#ifdef DEBUG_CODE
+    printf("Ouverture du fichier: %s\n", FILENAME);
+#endif
     // open file
     FILE* pt_fichier = fopen( FILENAME, "r"); //+");
     char line[LINE_SIZE];
@@ -65,7 +68,7 @@ bool search_joueur_in_historique( Historique* historique, Joueur* joueur)
                 new_joueur = false;
                 // do not compile ?? ok need parenthesis around  (joueur..= false)...??
                 is_daltonien == 1 ? (joueur->is_daltonien = true)
-                                  : (joueur->is_daltonien = false) ;
+                                  : (joueur->is_daltonien = false);
                 read_historique( historique, pt_fichier );
                 break;
             }
