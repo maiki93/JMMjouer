@@ -24,9 +24,8 @@ static int setup(void **state) {
     (void) state; // avoid warning not used variable
     histo = malloc( sizeof(Historique) );
     initialize_historique( histo );
-
+    // will pick the file for testing only
     FILENAME = "historique_test.txt";
-    printf("histo setup v mm %d \n", histo->nbre_victoire_mm);
     return 0;
 }
 
@@ -53,16 +52,14 @@ static void search_a_new_joueur_provide_default_historique(void **state) {
     Joueur joueur = {"titi",true,false};
     bool new_joueur = search_joueur_in_historique(histo, &joueur);
     //assert value of new joueur titi, and its performance
-    printf("histo new titi v mm %d \n", histo->nbre_victoire_mm);
-    print_historique(histo);
     assert_true( new_joueur );
     assert_true( joueur.is_daltonien);              // keep original value
-    assert_int_equal( histo->nbre_victoire_mm, 0);  // default value new joueur 2
+    assert_int_equal( histo->nbre_victoire_mm, 0);  // default value new joueur
     assert_int_equal( histo->nbre_defaite_morpion, 0);
 }
 
 // bug mic / michael :> michael matches first
-static void search_joueur_mic(void **state) {
+static void search_joueur_mic_and_not_michael(void **state) {
     (void) state; // avoid warning not used variable
     Joueur joueur = {"mic",true,false};
     bool new_joueur = search_joueur_in_historique(histo, &joueur);
@@ -70,7 +67,7 @@ static void search_joueur_mic(void **state) {
     assert_false( new_joueur );
     assert_true( joueur.is_daltonien);
     assert_int_equal( histo->nbre_victoire_mm, 4);
-    //assert_int_equal( histo->nbre_defaite_morpion, 3);
+    assert_int_equal( histo->nbre_defaite_morpion, 2);
 }
 
 /****************
@@ -82,7 +79,7 @@ int main()
     const struct CMUnitTest tests_historique[] = {
         cmocka_unit_test_setup_teardown(search_existing_joueur_load_historique, setup, teardown),
         cmocka_unit_test_setup_teardown(search_a_new_joueur_provide_default_historique, setup, teardown),
-        cmocka_unit_test_setup_teardown(search_joueur_mic, setup, teardown),
+        cmocka_unit_test_setup_teardown(search_joueur_mic_and_not_michael, setup, teardown),
     };
 
     // apply only setup and teardown at the beginning and end : e.g. change the FILENAME

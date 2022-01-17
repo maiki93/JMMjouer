@@ -10,6 +10,7 @@ int read_historique(Historique *histo, FILE* pt_fichier);
 // text is constant, but FILENAME is modifiable from test_historique
 const char * FILENAME="historique.txt";
 const int LINE_SIZE = 100;
+const int NAME_MAXSIZE = 40;
 
 void initialize_historique( Historique* histo)
 {
@@ -36,7 +37,8 @@ bool search_joueur_in_historique( Historique* historique, Joueur* joueur)
     // open file
     FILE* pt_fichier = fopen( FILENAME, "r"); //+");
     char line[LINE_SIZE];
-    bool new_joueur = true;       // default nouveau, switch if found in file
+    char name_historique[NAME_MAXSIZE];    // contains name read in file
+    bool new_joueur = true;                // default nouveau, switch if found in file
     // tricks for reading bool value
     int is_daltonien = false;
 
@@ -50,18 +52,18 @@ bool search_joueur_in_historique( Historique* historique, Joueur* joueur)
     {
         // reach a new record
         if( line[0] == '+' ) {
-            // read the next line
-            fscanf( pt_fichier, "\n%s %d\n", line, &is_daltonien );  // ACHTUNG besoin du slash \n !!
+            // read the next line,
+            fscanf( pt_fichier, "\n%s %d\n", name_historique, &is_daltonien );  // ACHTUNG besoin du slash \n !!
 #ifdef DEBUG_CODE
-            printf("scanf = %s \n", line);
+            printf("scanf name_historique= %s \n", name_historique);
+            printf("strlen name_historique = %ld \n", strlen(name_historique) );
             printf("strlen(joueur->nom) %ld  \n", strlen(joueur->nom));
             printf("is daltonien = %d \n", is_daltonien);
 #endif
             // match  the player name : retrieve info player and load the historic record
-
-// BUG !! mic and michael in history, stop to the first
-            //if( strcmp( line, joueur->nom ) == 0 ) {
-            if ( strncmp( joueur->nom, line, strlen(joueur->nom) ) == 0 ) { // same problem
+            if ( (strncmp( joueur->nom, name_historique, strlen(joueur->nom) ) == 0) // first letter correspond
+              && ( strlen(joueur->nom) ==  strlen(name_historique) ) ) // check size equals to solve bug mic / michael
+            {
 #ifdef DEBUG_CODE
                 printf("match joueur.name \n");
 #endif
