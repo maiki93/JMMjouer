@@ -52,6 +52,7 @@ static void test_RRRJ_JRRR(void **state) {
     // when
     mm_algo_mastermind(guess, secret, 4, &nb_bien, &nb_mal );
     // then
+    printf("RRRJ-JRRR B=%d M=%d", nb_bien, nb_mal);
     assert_int_equal( 2, nb_bien );
     assert_int_equal( 2, nb_mal);
 }
@@ -59,12 +60,13 @@ static void test_RRRJ_JRRR(void **state) {
 static void test_VRVJ_JVJR(void **state) {
     (void) state; /*  for setup, fixture  */
     // given
-    char secret[4] = {'V','R','J','V'};
+    char secret[4] = {'V','R','V','J'};
     char guess[4] =  {'J','V','J','R'};
     int nb_bien=0, nb_mal=0;
     // when
     mm_algo_mastermind(guess, secret, 4, &nb_bien, &nb_mal );
     // then
+    printf("VRVJ-JVJR B=%d M=%d", nb_bien, nb_mal);
     assert_int_equal( 0, nb_bien );
     assert_int_equal( 3, nb_mal);
 }
@@ -74,6 +76,20 @@ static void test_BRBB_BBBB(void **state) {
     // given
     char secret[4] = {'B','R','B','B'};
     char guess[4] =  {'B','B','B','B'};
+    int nb_bien=0, nb_mal=0;
+    // when
+    mm_algo_mastermind(guess, secret, 4, &nb_bien, &nb_mal );
+    // then
+    printf("BRBB-BBBB B=%d M=%d", nb_bien, nb_mal);
+    assert_int_equal( 3, nb_bien );
+    assert_int_equal( 0, nb_mal);
+}
+
+static void test_BBBB_BRBB(void **state) {
+    (void) state; /*  for setup, fixture  */
+    // given
+    char secret[4] = {'B','B','B','B'};
+    char guess[4] =  {'B','R','B','B'};
     int nb_bien=0, nb_mal=0;
     // when
     mm_algo_mastermind(guess, secret, 4, &nb_bien, &nb_mal );
@@ -95,6 +111,7 @@ int main()
         cmocka_unit_test(test_RRRJ_JRRR),
         cmocka_unit_test(test_VRVJ_JVJR),
         cmocka_unit_test(test_BRBB_BBBB),
+        cmocka_unit_test(test_BBBB_BRBB),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }

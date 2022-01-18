@@ -189,30 +189,43 @@ void mm_algo_mastermind(const char* const p_tab_guess, const char* const p_tab_c
     *nb_mal_place = 0;
     // internal use
     int memo_deja_utilise[size_piece];
-    for(int i=0; i < size_piece; i++) {
+    for(int i = 0; i < size_piece; i++) {
             memo_deja_utilise[i] = 0;
+    }
+
+    // 2 loops seems needed, compute nb bien placé, mark as used with == 1
+    for(int i = 0; i < size_piece; i++) {
+        if( p_tab_guess[ i ] == p_tab_code_secret[ i ] ) {
+            memo_deja_utilise[i] = 1;
+            (*nb_bien_place)++;
+        }
     }
 
     int autre_piece_modulo = 0;
     // first loop the over guess
     for(int piece = 0; piece < size_piece; piece++ ) {
-        // second loop over the secret code, start at piece => check bien place first autre_pice need modulo
-        // maintain the priority of bien place
-        for( int autre_piece = piece; autre_piece < piece + size_piece; autre_piece++ ) {
+
+        if( memo_deja_utilise[ piece ] == 1 ) // deja bien place pour le joueur
+            continue;                         // ou utilisé comme mal place
+
+        // second loop over the secret code, start at piece+1
+        for( int autre_piece = piece + 1; autre_piece < piece + size_piece; autre_piece++ ) {
             // assure to stay in the range [0,NB-PIECE[
             autre_piece_modulo = autre_piece % size_piece;
 
             // one match of color and not yet used
             if(  ( p_tab_guess[piece] == p_tab_code_secret[autre_piece_modulo] )  // couleurs correspondent
-             &&  ( memo_deja_utilise[ autre_piece_modulo ] == 0 ) ) { // l'autre piece n'a pas déjà été utilisé
+             &&  ( memo_deja_utilise[ autre_piece_modulo ] != 1 ) // 0 ou 2
+                  /*|| (memo_deja_utilise[ autre_piece_modulo ] == 2 ) )*/ ) { // l'autre piece n'a pas déjà été utilisé
                 // on marque les pièces du code secret deja utilisees
                 // bien place a toujours priorite : piece == autre_piece at first iteration
-                memo_deja_utilise[ autre_piece_modulo ] = 1;
-                // increment bien ou mal place
-                ( piece == autre_piece_modulo ) ? (*nb_bien_place)++
-                                                : (*nb_mal_place)++ ;
-                // it is done for this piece
-                break;
+                if( memo_deja_utilise [ autre_piece_modulo ] != 2 ) {
+                    memo_deja_utilise[ autre_piece_modulo ] = 2; //2== deja utilise  pour mal place
+                    // increment seulement mal place
+                    (*nb_mal_place)++;
+                    // it is done for this piece
+                    break;
+                }
             }
         }
     }
