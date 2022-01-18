@@ -206,7 +206,7 @@ void mm_algo_mastermind(const char* const p_tab_guess, const char* const p_tab_c
     for(int piece = 0; piece < size_piece; piece++ ) {
 
         if( memo_deja_utilise[ piece ] == 1 ) // deja bien place pour le joueur
-            continue;                         // ou utilisé comme mal place
+            continue;                         // deja mal place = 2
 
         // second loop over the secret code, start at piece+1
         for( int autre_piece = piece + 1; autre_piece < piece + size_piece; autre_piece++ ) {
@@ -215,17 +215,13 @@ void mm_algo_mastermind(const char* const p_tab_guess, const char* const p_tab_c
 
             // one match of color and not yet used
             if(  ( p_tab_guess[piece] == p_tab_code_secret[autre_piece_modulo] )  // couleurs correspondent
-             &&  ( memo_deja_utilise[ autre_piece_modulo ] != 1 ) // 0 ou 2
-                  /*|| (memo_deja_utilise[ autre_piece_modulo ] == 2 ) )*/ ) { // l'autre piece n'a pas déjà été utilisé
-                // on marque les pièces du code secret deja utilisees
-                // bien place a toujours priorite : piece == autre_piece at first iteration
-                if( memo_deja_utilise [ autre_piece_modulo ] != 2 ) {
-                    memo_deja_utilise[ autre_piece_modulo ] = 2; //2== deja utilise  pour mal place
-                    // increment seulement mal place
-                    (*nb_mal_place)++;
-                    // it is done for this piece
-                    break;
-                }
+             &&  ( memo_deja_utilise[ autre_piece_modulo ] == 0 ) ) {
+
+                memo_deja_utilise[ autre_piece_modulo ] = 2; //indique utilisé pour mal place
+                // increment seulement mal place
+                (*nb_mal_place)++;
+                // it is done for this piece
+                break;
             }
         }
     }
