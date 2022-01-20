@@ -11,7 +11,7 @@
 #include "utils.h"
 
 /** define global et types **/
-// pointer to function type to choose the game
+// pointer to function type to run the game
 typedef int(*PtrGame)(Joueur, Historique*);
 
 /** Demande le nom du joueur, recherche dans le fichier historique
@@ -50,7 +50,6 @@ int main()
 #endif
     set_joueur_and_historique( &joueur, &historique, &b_new_joueur); // pass pointer to pointer of historique
                                                                      //want to assign local historique to the allocated memory inside the function
-
     if( b_new_joueur ) {
         printf("Ah ! un nouveau venu !! \n");
         printf("Quelques questions pour mieux voir connaitre  \n");
@@ -61,27 +60,19 @@ int main()
         print_historique( historique );
         printf("\nCommençons dès maintenant \n\n");
     }
-
-    int choice_game;            // choix du jeu
-    // int choice_style_game    // suite de 3 jeu, aleatoire...
- //1   // Proposer le style de jeu :
-
-        // 3 a la suite
-        // 1 au choix
-            // Proposer la liste de jeu
-        // 1 au hasard
-
 #ifdef DEBUG_CODE
     printf("In main after set_joueur_historique historique = %p \n", (void *)historique); // Fine, point to the dynamic allocated memory
 #endif
-
+    // intermediate test
     if( historique == NULL ) {
         printf("ERROR !!");
         return 1;
     }
 
-// 1 ou 3 jeux
+    // menu principal, choix du jeu ou print info
+    int choice_game;
     bool rejouer = true;
+
     do {
         // si 1 jeu
         printf("A quel jeu voulez-vous jouer ?\n");
@@ -97,7 +88,7 @@ int main()
         clean_stdin();
 
         // logique propre au jeu
-        // incrementer historique directement
+        // incrementer historique directement dans le jeu, plus flexible pour les points
         switch( choice_game ) {
             case 1 : pf_game = &start_game_pendu;
                      //start_game_pendu( joueur, historique );
@@ -129,8 +120,7 @@ int main()
         }
         // test if one game to execute
         if( pf_game != NULL ) {
-            // valeur retour pas utilisée
-            pf_game( joueur, historique );
+            pf_game( joueur, historique ); // valeur retour pas utilisée
         }
 #ifdef DEBUG_CODE
         else { printf("pf_game== NULL"); }
@@ -143,7 +133,6 @@ int main()
     // deallocation of memory
     free( historique );
     historique = NULL;
-    // fin
     return 0;
 }
 

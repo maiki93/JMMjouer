@@ -24,7 +24,7 @@
     void mm_algo_mastermind(const char* const p_tab_guess, const char* const p_tab_code_secret, const int size_piece, int *nb_bien_place, int *nb_mal_place )
 ****/
 
-////// functions
+/***** test mm_algo function *****/
 /* A test case that does nothing and succeeds. from Tuto */
 static void null_test_success(void **state) {
     (void) state; /* unused  here*/
@@ -108,6 +108,10 @@ static void test_BBRR_JRBB(void **state) {
     assert_int_equal( 3, nb_mal);
 }
 
+/***** test start_game_mastermind : correct update of nb_victoire / defaite *****/
+// mock une parite
+
+
 /****************
     Main fonction
 ****/
@@ -123,5 +127,7 @@ int main()
         cmocka_unit_test(test_BBBB_BRBB),
         cmocka_unit_test(test_BBRR_JRBB),
     };
-    return cmocka_run_group_tests(tests, NULL, NULL);
+    int return_test_algo = cmocka_run_group_tests(tests, NULL, NULL);
+
+
 }

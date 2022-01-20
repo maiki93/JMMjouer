@@ -16,6 +16,7 @@
 /** Toute la logique pour une partie de mastermind
     return int vainqueur : 1-le joueur, 2-l'ordinateur
 **/
+// moved to h for test mock
 int mm_make_one_game( const char* colors, const int SizeColor, const int NbPIECE, const int MaxTENTATIVE, const bool mode_daltonien );
 /** genere un code secret aléatoire **/
 void mm_make_random_secret_code( char *secret, const int size_code, const char* colors, const int SizeColor);
@@ -42,6 +43,8 @@ void mm_print_code_with_colors( char* p_string, const char* p_code, const int si
 /** helper function for colors, validation... **/
 void mm_helper_formatted_string_colored( const char code, char* p_out);
 int mm_valid_code_input(const char * const p_tab_guess, const int size_code, const char *colors, const int SizeColor);
+
+
 
 /*** globale definitions ***/
 /* not used, keep for memo
@@ -92,12 +95,14 @@ int start_game_mastermind(Joueur joueur, Historique *historique)
     } while ( (rejouer == true) && (joueur.serie_3_game == false) );
 
     printf("Mastemind vous dit à bientôt %s, revenez vite\n\n", joueur.nom);
-    return 0;
+    return 3;
 }
 
 // color[] copy de tableau par référence
 // pointer char  color, pass the premier , besoin de la taille
-int mm_make_one_game( const char* colors, const int SizeColor, const int NbPIECE, const int MaxTENTATIVE, const bool mode_daltonien )
+// __attribute__((weak))
+// simulate as much as possible test_mock working with func1
+int __attribute__((weak)) mm_make_one_game( const char* colors, const int SizeColor, const int NbPIECE, const int MaxTENTATIVE, const bool mode_daltonien )
 {
     // déclare les tableaux : pieces et internal pour l'alrithme de match
     char tab_code_secret[NbPIECE];            // code secret de l'ordinateur
@@ -160,6 +165,7 @@ int mm_make_one_game( const char* colors, const int SizeColor, const int NbPIECE
     return (victoire == 1) ?  1
                            :  2;
 }
+
 
 void mm_make_random_secret_code( char *secret, const int size_code, const char* colors, const int SizeColor)
 {
