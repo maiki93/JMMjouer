@@ -5,15 +5,15 @@
 # debug option,
 # yes, use in code of DEBUG_CODE (example in main.c), and -g four building in debug mode( possible to use a debugger)
 # no, compile with optimization -O2
-#debug = yes
-debug = no
+debug = yes
+#debug = no
 
 # compilers, may give different errors/warning
 CC = gcc
 #CC = clang
 
 # List of subdirectories containing a Module.mk file
-MODULES := tests
+MODULES := tests tests/test_mock
 
 # compiler option, activate many warning( here seeems common to gcc and clang)
 OPTION_CC = -W -Wall -fPIC -Wunused -Wextra -pedantic -Wstrict-overflow=5 -fno-inline -Wno-unused-local-typedefs
@@ -40,7 +40,8 @@ $(info $$OBJS is [$(OBJS)] )
 # make all, generic way to use make produce executable JMMjouer
 all: $(EXE)
 # specific target for unit testing in tests/ , dependencies with CMocka
-unit_test::  
+unit_test::
+# unit_test_mock::
 
 # general rule for compiling c files
 %.o:  %.c

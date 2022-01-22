@@ -11,6 +11,15 @@
 #include "game_mastermind.h"
 #include "utils.h"
 
+// if we want to mock by redefinition,
+//    must define weak symbol( or use objdump intermediate )
+#ifdef UNIT_TEST_CMOCKA
+#define WEAK_FOR_CMOCKA __attribute__((weak))
+#else
+#define WEAK_FOR_CMOCKA
+#endif // UNIT_TEST_CMOCKA
+
+
 /*** functions declaration, definition below ****/
 
 /** Toute la logique pour une partie de mastermind
@@ -95,14 +104,15 @@ int start_game_mastermind(Joueur joueur, Historique *historique)
     } while ( (rejouer == true) && (joueur.serie_3_game == false) );
 
     printf("Mastemind vous dit à bientôt %s, revenez vite\n\n", joueur.nom);
-    return 3;
+    return 1;
 }
 
 // color[] copy de tableau par référence
 // pointer char  color, pass the premier , besoin de la taille
 // __attribute__((weak))
-// simulate as much as possible test_mock working with func1
-int __attribute__((weak)) mm_make_one_game( const char* colors, const int SizeColor, const int NbPIECE, const int MaxTENTATIVE, const bool mode_daltonien )
+// simulate as much as possible test_mock working with func1 WEAK_FOR_CMOCKA
+// int __attribute__((weak)) mm_make_one_game( const char* colors, const int SizeColor, const int NbPIECE, const int MaxTENTATIVE, const bool mode_daltonien )
+int WEAK_FOR_CMOCKA mm_make_one_game( const char* colors, const int SizeColor, const int NbPIECE, const int MaxTENTATIVE, const bool mode_daltonien )
 {
     // déclare les tableaux : pieces et internal pour l'alrithme de match
     char tab_code_secret[NbPIECE];            // code secret de l'ordinateur
