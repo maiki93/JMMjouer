@@ -1,0 +1,6 @@
+# Suppression for Error with sscanf
+UNADDRESSABLE ACCESS
+name=chkstk_ms_sscanf
+test_file_record.exe!___chkstk_ms
+test_file_record.exe!__mingw_vsscanf
+test_file_record.exe!sscanf

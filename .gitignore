@@ -3,3 +3,13 @@ obj/
 JMMjouer.cbp
 JMMjouer.depend
 JMMjouer.layout
+
+**/.o
+**/*.dll
+# except worng dll in test_plugins
+**/*.so
+**/*.a
+
+# keep local
+**/*_v1.h
+**/*_v1.c

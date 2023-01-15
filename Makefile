@@ -2,8 +2,8 @@
 # https://stackoverflow.com/questions/53136024/makefile-to-compile-all-c-files-without-needing-to-specify-them
 # https://accu.org/journals/overload/14/71/miller_2004/ famous paper: recursive make considered harmful
 
-# debug option,
-# yes, use in code of DEBUG_CODE (example in main.c), and -g four building in debug mode( possible to use a debugger)
+# debug option, override with make all debug=no CFLAGS=-std=c99
+# yes, use in code of JMMJ_DEBUG (example in main.c), and -g four building in debug mode( possibility to use a debugger)
 # no, compile with optimization -O2
 debug = yes
 #debug = no
@@ -13,22 +13,53 @@ CC = gcc
 #CC = clang
 
 # List of subdirectories containing a Module.mk file
-MODULES := tests tests/test_mock
+#MODULES := tests tests/test_mock
+MODULES := tests
 
+# see advices (and much more than compilation options) https://matt.sh/howto-c
 # compiler option, activate many warning( here seeems common to gcc and clang)
-OPTION_CC = -W -Wall -fPIC -Wunused -Wextra -pedantic -Wstrict-overflow=5 -fno-inline -Wno-unused-local-typedefs
+# pedantic => -Wpedantic gcc new
+# -fno-inline ? 
+# -Wno-unused-local-typedefs no need
+# -Wstrict-overflow=5, make pass game_morpion compilation
+# -Wunused -W (included already)
+# -fPIC on Windows, not adviced ?
+CFLAGS = -Wall -Wextra -pedantic -Wno-variadic-macros #-Wno-strict-overflow
+# to include again:  -Werror, better than Wno-X warning appears but compiles fine
 
+# standard configurable
+# gcc c89/90 : -ansi, -std=c90 or -std=iso9899:1990
+STD = -std=c90
+
+# standard gcc defines usually NDEBUG for release code (assert.h affected)
+# code uses internally a JMMJ_DEBUG, defined in preprocessor stage 
+# 	or declare directly here ? better will apply to all files without need to include a common header ?
 ifeq ($(debug),yes)          # separator mandatory between ifeq and '('
-	OPTION_CC += -g -DDEBUG_CODE
+# use specific code for the project, g3 to include MACRO definition as variables
+	CFLAGS += -g -g3 -O0 -DJMMJ_DEBUG
 else
-	OPTION_CC += -O2
+# kind of standard with gcc projects
+	CFLAGS += -DNDEBUG -O2
 endif
+
+$(info $$CFLAGS is $(CFLAGS) )
 
 # search for all *.c files and make *.o files
 SRCS := $(wildcard *.c)
 OBJS := $(patsubst %.c, %.o, $(SRCS))
 # take away main.o to avoid mutliple main() functions
 OBJS := $(filter-out main.o, $(OBJS))
+
+# Override for tests
+OBJS = main.o clogger.o utils.o utils_file.o \
+	   victory.o person.o joueur.o \
+	   plugin_manager.o cmap_ptrf_game.o game_loader.o \
+	   game_mastermind.o \
+	   clist_generic.o clist_cstring.o cmap_game_victories.o \
+	   file_record.o irecord.o \
+	   arcade.o
+
+# define main executable
 EXE  := JMMjouer
 
 # inspect variables
@@ -43,14 +74,34 @@ all: $(EXE)
 unit_test::
 # unit_test_mock::
 
-# general rule for compiling c files
-%.o:  %.c
+# general rule for compiling c files when header file is available 
+%.o: %.c %.h
 	@echo "Build file generic rule in root:   $@"
-	$(CC) $(OPTION_CC) -c $< -o $@
+	$(CC) $(STD) $(CFLAGS) -c $< -o $@
 
+# general rule, no header file associated (ex. main.c)
+%.o: %.c
+	@echo "Build file generic rule without header in root:   $@"
+	$(CC) $(STD) $(CFLAGS) -c $< -o $@
+
+# -Wl,-rpath,dir1  or -rpath=dir1 # -Wl to pass argument to linker, rpath runtime to search for lib
 $(EXE): $(OBJS) main.o
 	@echo "Build $(EXE): all dependencies $^"
-	$(CC) $(OPTION_CC) $^ -o $@
+#	$(CC) $(STD) $(CFLAGS) $^ -o $@
+	$(CC) $(STD) $(CFLAGS) $^ -L. -lpendu -o $@
+
+##### compile shared library to include at compile-time
+libpendu.dll : game_pendu.o game_pendu.h utils.o
+	$(CC) -shared $(CFLAGS) game_pendu.o utils.o -o libpendu.dll -Wl,--out-implib,libpendu.a
+
+##### compile shared library to include at run-time (game_morpion)
+# version unix-like available more recently in mingw
+#libmorpion.dll : game_morpion.o game_morpion.h
+#	$(CC) -shared game_morpion.o -o libmorpion.dll
+
+# windows style, with importing lib, not used at run-time link anyway
+libmorpion.dll : game_morpion.o game_morpion.h
+	$(CC) -shared $(CFLAGS) game_morpion.o -o libmorpion.dll -Wl,--out-implib,libmorpion.a
 
 # include the description for each module
 include $(patsubst %,%/Module.mk,$(MODULES))

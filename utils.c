@@ -2,13 +2,14 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include <unistd.h> // for clear_screen
+/* for clear_screen */
+/* #include <unistd.h> //not found on windows */
 
 #include "utils.h"
 
 /***** Functions ******/
 
-// to delete
+/* to delete */
 bool rejouer_une_partie() {
 
     bool b_rejouer;
@@ -55,10 +56,25 @@ void clean_stdin(void)
     } while (c != '\n' && c != EOF);
 }
 
-// https://stackoverflow.com/questions/2347770/how-do-you-clear-the-console-screen-in-c
+/* https://stackoverflow.com/questions/2347770/how-do-you-clear-the-console-screen-in-c */
+
 void clear_screen()
 {
-  const char *CLEAR_SCREEN_ANSI = "\e[1;1H\e[2J";
-  //write(STDOUT_FILENO, CLEAR_SCREEN_ANSI, 12);
-  printf("%s", CLEAR_SCREEN_ANSI);
+    #ifdef _WIN32 
+    /* warning: non-ISO-standard escape sequence, '\e' */
+    /* Use \033 instead. \e is a GNU shortcut. */
+    const char *CLEAR_SCREEN_ANSI = "\033[1;1H\033[2J";
+    /* write(STDOUT_FILENO, CLEAR_SCREEN_ANSI, 12); */
+    printf("%s", CLEAR_SCREEN_ANSI);
+        #ifdef JMMJ_DEBUG
+            printf("clear screen _win32\n");
+        #endif
+    #else
+        system("cls");
+        #ifdef JMMJ_DEBUG
+            printf("clear screen NOT _win32\n");
+        #endif
+    #endif
 }
+
+

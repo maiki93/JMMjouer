@@ -1,0 +1,79 @@
+
+== DrMemroy execution
+
+DRMemro installed in C:/ProgFile/DrMemory
+Accessible directly from git-bash (bin version in PATH) but do not find where it has been added !!! ????
+
+=== MINGW64 ===
+drmemory.exe -ignore_kernel -show_reachable -light -logdir . -- ./test_clist_generic.exe
+or 64 bin version
+'/c/Program Files (x86)/Dr. Memory/bin64/drmemory.exe' -version
+
+To clean all output from an execution
+bash clean_drmemory_output.sh
+
+== 2 recurrent errors form execution with mingw64 (64bit or 32 bit dr_memory)
+Error #1: UNADDRESSABLE ACCESS beyond top of stack: reading 0x00000089349ff810-0x00000089349ff818 8 byte(s)
+# 0 .text                 
+# 1 _pei386_runtime_relocator
+# 2 __tmainCRTStartup     
+# 3 .l_start              
+# 4 KERNEL32.dll!BaseThreadInitThunk
+Note: @0:00:00.125 in thread 6688
+Note: 0x00000089349ff810 refers to 824 byte(s) beyond the top of the stack 0x00000089349ffb48
+Note: instruction: or     $0x0000000000000000 (%rcx) -> (%rcx)
+
+Error #2: POSSIBLE LEAK 42 direct bytes 0x000001f2814301c0-0x000001f2814301ea + 0 indirect bytes
+# 0 replace_malloc                    [d:\a\drmemory\drmemory\common\alloc_replace.c:2580]
+..
+# 6 __tmainCRTStartup     
+# 7 .l_start              
+# 8 KERNEL32.dll!BaseThreadInitThunk
+
++ (if -show_reachable is used)
+3  REACHABLE LEAK 16 direct bytes 0x000001f281430240-0x000001f281430250 + 0 indirect bytes
+<memory was allocated before tool took control>
+
+and output:
+FINAL SUMMARY:
+
+DUPLICATE ERROR COUNTS:
+	Error #   1:      2
+
+SUPPRESSIONS USED:
+
+ERRORS FOUND:
+      1 unique,     2 total unaddressable access(es)
+      0 unique,     0 total uninitialized access(es)
+      0 unique,     0 total invalid heap argument(s)
+      0 unique,     0 total GDI usage error(s)
+      0 unique,     0 total handle leak(s)
+      0 unique,     0 total warning(s)
+      0 unique,     0 total,      0 byte(s) of leak(s)
+      1 unique,     1 total,     42 byte(s) of possible leak(s)
+      3 unique,     3 total,     57 byte(s) of still-reachable allocation(s)
+ERRORS IGNORED:
+     19 potential error(s) (suspected false positives)
+         (details: C:\Users\mic_w\source\gitHub\JMMjouer\DrMemory-test_clist_generic.exe.3616.000\potential_errors.txt)
+
+=> Suggestions from generate doutput: -light 
+If these are all false positives and your focus is unaddressable errors, consider running with -light to skip all uninitialized reads and leaks for higher performance.
+==> NO ERRORS !! (good or bad ??)
+FINAL SUMMARY:
+
+DUPLICATE ERROR COUNTS:
+
+SUPPRESSIONS USED:
+
+NO ERRORS FOUND:
+      0 unique,     0 total unaddressable access(es)
+      0 unique,     0 total invalid heap argument(s)
+      0 unique,     0 total GDI usage error(s)
+      0 unique,     0 total warning(s)
+
+# test_file_record
+Create error with use of sscanf
+=> suppress_sscanf.txt
+run with -suppress suppress_sscanf.txt
+
+'/c/Program Files (x86)/Dr. Memory/bin64/drmemory.exe' -logdir . -show_reachable -suppress suppress_sscanf.txt -- ./test_file_record.exe

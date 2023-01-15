@@ -1,0 +1,4 @@
+# Try more general suppreession
+UNADDRESSABLE ACCESS
+name=chkstk_ms_sscanf
+*!___chkstk_ms

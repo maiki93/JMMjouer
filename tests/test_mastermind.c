@@ -5,11 +5,12 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
+#include <stdint.h>
 
 #include <cmocka.h>
 
-// in  fact not used, mm_algo not declared in header
-// 2nde version, include directly *.c file
+/* in  fact not used, mm_algo not declared in header
+    2nde version, include directly *.c file */
 #include "../game_mastermind.c"
 
 /***************
@@ -32,13 +33,13 @@ static void null_test_success(void **state) {
 
 static void test_RRVB_RRBM(void **state) {
     (void) state; /* for setup, fixture */
-    // given
+    /* given */
     char secret[4] = {'R','R','V','B'};
     char guess[4] =  {'R','R','B','M'};
     int nb_bien=0, nb_mal=0;
-    // when
+    /* when */
     mm_algo_mastermind(guess, secret, 4, &nb_bien, &nb_mal );
-    // then
+    /* then */
     assert_int_equal( 2, nb_bien );
     assert_int_equal( 1, nb_mal);
 }
@@ -127,7 +128,7 @@ int main()
         cmocka_unit_test(test_BBBB_BRBB),
         cmocka_unit_test(test_BBRR_JRBB),
     };
+    
     int return_test_algo = cmocka_run_group_tests(tests, NULL, NULL);
-
-
+    return return_test_algo;
 }

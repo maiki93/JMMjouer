@@ -1,0 +1,90 @@
+{
+    "makefile.extensionOutputFolder": "./.vscode",
+    "makefile.makePath": "C:\\msys64\\mingw64\\bin",
+    "makefile.panel.visibility": {},
+    "files.associations": {
+        "stdio.h": "c",
+        "stdbool.h": "c",
+        "stdint.h": "c",
+        "stdint-gcc.h": "c",
+        "historique.h": "c",
+        "assert.h": "c",
+        "string.h": "c",
+        "game_loader.h": "c",
+        "cmocka.h": "c",
+        "game_pendu.h": "c",
+        "windows.h": "c",
+        "typeinfo": "c",
+        "plugin_manager.h": "c",
+        "joueur.h": "c",
+        "irecord.h": "c",
+        "cmap_game_victories.h": "c",
+        "plugin_manager_fwd.h": "c",
+        "strings.h": "c",
+        "clist_cstring.h": "c"
+    }, // default
+
+    // https://earthly.dev/blog/vscode-make/
+    "makefile.configurations": [
+        {
+            "name": "Default",
+            "makeArgs": []
+        },
+        {
+            "name": "Print make version",
+            "makeArgs": ["--version"]
+        }
+    ],
+    // ajouté automatiquement en sélectionnant cible de lancement dans Makefile perspective
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer",
+            "binaryPath": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer\\JMMjouer",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer",
+            "binaryPath": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer\\test_game_loader",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer",
+            "binaryPath": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer\\test_plugin_manager",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer",
+            "binaryPath": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer\\test_file_record",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer",
+            "binaryPath": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer\\test_clist_generic",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer",
+            "binaryPath": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer\\test_cmap_game_victories",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer",
+            "binaryPath": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer\\test_clist_cstring",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer",
+            "binaryPath": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer\\test_cmap_game_ptrf",
+            "binaryArgs": []
+        }
+    ],
+    "C_Cpp.default.includePath": [
+        "C:\\dev\\cmocka_local_mingw\\include",
+    ],
+    /*
+    "C_Cpp.default.systemIncludePath": [
+        "C:\\dev\\cmocka_local_mingw\\include"
+    ],*/
+
+    
+}

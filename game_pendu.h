@@ -1,8 +1,9 @@
 #ifndef GAME_PENDU_H_INCLUDED
 #define GAME_PENDU_H_INCLUDED
 
-#include "historique.h"
+#include "person.h"
+#include "victory.h"
 
-int start_game_pendu(Joueur joueur, Historique *historique);
+victory_t start_game_pendu(person_t person);
 
-#endif // GAME_PENDU_H_INCLUDED
+#endif
