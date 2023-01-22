@@ -110,7 +110,7 @@ static int load_static_game(game_loader_t *gload)
                                    default_game_prtf[i]);
 
         if( retour /*!= CLIST_OK */ ) {
-            CLOG_ERR("Cannot load game : %s\n", "Mastermind");
+            CLOG_ERR("Cannot load game : %s\n", "Mastermind or Morpion");
             return retour;
         }
     }

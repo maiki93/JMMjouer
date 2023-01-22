@@ -76,7 +76,7 @@ unit_test::
 
 # general rule for compiling c files when header file is available 
 %.o: %.c %.h
-	@echo "Build file generic rule in root:   $@"
+	@echo "Build file generic rule with header in root:   $@"
 	$(CC) $(STD) $(CFLAGS) -c $< -o $@
 
 # general rule, no header file associated (ex. main.c)

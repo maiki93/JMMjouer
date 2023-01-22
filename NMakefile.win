@@ -1,0 +1,153 @@
+
+# Compiler, macro here discards space around '=' sign
+# CC is already defined by default in Nmake == cl.exe
+!MESSAGE Compiler by default $(CC)
+CC = $(CC)
+# equivalent CFLAGS
+CFLAGS = /nologo /std:c89 /W4 /WX /D_CRT_SECURE_NO_WARNINGS 
+
+# print default fund on system / environment
+!MESSAGE CC by default: $(CC)
+!MESSAGE CFLAGS by default: $(CFLAGS)
+# Linker , LDD empty
+!MESSAGE Linker(LDD) by default: $(LDD)
+
+# C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.33.31629\bin\Hostx64\x86
+#LINK="C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.33.31629\bin\Hostx64\x86\link.exe"
+LINK = link.exe
+LINK_OPTIONS = /NOLOGO
+
+# force 1 / true
+DEBUGMACRO = 1 
+
+####### Test mode of compilation debug / release
+!IFDEF DEBUGMACRO
+!MESSAGE Compile with debug options $(DEBUGMACRO)
+#CC = $(CC) /nologo 
+CFLAGS = /Zi /DJMMJ_DEBUG
+LINK = $(LINK)
+LINK_OPTIONS = /DEBUG
+!ELSE
+!MESSAGE Compile with full optimization
+OPTIONS = /Ox
+!ENDIF
+
+OBJS = main_cl.o clogger.o
+
+!MESSAGE Phase de macro terminee
+# .PHONY : all
+# pseudo and first target, usage setvenv (set LIB=/toto/) exe1 exe2 tests.exe
+all : main_test_cl JMMjouer  # test_one.exe
+#test1
+
+# inference rule for compiling object files
+.c.obj :
+	@ECHO Compile obj file $< with generic inference
+	$(CC) $(CFLAGS) /c $<
+
+#SOURCES = project.c one.c two.c
+#project.exe : $(SOURCES:.c=.obj)
+#	LINK $**;
+
+# No Gnu, need to include getopt.obj
+OBJS = clogger.obj getopt.obj utils.obj utils_file.obj \
+	   victory.obj person.obj joueur.obj \
+	   plugin_manager.obj cmap_ptrf_game.obj game_loader.obj \
+	   game_mastermind.obj \
+	   clist_generic.obj clist_cstring.obj cmap_game_victories.obj \
+	   file_record.obj irecord.obj \
+	   arcade.obj
+
+### Build all targets
+# test main_cl
+#main_test_cl : main_test_cl.obj clogger.obj
+#	$(LINK) $(LINK_OPTIONS) /OUT:main_test_cl.exe main_test_cl.obj clogger.obj
+main_test_cl : main_test_cl.obj $(OBJS)
+	$(LINK) $(LINK_OPTIONS) /OUT:main_test_cl.exe main_test_cl.obj $(OBJS)
+
+# if target not specifiec, nmake nuild the first target
+# Make binary, option available with linker :
+# /DEBUG produces app.pdb and app.ilk (vc140.pdb produced with /Zi on compilation)
+#	  game_mastermind.lib game_morpion.lib game_pendu.obj
+JMMjouer : main.obj $(OBJS)
+	$(LINK) $(LINK_OPTIONS) /OUT:JMMjouer.exe main.obj $(OBJS) /LIBPATH:. game_pendu.lib
+
+# Compile source, default name *obj on windows, adviced to keep it
+# /O1, /O2 optimisation , /Ox 'best' optimization'
+# /W4 adviced, /Wall , /WX : warning as error
+# /EHsc : found often, to check
+# /Tc : c source file, default if filename is *.c  ANSI C89 + Microsoft extension. /Za to take out some of those, a bit like C99 but not exactly
+# /std:c11,c17
+# /Zi : generate PDB for use when debugging (do not affect optimisation) and pass option /DEBUG to linker
+# /D_CRT_SECURE_NO_WARNINGS warning microsoft strcpy_s,scanf_s etc
+main.obj: main.c
+# or -Fo:.\test\
+#	$(CC) Fo".\obj\" /c main.c # compile main.obj into obj/ directory
+#	$(CC) $(CFLAGS) /c main.c
+
+# @command supress the display in console
+# we can add specific target, priority over inference rule
+utils.obj: utils.c
+	@ECHO Compile utils with a specific rule
+	@$(CC)  $(CFLAGS) /c utils.c
+
+
+#### games
+
+# mastermind is a game included in the code (no library)
+
+# pendu is a game provided in a shared library, known at link time (no plugin)
+# on windows we (usually) link the lib file. 
+# /LD ou /LDd (debug) to create shared library
+# cl.exe /LD game_morpion.c => produces game_morpion.dll (+lib and exp IF __declspec)
+# link -dll game_morpion.obj => same (lib and exp ONLY IF __declspec is used, some fct or var exprted)
+# finally lib.exe is certainly called at the final stage, could choose what to export
+game_pendu.dll : game_pendu.obj
+	$(LINK) /DLL game_pendu.obj /IMPLIB:game_pendu.lib /OUT:game_pendu.dll
+
+# create both dll and lib. plugin_manager loads directly the '*dll'
+game_morpion.dll : game_morpion.obj
+	$(LINK) /DLL game_morpion.obj /IMPLIB:game_morpion.lib /OUT:game_morpion.dll
+
+### Include modules
+# test inlcuding a module, similar to make *mk files
+# !INCLUDE test/Module.win2.mk (recent comment)
+# check utils dependency before running rule in tests
+# all_test : utils.obj all_test_impl (recent comment)
+
+#test1 : 
+#	@ECHO Target test
+#	@ECHO cflags $(CFLAGS)
+#	cd test
+#	SET LINK=$(LINK)
+#	SET CFLAGS="$(CFLAGS)"
+#	$(MAKE) "CFLAGS=$(CFLAGS)" "LINK=$(LINK)" -f Module.win.mk test_one.exe
+#test_one.exe
+#	$(MAKE) -f Module.win.mk test_one.exe LINK=$(LINK) CFLAGS=$(CFLAGS)
+#	$(MAKE) -f test/Module.win.mk test_one.exe
+#	cd ..
+#	@ECHO Target test over
+
+# Clean target
+# .PHONY : clean
+# https://stackoverflow.com/questions/855847/recursive-nmake-target
+#clean ::
+#	 @del .\main.obj,.\app.exe,.\joueur.obj,.\utils.obj, .\utils_file.obj, .\historique.obj
+#	 @del .\victory.obj, .\person.obj, .\joueur.obj, \
+#	   .\plugin_manager.obj, .\cmap_ptrf_game.obj, .\game_loader.obj
+#	 @del .\clist_generic.obj, .\clist_cstring.obj, .\cmap_game_victories.obj, \
+#	   .\file_record.obj, irecord.obj arcade.obj
+#	 @del .\game_pendu.obj,.\game_mastermind.obj,.\game_morpion.obj
+#	 @del .\game_mastermind.lib,.\game_morpion.dll,.\game_morpion.lib,.\game_morpion.exp
+#	 @del .\JMMjouer.ilk,.\JMMjouer.pdb,.\vc140.pdb
+
+clean ::
+	@del main.obj, $(OBJS)
+	@del .\game_mastermind.lib,.\game_morpion.dll,.\game_morpion.lib,.\game_morpion.exp
+	@del .\game_pendu.lib,.\game_pendu.dll
+	@del .\JMMjouer.exe,.\JMMjouer.ilk,.\JMMjouer.pdb,.\vc140.pdb
+
+#clean ::
+#	del .\main_test_cl.exe, .\main_test_cl.obj, .\main_test_cl.pdb, .\main_test_cl.ilk
+#	del .\clogger.obj
+

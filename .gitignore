@@ -10,6 +10,10 @@ JMMjouer.layout
 **/*.so
 **/*.a
 
+# log files
+*.log
+
 # keep local
 **/*_v1.h
 **/*_v1.c
+main_test_cl.c

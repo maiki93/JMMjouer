@@ -44,7 +44,8 @@ victory_t start_game_morpion(person_t joueur)
             if( test_victoire(plateau,'O') ){
                     printf("Bravo !\nVous avez gagne !!!\n");
                     jeu_en_cours = 0;
-                    score = 1;
+                    /*score = 1;*/
+                    victories.nb_win++;
             }
         }else{
             printf("C'est au tour de l'IA.\n");
@@ -53,14 +54,16 @@ victory_t start_game_morpion(person_t joueur)
             if( test_victoire(plateau,'X') ){
                     printf("Oh non !\nL'IA vous a battu !!!");
                     jeu_en_cours = 0;
-                    score = 0;
+                    /*score = 0;*/
+                    victories.nb_lost++;
             }
         }
         /* S'il n'y a pas de victoire a ce tour (le jeu est toujours en cours), on regarde si le tableau n'est pas rempli */
         /* Si le tableau est rempli alors c'est un match nul */
         if(jeu_en_cours && test_plateau_rempli(plateau)){
             printf("La teableau est rempli !\nC'est un match nul !\n");
-            score = 0;
+            /*score = 0;*/
+            victories.nb_equality++;
             jeu_en_cours = 0;
         }
 

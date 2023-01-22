@@ -1,0 +1,47 @@
+# first tests are done in testCompilation\code_nmake_c
+- compile c file
+- compile lib
+- compile with one cmocka test
+
+
+####### Environment
+1. Terminal Windows (nice terminal)
+###
+1.1 Develop PowerShell for VStudio 2022
+    and vscode powershell terminal if run from previous terminal
+    => environment variable already set correctly by default (cl,link.. in 64BITS)
+
+> where.exe cl.exe
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.33.31629\bin\Hostx64\x64\cl.exe
+
+> where.exe nmake
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.33.31629\bin\Hostx64\x64\nmake.exe
+
+> where.exe link.exe
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.33.31629\bin\Hostx64\x64\link.exe
+
+# compilation (for all PS, CMD...)
+> nmake -f [N]Makefile.win [all_test/clean]
+> ls *exe
+.\app.exe
+.\test_one.exe
+.\test_historique.exe
+.\test_mastermind.exe
+game_mastermind.lib
+game_morpion.lib
+vc140.pdb (unique debug output , not sure why..)
+
+1.2 PowerShell (normal, default one)
+    One must set Visual Studio executable
+Follow the indication in set64PS.txt
+   => come back to case 1.1
+
+
+2. Command prompt (cmd)
+# call directly the batch script
+"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+=> Enter Developper Command Prompt / initialized for 'x64'
+# alternative
+to try InfoWindows/batch_x64.bat
+
+

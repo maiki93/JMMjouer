@@ -3,8 +3,11 @@
 #include <stdbool.h>
 #include <string.h>
 #include <time.h>
-#include <getopt.h>
 #include <assert.h>
+
+/* available system-wide only with gnu / glibc */
+/* #include <getopt.h> */
+#include "getopt.h"
 
 #include "arcade_params.h"
 #include "arcade.h"
@@ -66,7 +69,7 @@ int main(int argc, char *argv[])
     options_t options = { false, 0, NULL };
 
     /* initialize the logger */
-    /*init_clogger("jmmjouer.log");*/
+    init_clogger("jmmjouer.log");
 
     /* default value, cannot be in initilization, not compiled time */
     options.plg_dir = (char *)DEFAULT_PLUGINS_DIR;
