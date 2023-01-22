@@ -1,0 +1,122 @@
+#
+# similar Makefile but with windows tools
+# speicify only windows specific options
+
+debug = yes
+
+# compilers, may give different errors/warning
+# can use $(CC) if correct environment ?
+CC = cl.exe
+#CC = clang
+
+# linker
+#LINK = $(LINK)
+LINK = link.exe
+#LINK_OPTIONS = /DEBUG
+
+# List of subdirectories containing a Module.win.mk file
+MODULES := tests
+
+# Compile source, default name *obj on windows, adviced to keep it
+# /O1, /O2 optimisation , /Ox 'best' optimization'
+# /W4 adviced, /Wall , /WX : warning as error
+# /EHsc : found often, to check
+# /Tc : c source file, default if filename is *.c  ANSI C89 + Microsoft extension. /Za to take out some of those, a bit like C99 but not exactly
+# /std:c11,c17
+# /Zi : generate PDB for use when debugging (do not affect optimisation) and pass option /DEBUG to linker
+# /D_CRT_SECURE_NO_WARNINGS warning microsoft strcpy_s,scanf_s etc
+CFLAGS = /nologo  /W4 /D_CRT_SECURE_NO_WARNINGS
+# /WX /Wall
+
+# standard configurable
+# gcc c89/90 : -ansi, -std=c90 or -std=iso9899:1990
+STD = 
+# /std:c89
+
+ifeq ($(debug),yes)          # separator mandatory between ifeq and '('
+	# use specific code for the project, g3 to include MACRO definition as variables
+	CFLAGS += /Zi /DJMMJ_DEBUG
+else
+	# 'best' optimization msvc
+	CFLAGS += /Ox
+endif
+
+$(info $$CFLAGS is $(CFLAGS) )
+$(info $$LINK is $(LINK) )
+
+# search for all *.c files and make *.o files
+# SRCS := $(wildcard *.c)
+# OBJS := $(patsubst %.c, %.o, $(SRCS))
+# take away main.o to avoid mutliple main() functions
+# OBJS := $(filter-out main.o, $(OBJS))
+
+# Override for tests
+OBJS = clogger.obj utils.obj utils_file.obj \
+	   victory.obj person.obj joueur.obj \
+	   plugin_manager.obj cmap_ptrf_game.obj game_loader.obj \
+	   game_mastermind.obj \
+	   clist_generic.obj clist_cstring.obj cmap_game_victories.obj \
+	   file_record.obj irecord.obj \
+	   arcade.obj
+
+# define main executable
+EXE  := JMMjouer
+
+# inspect variables
+$(info $$OBJS is [$(OBJS)] )
+
+# alternative to target as files
+.PHONY : all clean unit_test
+
+# make all, generic way to use make produce executable JMMjouer
+all: $(EXE)
+# specific target for unit testing in tests/ , dependencies with CMocka
+unit_test::
+# unit_test_mock::
+
+# general rule for compiling c files when header file is available 
+%.obj: %.c %.h
+	@echo "Build file generic rule with header in root:   $@"
+	$(CC) $(CFLAGS) /c $<
+
+# general rule, no header file associated (ex. main.c)
+%.obj: %.c
+	@echo "Build file generic rule without header in root:   $@"
+	$(CC) $(CFLAGS) /c $<
+
+# -Wl,-rpath,dir1  or -rpath=dir1 # -Wl to pass argument to linker, rpath runtime to search for lib
+$(EXE): $(OBJS) main.obj
+	@echo "Build $(EXE): all dependencies $^"
+	echo $(LINK) $(LINK_OPTIONS) /OUT:JMMjouer.exe main.obj $(OBJS) /LIBPATH:. game_pendu.lib
+
+#### games ####
+# pendu is a game provided in a shared library, known at link time (no plugin)
+# on windows we (usually) link the lib file. 
+# /LD ou /LDd (debug) to create shared library
+# cl.exe /LD game_morpion.c => produces game_morpion.dll (+lib and exp IF __declspec)
+#
+# may be important
+# link -dll game_morpion.obj => same (lib and exp ONLY IF __declspec is used, some fct or var exprted)
+#
+# finally lib.exe is certainly called at the final stage, could choose what to export
+
+# compile shared library to include at compile-time
+game_pendu.dll : game_pendu.obj
+	$(LINK) /DLL game_pendu.obj /IMPLIB:game_pendu.lib /OUT:game_pendu.dll
+
+# compile shared library to include at run-time (game_morpion)
+# windows style, with importing lib but not used
+game_morpion.dll : game_morpion.obj game_morpion.h
+	$(LINK) /DLL game_morpion.obj /IMPLIB:game_morpion.lib /OUT:game_morpion.dll
+
+# include the description for each module
+include $(patsubst %,%/Module.win.mk,$(MODULES))
+
+# call clean here and in subdirectories
+clean::
+	@echo "Clean in root directory"
+	del $(OBJS), main.obj
+	del game_morpion.lib,game_morpion.dll,game_morpion.exp
+	del game_pendu.lib,game_pendu.dll,game_pendu.exp
+	del JMMjouer.exe,JMMjouer.ilk,JMMjouer.pdb
+	del vc140.pdb
