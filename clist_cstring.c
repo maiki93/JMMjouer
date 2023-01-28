@@ -122,7 +122,7 @@ int clist_cstring_get_array( clist_cstring_t *list, char ***array_out, size_t *a
     value_t value_out;
     char **array = NULL; /* use local only */
     size_t lgen_len, indice;
-    int retour;
+    int retour = 0;
     assert( list );
     /* default return in case of error, use swap idiom */
     *array_out = NULL;

@@ -173,7 +173,6 @@ ptr_game_local_t game_ptrf_get_from_name(const cmap_ptrf_game_t *cmap, const cha
     /* create victory from value_clist */
     pair_out = extract_value_ptr_game( &value_out );
     /* deallocate local copy */
-    /*free(value_out.data);*/
     free_value( &value_out );
     free(pair_out.game_name);
 
@@ -219,7 +218,7 @@ int game_ptrf_get_array_name( const cmap_ptrf_game_t *cmap, char ***array_out, s
     struct pair_ptr_game pair_out;
     char **array = NULL; /* use local only */
     size_t lgen_len, indice;
-    int retour;
+    int retour = 0;
 
     /* default return in case of error, use swap idiom 
         may delete entries if already allocated / or append data ? */

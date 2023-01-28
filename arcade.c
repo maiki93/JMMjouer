@@ -180,6 +180,9 @@ int run_game(joueur_t* joueur, const char *name_game)
     pair_vict_rec.victories.nb_win += victory_game.nb_win;
     game_victories_insert( &joueur->map_victories, pair_vict_rec);
 
+    // try dr memory error, no crash
+    // free(pair_vict_rec.game_name);
+
     return 0;
 }
 

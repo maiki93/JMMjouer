@@ -69,6 +69,7 @@ joueur_t __find_joueur_error( void *this, const char *name)
 {
     joueur_t joueur;
     assert(this != NULL);
+    assert(name); // msvc forces to use variable
     /*
     joueur_record_init( &joueur, "invalid", false);
     strcpy( joueur.person.nom , "invalid");

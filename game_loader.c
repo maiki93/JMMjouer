@@ -102,7 +102,7 @@ ptr_game_t game_loader_get_ptr_game( const game_loader_t *gameldr, const char * 
 /*** Private functions ***/
 static int load_static_game(game_loader_t *gload) 
 {
-    int retour,i;
+    int retour=0,i;
     /* load games known at compile-time*/
     for( i = 0; i < nb_default_game; i++ ) {
         retour = game_ptrf_insert( gload->map_game,

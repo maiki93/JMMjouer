@@ -1,5 +1,4 @@
-#pragma once /*CLOOGER_H*/
-
+#pragma once
 
 /* inclusion of a logger, see test/c89_test
    other variables (not so portable : __func__, __FUNCTION__, __PRETTY_FUNCTION__

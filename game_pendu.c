@@ -193,7 +193,7 @@ int p_make_one_pendu()
     int win,i;
     char mot_mystere[200];
     int randomIndex=rand() % NOMBRE_MOTS_MYSTERES;
-    int lengthRandWord=strlen(mots_mysteres[randomIndex]);
+    int lengthRandWord=(int) strlen(mots_mysteres[randomIndex]);
     int victoires = 0; /* vainqueur de la partie */
     strcpy(mot_mystere, mots_mysteres[randomIndex]);
 
@@ -321,6 +321,7 @@ victory_t start_game_pendu( person_t joueur)
     int victoire = 0;           /* vainqueur de la partie */
     bool rejouer = false;
 
+    victory_init(&victories); 
     /*printf("start jeu du pendu\n");*/
     printf("Joueur : %s \n", joueur.nom);
 

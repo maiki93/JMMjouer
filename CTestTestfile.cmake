@@ -5,6 +5,7 @@
 #
 add_test (test_clist_generic "test_clist_generic.exe")
 add_test (test_clist_cstring "test_clist_cstring.exe")
+add_test (test_cmap_game_ptrf "test_cmap_game_ptrf.exe")
 add_test (test_cmap_game_victories "test_cmap_game_victories.exe")
 add_test (test_mastermind "test_mastermind.exe")
 add_test (test_file_record "test_file_record.exe")

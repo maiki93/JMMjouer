@@ -65,9 +65,7 @@ static void insert_new_victory()
 
 static void find_not_existing_entry()
 {
-    // size_t retour;
     cmap_game_victories_t map_victory;
-    struct pair_game_victory_t pair_out;
     game_victories_init( &map_victory );
     
     // find with an empty list

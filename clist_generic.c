@@ -1,7 +1,7 @@
-#include <stdio.h> /* only for print, to delete later if use log only */
-/*#include <stdlib.h>*/
 #include <string.h>
 #include <assert.h>
+/*#include <stdio.h> */ /* only for print, to delete later if use log only */
+/*#include <stdlib.h>*/
 
 #include "clist_generic.h"
 #include "clogger.h"
@@ -73,7 +73,6 @@ void clist_gen_clear(clist_gen_t *clist, deleter_t deleter)
     struct clist_node* curr_node = clist->first_node;
 
    if(curr_node == NULL) {
-        printf("First node is NULL, nothing to delelte\n");
         CLOG_DEBUG("First node is NULL, nothing to delete, size: %d\n",clist->len);
         return;
    }
@@ -90,7 +89,7 @@ void clist_gen_clear(clist_gen_t *clist, deleter_t deleter)
         clist->len --;
         curr_node = next_node; 
    } while (curr_node != NULL);
-   /* all has been deleted, clist.first_node safetly nullified */
+   /* all has been deleted, clist.first_node can be safetly nullified */
    clist->first_node = NULL;
    assert( clist->len == 0);
 }

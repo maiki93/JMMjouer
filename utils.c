@@ -20,7 +20,7 @@ bool rejouer_une_partie() {
 bool ask_yesno_question(const char* message)
 {
     char answer_char;
-    bool valid = false, answer_yes;
+    bool valid = false, answer_yes = false;
 
     do {
         printf("%s", message );

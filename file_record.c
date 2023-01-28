@@ -199,7 +199,7 @@ int extract_map_victories( file_record_t *this, char *line, cmap_game_victories_
     mastermind: 2 2 */
     struct pair_game_victory_t pair_victory;
     char *delimiter = ":";
-    int pos_delimiter;
+    size_t pos_delimiter;
 
     fgets(line, MAX_LINE_SIZE,  this->fp);
 

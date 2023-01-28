@@ -8,6 +8,7 @@
 #include "../clist_generic.c"
 
 /* TODO Check comparison by string, when possible/not */
+/* MSVC void **state argument or warning c4113 */
 
 /* maybe a default deleter to give to user ? 
    works until value does not contain allocated memory himself */
@@ -104,7 +105,8 @@ static void add_last_two_str_as_value()
     clist = NULL;
 }
 
-static void get_element_by_nb_reference() {
+static void get_element_by_nb_reference() 
+{
     clist_gen_t clist;
     value_t* value_out; /* value by ref */
     clist_gen_init( &clist );
@@ -130,18 +132,19 @@ static void get_element_by_nb_reference() {
     assert_int_equal(0, clist.len);
 }
 
-static void get_element_by_nb_copy() {
+static void get_element_by_nb_copy() 
+{
     clist_gen_t clist;
-    value_t value_str, value_str2; 
+    value_t value_str_inl, value_str_inl2; 
     int retour;
     value_t value_out; /* value by copy, must be deleted */
-    value_str.data="first";
-    value_str.len = 5; /* strlen */
+    value_str_inl.data="first";
+    value_str_inl.len = 5; /* strlen */
     clist_gen_init( &clist );
-    clist_gen_push_front( &clist, value_str );
-    value_str2.data="second";
-    value_str2.len = 6; /* strlen  */
-    clist_gen_push_front( &clist, value_str2 );
+    clist_gen_push_front( &clist, value_str_inl );
+    value_str_inl2.data="second";
+    value_str_inl2.len = 6; /* strlen  */
+    clist_gen_push_front( &clist, value_str_inl2 );
 
     retour = clist_gen_get_value_copy( &clist, 0, &value_out);
     assert_int_equal(0, retour);
@@ -165,21 +168,22 @@ static void get_element_by_nb_copy() {
     clist_gen_clear( &clist, deleter_value );
 }
 
-static void find_element_by_comparison_copy() {
+static void find_element_by_comparison_copy() 
+{
     clist_gen_t clist;
-    value_t value_str, value_str2; 
+    value_t value_str_inl, value_str_inl2; 
     int retour_nb;
 
     value_t value_out; /*  value by copy */
     char buffer_search[4] = "sec";
     
-    value_str.data="first";
-    value_str.len = 6; /* strlen + 1 */
+    value_str_inl.data="first";
+    value_str_inl.len = 6; /* strlen + 1 */
     clist_gen_init( &clist );
-    clist_gen_push_front( &clist, value_str );
-    value_str2.data="second";
-    value_str2.len = 7; /* strlen + 1 */
-    clist_gen_push_front( &clist, value_str2 );
+    clist_gen_push_front( &clist, value_str_inl );
+    value_str_inl2.data="second";
+    value_str_inl2.len = 7; /* strlen + 1 */
+    clist_gen_push_front( &clist, value_str_inl2 );
 
     // one of more generic possible, fill a value_t for comparison
     // a function could be nice also

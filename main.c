@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
 
     /* initalize pour random on peut l'appeler d'ici pour tous les jeux */
     /* for testing, full control random will be usefull */
-    srand(time(NULL));
+    srand( (unsigned int) time(NULL)); // cast for msvc
     
     /***
      * Initilaization of the system of game laoding with compiled and plugins dll 
@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
     retour = arcade_init( game_loader, (irecord_t*)record);
     /* error, normal ending .. for return value */
     retour = arcade_run( &arcade_options );
-    
+    //arcade_clear()
 
     /* to pass to clear_ressources */
     file_record_delete( record );
@@ -236,7 +236,8 @@ void log_directives()
 #endif
 /* VER of MSVC see _MSS_VER_LONG..
    MSVC compiler
-   _DEBUG Defined as 1 when the /LDd, /MDd, or /MTd compiler option is set. Otherwise, undefined.*/
+   _DEBUG Defined as 1 when the /LDd, /MDd, or /MTd compiler option is set. Otherwise, undefined.
+   show release mode indeed */
 #ifdef _MSC_VER
 	printf("compile avec MSVC compiler\n");
     #if defined(_DEBUG)

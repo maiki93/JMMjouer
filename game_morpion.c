@@ -27,6 +27,8 @@ victory_t start_game_morpion(person_t joueur)
     /* get pseudo from the joueur */
     const char* pseudo = joueur.nom;
 
+    victory_init(&victories);
+
     /* Bienvenue au joueur dans le jeu */
     printf("Bienvenue %s dans le jeu du morpion !\n",pseudo);
     printf("C'est a vous de commencer le premier tour.\n");
@@ -197,9 +199,9 @@ void tour_ia(char * plateau)
     /* Boucle de generation de nombre aleatoire jusqu'a que ce soit valide */
     do {
         jeu_ordinateur = (rand() % 9) + 1; /* On genere un nombre entier entre 1 et 9 */
-    } while( !saisie_est_correct(plateau,tentative+jeu_ordinateur) );
+    } while( !saisie_est_correct(plateau,tentative + (char)jeu_ordinateur) );
 
-    maj_plateau(plateau,tentative+jeu_ordinateur,'X');
+    maj_plateau(plateau,tentative+ (char)jeu_ordinateur,'X');
 }
 
 /* Test si la saisie en entre est correcte pour le plateau en entree */

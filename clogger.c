@@ -11,11 +11,13 @@
 static FILE *fp = NULL;
 
 /* to avoid global intitialization, not sure static possible here in c89 */
+/*
 FILE* getFp() 
 {
     static FILE *fp;
     return fp;
 }
+*/
 
 int init_clogger(const char *filename) 
 {
@@ -44,7 +46,7 @@ int init_clogger(const char *filename)
 
 int close_clogger() 
 {
-    int retour;
+    int retour = 0;
     if (fp != NULL)
         retour = fclose(fp);
 
@@ -59,6 +61,9 @@ int close_clogger()
 void log_debug(const char *filename, long line, const char* format, ...) 
 {
     va_list args;
+
+    if ( fp == NULL ) return;
+
     /*printf("%s:%ld :: ", filename, line);*/
     fprintf(fp, "%s:%ld :: ", filename, line);
     /* loop over the argument */

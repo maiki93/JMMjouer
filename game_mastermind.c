@@ -9,6 +9,7 @@
     https://i.stack.imgur.com/9UVnC.png
 */
 #include "game_mastermind.h"
+#include "victory.h"
 #include "utils.h"
 
 /* if we want to mock by redefinition,
@@ -85,6 +86,9 @@ victory_t start_game_mastermind(person_t person)
     victory_t victories;        /* results of the game(s) */
     int victoire = 0;           /* vainqueur de la partie */
     bool rejouer = false;
+
+    /* init victories */
+    victory_init(&victories);
 
     /* message d'intro au jeu */
     clear_screen();
@@ -206,7 +210,7 @@ int mm_ask_guess_user( char* p_tab_guess, const int size_code, const char *color
        TODO verify valid entries */
     printf("Proposez une combinaison > ");
     for( i=0; i < size_code; i++ ) { /* best way found to read a line for the moment */
-        p_tab_guess[i] = getchar();  /* getchar() <=> getc(stdin) */
+        p_tab_guess[i] = (char) getchar();  /* getchar() <=> getc(stdin) */
     }
     clean_stdin();
     /* valid code are valid */

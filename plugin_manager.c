@@ -195,14 +195,17 @@ ptr_plugin_funct plugin_manager_get_game_ptrf( const plugin_mgr_t* manager, cons
     }
     /* only GCC : error: cast between incompatible function types from 'FARPROC' {aka 'long long int (*)()'} to */
     /* if add (void*) pedantic error throw */
-    
+#if defined(__GNUC__) || defined(__GNUG__)   
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
     funct_casted = (ptr_plugin_funct) fptr;
     /* #pragma GCC diagnostic ignored "-Wpedantic"
     pf_game = (ptr_game_t) (void*) fptr; */
+#if defined(__GNUC__) || defined(__GNUG__)
     #pragma GCC diagnostic pop
-    
+#endif
+
     /* printf("handle: %p\n", (long *)fptr); */
     /*printf("record in handle2 nb_element=%d",nb_element);*/
 
