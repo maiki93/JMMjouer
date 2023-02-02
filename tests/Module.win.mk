@@ -77,10 +77,21 @@ test_cmap_game_ptrf: $(MODDIR_TESTS)/test_cmap_game_ptrf.obj clist_generic.obj c
 	@echo "Building test_game_ptrf @ :    $@"  # target name
 	$(LINK) $(LFLAGS) /LIBPATH:$(LIB_CMOCKA) cmocka.lib $?
 
-test_mastermind: $(MODDIR_TESTS)/test_mastermind.obj utils.obj victory.obj
-	@echo "Building test_game_loader @ :    $@"  # target name
+
+OBJS_NO_ARCADE := $(filter-out arcade.obj, $(OBJS))
+
+test_arcade: $(MODDIR_TESTS)/test_arcade.obj $(OBJS_NO_ARCADE) game_pendu.obj
+	@echo "Building test_arcade @ :    $@"  # target name
 	$(LINK) $(LFLAGS) /LIBPATH:$(LIB_CMOCKA) cmocka.lib $?
-	
+
+test_mastermind: $(MODDIR_TESTS)/test_mastermind.obj utils.obj victory.obj
+	@echo "Building test_mastermind @ :    $@"  # target name
+	$(LINK) $(LFLAGS) /LIBPATH:$(LIB_CMOCKA) cmocka.lib $?
+
+# use only interface header in test
+test_clogger: $(MODDIR_TESTS)/test_clogger.obj clogger.obj
+	@echo "Building test_clogger @ :    $@"  # target name
+	$(LINK) $(LFLAGS) /LIBPATH:$(LIB_CMOCKA) cmocka.lib $?
 
 clean::
 	echo "Clean unit tests in MODDIR_C = $(MODDIR_TESTS) "

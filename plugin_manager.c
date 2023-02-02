@@ -158,6 +158,10 @@ int plugin_manager_load_shared_library(plugin_mgr_t *plg_manager, const char *fi
     if( !handle)
     {
         CLOG_ERR("Error loading library %s\n", fullname);
+        /* no memory leak, but bad duplication, better to use local varirable */
+        free(fullname);
+        if( b_delete_dir )
+            free(dir);
         return PLG_MANAGER_DLL_NOT_FOUND;
     }
 

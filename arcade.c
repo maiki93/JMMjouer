@@ -68,6 +68,7 @@ int arcade_run(arcade_params_t *params)
     int game_indice = -1;
 
     bool play_anonymous = params->play_anonymous;
+    bool exit_loop = false;
 
     CLOG_DEBUG("arcde::run_game() %d\n",0);
     printf("arcade_run() ");
@@ -84,16 +85,7 @@ int arcade_run(arcade_params_t *params)
     /* check if joueur is valid , even if done before ... ? */
     assert( person_is_valid((person_t *)&joueur) == true);
     joueur_info( &joueur );
-    /*
-    if( strcmp( person_name((person_t*)&joueur),  "invalid" ) == 0) { 
-        printf("Error initialisation joueur name_to_write %d\n",0);
-        CLOG_ERR("Error initialisation joueur name_to_write %d\n",0);
-        return 1;
-        abort(); to check in C terminate, clean ending
-        return EXIT_FAILURE;
-    }
-    */
-
+    
     /*** 2. Game menu ***/
     /* error_code, is ok also */
     clist_game_name = game_loader_get_names( gloader );
@@ -122,7 +114,7 @@ int arcade_run(arcade_params_t *params)
         /* exit game properly, function end_game to choose / with error also */
         else if( game_indice == -2 ) {
             printf("\ngood bye %s!\n",joueur.person.nom);
-            return 0;
+            exit_loop = true;
             /*
             clear_ressources_and_exit(historique); */ /* not clean at all !*/
         }
@@ -137,7 +129,7 @@ int arcade_run(arcade_params_t *params)
             /* store result in record */
         }
 
-    } while( true );
+    } while( exit_loop == false );
 
     /** 3. exit game **/
     clist_cstring_delete( clist_game_name );
@@ -194,9 +186,17 @@ static joueur_t identification_joueur()
     bool accepted = false;
     bool new_joueur_confirmation = false;
 
-    joueur_default_init( &joueur );
+    /* avoid memory leak to comment but warning potentially unitialized*/
+    /* joueur_default_init( &joueur ); */
 
-    while( accepted == false) {
+    /* if test before loop, sure initilaized*/
+    /* print_identification_menu(try_name);
+    joueur = record_find_joueur_from_name((irecord_t *)record, try_name); */
+
+    /* do... while important, avoid potentialy initialized variable
+        => may change interface, passing joueur_t as argument... or other trick */
+    /*while( accepted == false) {*/
+    do {
         print_identification_menu(try_name);
 
         joueur = record_find_joueur_from_name((irecord_t *)record, try_name);
@@ -207,13 +207,17 @@ static joueur_t identification_joueur()
         /* print the name because frist in structure !! same adreess !! */
         printf("name : %s\n", (char*) &joueur);
 
-        /*if( person_name((person_t*)joueur) == "invalid") {*/
+        
         if( person_is_valid((person_t*)&joueur) == false) {
             CLOG_DEBUG("INVALID PERSON %d\n",0);
             printf("Invalid joueur it is a new joueur, TODO to confirm !!\n");
             /* clean, menu for a new joueur: make its profile */
             new_joueur_confirmation = ask_yesno_question("Nouveau joueur ? confirm by y/n plz: ");
             if( new_joueur_confirmation) {
+                // delete previous invalid joueur
+                // or set argument  of new joueur setName, dalto...
+                joueur_clear(&joueur);
+                printf("NEW JOUEUR INIT\n");
                 joueur_init(&joueur, try_name, false);
                 accepted = true;
             }
@@ -224,7 +228,9 @@ static joueur_t identification_joueur()
             /* funct_welcome_back()  or deal with it on higher-level ...*/
             accepted = true;
         }
-    }
+
+    } while(accepted == false);
+
     return joueur;
 }
 

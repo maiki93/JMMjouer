@@ -55,7 +55,7 @@ void clist_cstring_delete(clist_cstring_t* list)
     clist_gen_del( list->clist, deleter_cstring);
     /* better if ! list->clist and call cstring_clear; more uniform */
     list->clist = NULL;
-    free(list);
+    free(list); /*commented and free in arcade_run, same missing */
 }
 
 size_t clist_cstring_size(clist_cstring_t *list)

@@ -26,16 +26,15 @@ int init_clogger(const char *filename)
     if( !filename ) {
         local_filename = "clogger.log";
     } else {
-        local_filename = (char*) malloc( strlen(filename) );
+        local_filename = (char*) malloc( strlen(filename) + 1 );
         strcpy(local_filename, filename);
     }
     /* cannot log yet ! */
     fp = fopen( local_filename, "w");
 
-    
-
     if (fp == NULL) {
         printf("Error in creating log file %s\n", local_filename);
+        // works only if default not used ?
         free( local_filename );
         return 1;
     }

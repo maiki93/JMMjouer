@@ -60,6 +60,7 @@ void game_victories_init(cmap_game_victories_t *cmap)
 
 void game_victories_clear(cmap_game_victories_t *cmap)
 {
+    assert( cmap->clist != NULL);
     /* to test if not null ? */
     clist_gen_clear( cmap->clist, deleter_pair_game_victory);
     /* post condition before continuing */

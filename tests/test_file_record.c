@@ -126,6 +126,32 @@ static void joueur_with_historic()
     free( file );
 }
 
+/* no point to delelte */
+static void default_init_joueur_with_historic()
+{
+    joueur_t joueur;
+    struct pair_game_victory_t pair_out;
+
+
+    file_record_t *file = file_record_new();
+    file_record_init( file, "test_record_file.txt");
+
+    /* or joueur already existing */
+    /*joueur_default_init( &joueur );*/
+    joueur = record_find_joueur_from_name( (irecord_t*)file, "jasmine");
+
+    assert_string_equal( joueur.person.nom, "jasmine");
+    assert_int_equal( joueur.person.is_daltonien, 1);
+
+    size_t nb_games = game_victories_size( & joueur.map_victories );
+    assert_int_equal(3, nb_games);
+
+    joueur_clear( &joueur );
+    file_record_delete( file );
+    free( file );
+
+}
+
 static void count_functional_style_test()
 {
     size_t count=0;
@@ -147,6 +173,7 @@ int main()
         cmocka_unit_test(joueur_not_found),
         cmocka_unit_test(joueur_valid_daltonien_no_game),
         cmocka_unit_test(joueur_with_historic),
+        cmocka_unit_test(default_init_joueur_with_historic),
         cmocka_unit_test(count_functional_style_test),
     };
 

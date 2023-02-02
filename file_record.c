@@ -80,6 +80,7 @@ void file_record_delete( file_record_t *this)
     this->fp = NULL;
     /* more "polymorphic"*/
     irecord_delete( (irecord_t*) this);
+    // free this ?
 }
 
 joueur_t __get_joueur_from_name( void *this, const char* name)
@@ -129,6 +130,7 @@ int open_file( file_record_t *this, bool mode_write )
 
     if( this->fp == NULL ) {
         CLOG_ERR("Impossible d'ouvrir le fichier %s\n", this->filename );
+        printf("Impossible d'ouvrir le fichier %s\n", this->filename );
         CLOG_ERR("Etat de fp %p\n", (void *)this->fp);
         return -1; /*RETURN_KO / FILE_ERROR */
     }
@@ -161,7 +163,6 @@ bool search_record_joueur_by_name(file_record_t *this, char *line, const char* n
         }
     }
 
-    /*free(name_joueur);*/
     return false;
 }
 
@@ -188,6 +189,13 @@ int extract_one_record(file_record_t *this, char *line, joueur_t *joueur)
     /* return errno or nb correct assignement == 2 */
     strncpy_s( joueur->person.nom, MAX_SIZE_NOM_PERSON, name_record, MAX_SIZE_NOM_PERSON);
     joueur->person.is_daltonien = is_daltonien;
+
+
+    /* test if already existing / allocated map_victories */
+    if( joueur->map_victories.clist != NULL) {
+        printf("deallocate the map before extraction of one");
+
+    }
     /* read game victories */
     extract_map_victories( this, line, &joueur->map_victories );
     return retour;

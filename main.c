@@ -5,9 +5,12 @@
 #include <time.h>
 #include <assert.h>
 
-/* available system-wide only with gnu / glibc */
-/* #include <getopt.h> */
-#include "getopt.h"
+/* available system-wide only with gnu / glibc, found one implementation for windows */
+#if defined(_WIN32) && defined(_MSC_VER)
+    #include "getopt.h"
+#else /* LINUX or gcc mingw */
+    #include <getopt.h>
+#endif
 
 #include "arcade_params.h"
 #include "arcade.h"
@@ -29,7 +32,6 @@
 #define DEFAULT_PROGNAME JMMjouer
 
 static const char* const DEFAULT_PLUGINS_DIR = "plugins";
-/*const char* DEFAULT_PLUGINS_DIR = "plugins";*/
 
 /* extern int errno;*/ /*dllimport attribute needed (windows spacific ?)*/
 extern char *optarg;
@@ -164,7 +166,7 @@ int main(int argc, char *argv[])
 void clear_ressources_and_exit() 
 {
     /* clear / delete singleton instances */
-    close_clogger();
+    /*close_clogger();*/
     plugin_manager_free();
     /*exit(0);*/
     exit(EXIT_SUCCESS);
@@ -237,7 +239,7 @@ void log_directives()
 /* VER of MSVC see _MSS_VER_LONG..
    MSVC compiler
    _DEBUG Defined as 1 when the /LDd, /MDd, or /MTd compiler option is set. Otherwise, undefined.
-   show release mode indeed */
+   show release mode otherwise, even with /DEBUG option of cl.exe / link.exe */
 #ifdef _MSC_VER
 	printf("compile avec MSVC compiler\n");
     #if defined(_DEBUG)
