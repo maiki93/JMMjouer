@@ -172,8 +172,8 @@ int run_game(joueur_t* joueur, const char *name_game)
     pair_vict_rec.victories.nb_win += victory_game.nb_win;
     game_victories_insert( &joueur->map_victories, pair_vict_rec);
 
-    // try dr memory error, no crash
-    // free(pair_vict_rec.game_name);
+    /* try dr memory error, no crash */
+    /* free(pair_vict_rec.game_name); */
 
     return 0;
 }
@@ -214,10 +214,11 @@ static joueur_t identification_joueur()
             /* clean, menu for a new joueur: make its profile */
             new_joueur_confirmation = ask_yesno_question("Nouveau joueur ? confirm by y/n plz: ");
             if( new_joueur_confirmation) {
-                // delete previous invalid joueur
-                // or set argument  of new joueur setName, dalto...
+                /* delete previous invalid joueur 
+                    or need to set argument of new joueur setName, dalto... */
                 joueur_clear(&joueur);
                 printf("NEW JOUEUR INIT\n");
+                CLOG_DEBUG("clear previous joueur and init a new one with name %s\n", try_name);
                 joueur_init(&joueur, try_name, false);
                 accepted = true;
             }

@@ -42,20 +42,23 @@ else
 	CFLAGS += -DNDEBUG -O2
 endif
 
+$(info $$CC is $(CC) )
 $(info $$CFLAGS is $(CFLAGS) )
 
 # search for all *.c files and make *.o files
-SRCS := $(wildcard *.c)
-OBJS := $(patsubst %.c, %.o, $(SRCS))
+# keep for example
+#SRCS := $(wildcard *.c)
+#OBJS := $(patsubst %.c, %.o, $(SRCS))
 # take away main.o to avoid mutliple main() functions
-OBJS := $(filter-out main.o, $(OBJS))
+#OBJS := $(filter-out main.o, $(OBJS))
 
-# Override for tests
-OBJS = main.o clogger.o utils.o utils_file.o \
-	   victory.o person.o joueur.o \
+# Use explicit OBJS, more control
+# do not include main.o
+OBJS = clogger.o utils.o utils_file.o \
+	   clist_generic.o clist_cstring.o  \
+	   victory.o cmap_game_victories.o person.o joueur.o \
 	   plugin_manager.o cmap_ptrf_game.o game_loader.o \
 	   game_mastermind.o \
-	   clist_generic.o clist_cstring.o cmap_game_victories.o \
 	   file_record.o irecord.o \
 	   arcade.o
 
@@ -85,14 +88,14 @@ unit_test::
 	$(CC) $(STD) $(CFLAGS) -c $< -o $@
 
 # -Wl,-rpath,dir1  or -rpath=dir1 # -Wl to pass argument to linker, rpath runtime to search for lib
-$(EXE): $(OBJS) main.o
+$(EXE): $(OBJS) main.o libgame_pendu.dll
 	@echo "Build $(EXE): all dependencies $^"
 #	$(CC) $(STD) $(CFLAGS) $^ -o $@
-	$(CC) $(STD) $(CFLAGS) $^ -L. -lpendu -o $@
+	$(CC) $(STD) $(CFLAGS) $^ -L. -lgame_pendu -o $@
 
 ##### compile shared library to include at compile-time
-libpendu.dll : game_pendu.o game_pendu.h utils.o
-	$(CC) -shared $(CFLAGS) game_pendu.o utils.o -o libpendu.dll -Wl,--out-implib,libpendu.a
+libgame_pendu.dll : game_pendu.o game_pendu.h victory.o
+	$(CC) -shared $(CFLAGS) $^ -o $@ -Wl,--out-implib,libgame_pendu.lib
 
 ##### compile shared library to include at run-time (game_morpion)
 # version unix-like available more recently in mingw
@@ -100,8 +103,8 @@ libpendu.dll : game_pendu.o game_pendu.h utils.o
 #	$(CC) -shared game_morpion.o -o libmorpion.dll
 
 # windows style, with importing lib, not used at run-time link anyway
-libmorpion.dll : game_morpion.o game_morpion.h
-	$(CC) -shared $(CFLAGS) game_morpion.o -o libmorpion.dll -Wl,--out-implib,libmorpion.a
+libmorpion.dll : game_morpion.o game_morpion.h victory.o
+	$(CC) -shared $(CFLAGS) $^ -o libmorpion.dll -Wl,--out-implib,libmorpion.lib
 
 # include the description for each module
 include $(patsubst %,%/Module.mk,$(MODULES))
@@ -110,4 +113,5 @@ include $(patsubst %,%/Module.mk,$(MODULES))
 clean::
 	@echo "Clean in root directory"
 	rm -f ./*.o
+	rm -f ./*.dll ./*.lib
 	rm -f JMMjouer

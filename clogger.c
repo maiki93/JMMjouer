@@ -34,7 +34,8 @@ int init_clogger(const char *filename)
 
     if (fp == NULL) {
         printf("Error in creating log file %s\n", local_filename);
-        // works only if default not used ?
+        /* works only if default not used ? 
+        TODO test this case */
         free( local_filename );
         return 1;
     }

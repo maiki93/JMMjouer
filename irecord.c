@@ -69,12 +69,8 @@ joueur_t __find_joueur_error( void *this, const char *name)
 {
     joueur_t joueur;
     assert(this != NULL);
-    assert(name); // msvc forces to use variable
-    /*
-    joueur_record_init( &joueur, "invalid", false);
-    strcpy( joueur.person.nom , "invalid");
-    printf("to delete name input: %s\n", name);
-    */
+    assert(name); /* msvc forces to use argument variable */
+    
     joueur_init(&joueur, "invalid", false);
     printf("-- In record base __get_joueur_error --\n");
     printf("joueur name: %s\n", joueur.person.nom);

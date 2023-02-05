@@ -76,11 +76,11 @@ void file_record_delete( file_record_t *this)
     if( this->filename )
         free( this->filename );
     this->filename = NULL;
-    /* assert fp is closed */
+    /* assert fp is closed, or check and call fclose from here also */
     this->fp = NULL;
-    /* more "polymorphic"*/
+    /* more "polymorphic" */
     irecord_delete( (irecord_t*) this);
-    // free this ?
+    /* free this here ? */
 }
 
 joueur_t __get_joueur_from_name( void *this, const char* name)

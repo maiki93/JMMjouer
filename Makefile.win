@@ -30,17 +30,16 @@ CFLAGS = /nologo /W4 /D_CRT_SECURE_NO_WARNINGS /wd4131
 # 4131 for getopt "declarateur obsolete"
 
 # standard configurable
-# gcc c89/90 : -ansi, -std=c90 or -std=iso9899:1990
+# /std:c11
 # msvc /za closer to c89
 #STD = /Za #winnt error !
-# /std:c89
 
 ifeq ($(debug),yes)          # separator mandatory between ifeq and '('
-	# use specific code for the project, g3 to include MACRO definition as variables
+# use specific code for the project, g3 to include MACRO definition as variables
 	CFLAGS += /Zi /Od /DJMMJ_DEBUG
 	LFLAGS += /DEBUG
 else
-	# 'best' optimization msvc
+# 'best' optimization msvc
 	CFLAGS += /Ox
 endif
 
@@ -54,12 +53,13 @@ $(info $$LFLAGS is $(LFLAGS) )
 # take away main.o to avoid mutliple main() functions
 # OBJS := $(filter-out main.o, $(OBJS))
 
-# Override for tests
+# Use explicit OBJS, more control
+# do not include main.o
 OBJS = getopt.obj clogger.obj utils.obj utils_file.obj \
-	   victory.obj person.obj joueur.obj \
+	   clist_generic.obj clist_cstring.obj  \
+	   victory.obj cmap_game_victories.obj person.obj joueur.obj \
 	   plugin_manager.obj cmap_ptrf_game.obj game_loader.obj \
 	   game_mastermind.obj \
-	   clist_generic.obj clist_cstring.obj cmap_game_victories.obj \
 	   file_record.obj irecord.obj \
 	   arcade.obj
 

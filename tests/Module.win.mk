@@ -47,6 +47,7 @@ test_plugin_manager: $(MODDIR_TESTS)/test_plugin_manager.obj clogger.obj
 	@echo "Building test_plugin_manager @ :    $@"  # target name
 	@echo "Building test_plugin_manager < :    $<" 	# test_X.o
 	@echo "Building test_plugin_manager ^ :    $^"  # test_X.o utils.o (ok for compil)
+	@echo "Building test_plugin_manager ^ :    $?"  # 
 	$(LINK) $(LFLAGS) /LIBPATH:$(LIB_CMOCKA) cmocka.lib $?
 
 test_file_record: $(MODDIR_TESTS)/test_file_record.obj irecord.obj \

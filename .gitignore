@@ -13,7 +13,3 @@ JMMjouer.layout
 # log files
 *.log
 
-# keep local
-**/*_v1.h
-**/*_v1.c
-main_test_cl.c
