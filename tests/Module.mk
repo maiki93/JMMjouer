@@ -3,17 +3,6 @@
 #     generic rules to compile object file list from "test_X".c
 #     specific for each executable tests, keep better track of dependencies
 #     CMocka need c99 standard
-#
-# third version, make a general rule for all tests. just need to create a new test_X.c file in the directory
-#                recompile only minimimum, and for any changes (modif test_X.c or delete test_X executable)
-#
-# second version :
-# include *.c file directly in test (adviced with cmocka )
-# => no more dependencies for compilation
-#
-# first :
-# add option -Wno-implicit-function-declaration to suppress warning for "private function mm-algo" (not decalred in a header)
-#
 
 MODDIR_TESTS := tests
 
@@ -23,11 +12,13 @@ MODDIR_TESTS := tests
 # CFLAGS_TESTS = -Wno-implicit-function-declaration $(CFLAGS)
 #CFLAGS_TESTS = $(CFLAGS)
 # -fno-inline
-CFLAGS_TESTS = -g -g3 -W -Wall -fPIC -Wunused -Wextra -pedantic -Wstrict-overflow=5 -Wno-unused-local-typedefs -fno-inline
+# -g3 : all debug information + MACRO (-g0 : no debug ), -g default 2
+CFLAGS_TESTS = -g3 -Wall -fPIC -Wextra -pedantic -Wstrict-overflow=5 -Wno-unused-local-typedefs -fno-inline
 # need c99 standard to use cmocka
 # gnu implements inline -std=gnu89 or -fgnu89-inline but does not seem to work. Other errors appears with c89
 STD_TESTS = -std=c99
 
+## Ubuntu, global installation with package manager
 INCLUDE_CMOCKA = C:\dev\cmocka_local_mingw\include
 LIB_CMOCKA = C:\dev\cmocka_local_mingw\lib
 

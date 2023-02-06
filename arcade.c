@@ -5,6 +5,8 @@
 #include <string.h>
 #include <assert.h>
 
+#include <limits.h> /* ubuntu, required for INT_MAX */
+
 /* order of include important */
 #include "arcade_params.h"
 #include "arcade.h"

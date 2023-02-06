@@ -1,3 +1,8 @@
+# version linux (tested wsl2/ubuntu)
+# use gcc, very similar except: 
+#	- standard name of libraries
+# + code modification (windows / posix ), visibility of variable in object file / library 
+
 # many tricks
 # https://stackoverflow.com/questions/53136024/makefile-to-compile-all-c-files-without-needing-to-specify-them
 # https://accu.org/journals/overload/14/71/miller_2004/ famous paper: recursive make considered harmful
@@ -23,8 +28,11 @@ MODULES := tests
 # -Wno-unused-local-typedefs no need
 # -Wstrict-overflow=5, make pass game_morpion compilation
 # -Wunused -W (included already)
-# -fPIC on Windows, not adviced ?
-CFLAGS = -Wall -Wextra -pedantic -Wno-variadic-macros #-Wno-strict-overflow
+# -fPIC on Windows, not adviced ? 
+#       on linux not for performance ? but cannot comile, give error !
+# -g3 : all debug information + MACRO (-g0 : no debug ), -g default 2
+# -ggdb : include gdb extension if possible (not tested)
+CFLAGS = -Wall -Wextra -pedantic -fPIC -Wno-variadic-macros #-Wno-strict-overflow
 # to include again:  -Werror, better than Wno-X warning appears but compiles fine
 
 # standard configurable
@@ -36,7 +44,7 @@ STD = -std=c90
 # 	or declare directly here ? better will apply to all files without need to include a common header ?
 ifeq ($(debug),yes)          # separator mandatory between ifeq and '('
 # use specific code for the project, g3 to include MACRO definition as variables
-	CFLAGS += -g -g3 -O0 -DJMMJ_DEBUG
+	CFLAGS += -g3 -O0 -DJMMJ_DEBUG
 else
 # kind of standard with gcc projects
 	CFLAGS += -DNDEBUG -O2
@@ -44,13 +52,6 @@ endif
 
 $(info $$CC is $(CC) )
 $(info $$CFLAGS is $(CFLAGS) )
-
-# search for all *.c files and make *.o files
-# keep for example
-#SRCS := $(wildcard *.c)
-#OBJS := $(patsubst %.c, %.o, $(SRCS))
-# take away main.o to avoid mutliple main() functions
-#OBJS := $(filter-out main.o, $(OBJS))
 
 # Use explicit OBJS, more control
 # do not include main.o
@@ -75,7 +76,6 @@ $(info $$OBJS is [$(OBJS)] )
 all: $(EXE)
 # specific target for unit testing in tests/ , dependencies with CMocka
 unit_test::
-# unit_test_mock::
 
 # general rule for compiling c files when header file is available 
 %.o: %.c %.h
@@ -88,14 +88,14 @@ unit_test::
 	$(CC) $(STD) $(CFLAGS) -c $< -o $@
 
 # -Wl,-rpath,dir1  or -rpath=dir1 # -Wl to pass argument to linker, rpath runtime to search for lib
-$(EXE): $(OBJS) main.o libgame_pendu.dll
+$(EXE): $(OBJS) main.o libgame_pendu.so
 	@echo "Build $(EXE): all dependencies $^"
-#	$(CC) $(STD) $(CFLAGS) $^ -o $@
 	$(CC) $(STD) $(CFLAGS) $^ -L. -lgame_pendu -o $@
 
 ##### compile shared library to include at compile-time
-libgame_pendu.dll : game_pendu.o game_pendu.h victory.o
-	$(CC) -shared $(CFLAGS) $^ -o $@ -Wl,--out-implib,libgame_pendu.lib
+# linux, ask only for shared or static
+libgame_pendu.so : game_pendu.o game_pendu.h victory.o
+	$(CC) -shared $(CFLAGS) $^ -o $@
 
 ##### compile shared library to include at run-time (game_morpion)
 # version unix-like available more recently in mingw
@@ -103,8 +103,8 @@ libgame_pendu.dll : game_pendu.o game_pendu.h victory.o
 #	$(CC) -shared game_morpion.o -o libmorpion.dll
 
 # windows style, with importing lib, not used at run-time link anyway
-libmorpion.dll : game_morpion.o game_morpion.h victory.o
-	$(CC) -shared $(CFLAGS) $^ -o libmorpion.dll -Wl,--out-implib,libmorpion.lib
+libgame_morpion.so : game_morpion.o game_morpion.h victory.o
+	$(CC) -shared $(CFLAGS) $^ -o $@
 
 # include the description for each module
 include $(patsubst %,%/Module.mk,$(MODULES))
@@ -113,5 +113,5 @@ include $(patsubst %,%/Module.mk,$(MODULES))
 clean::
 	@echo "Clean in root directory"
 	rm -f ./*.o
-	rm -f ./*.dll ./*.lib
+	rm -f ./*.so ./*.a
 	rm -f JMMjouer

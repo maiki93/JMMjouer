@@ -1,0 +1,7 @@
+total 64
+drwxr-xr-x  2 michael michael  4096 Feb  6 21:26 ./
+drwxr-xr-x 10 michael michael  4096 Feb  6 21:22 ../
+-rw-r--r--  1 michael michael     0 Feb  6 21:26 content.txt
+-rwxr-xr-x  1 michael michael 50864 Feb  6 21:25 libgame_morpion.so*
+-rw-r--r--  1 michael michael    11 Feb  5 12:22 toto
+-rw-r--r--  1 michael michael     0 Feb  5 12:22 toto.txt

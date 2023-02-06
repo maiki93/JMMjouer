@@ -18,7 +18,9 @@ void test();
 
 /*  objdump.exe -tT game_morpion.dll | grep 'start' do not see difference start_game_morpion appears in both */
 /* gcc default is visibilty on ? */
-victory_t SHARED_LIB start_game_morpion(person_t joueur);
+/*victory_t SHARED_LIB start_game_morpion(person_t joueur);*/
+victory_t start_game_morpion(person_t joueur);
+
 
 void afficher_plateau(char *, int *);
 

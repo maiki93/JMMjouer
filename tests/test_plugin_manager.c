@@ -12,7 +12,12 @@
 
 /* constante for tests */
 const char* DIR_PLUGINS = "test_plugins";
-const char* NAME_DLL_MORPION = "libmorpion.dll";
+/* coud use only specific extension + macro to create the name?*/
+#if defined(_WIN32)
+    const char* NAME_DLL_MORPION = "libmorpion.dll";
+#else
+    const char* NAME_DLL_MORPION = "libgame_morpion.so";
+#endif
 const char* START_GAME_FUNCTION = "start_game_morpion";
 
 /* because inclusion of *c file, can check private data */
@@ -88,7 +93,7 @@ static void function_does_not_exist()
     ptr_plugin_funct pf_game = NULL;
     plugin_mgr_t *manager = plugin_manager_get_instance();
     plugin_manager_set_directory( manager, "test_plugins");
-    plugin_manager_load_shared_library( manager, "libmorpion.dll" );
+    plugin_manager_load_shared_library( manager, NAME_DLL_MORPION );
 
     /* api cannot use PLG_MANAGER_FCT_NOT_FOUUND */
     pf_game = plugin_manager_get_game_ptrf( manager, "start_game_titi");

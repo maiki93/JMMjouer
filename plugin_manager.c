@@ -1,7 +1,13 @@
 #include "plugin_manager.h"
 
-#include <windows.h>
+#if defined(_WIN32)
+    #include <windows.h>
+#else
+    #include <dlfcn.h>
+#endif
+
 #include <stdio.h>
+#include <stdlib.h> /* warning on linux */
 #include <string.h>
 #include <assert.h>
 
@@ -19,7 +25,11 @@ static const char* CURRENT_DIRECTORY = ".";
 
 /* declaration of the structure */
 struct plugin_manager {
-    HINSTANCE handle_dll[MAX_NB_SHARED_LIB]; /* INVALID_HANDLE_VALUE */
+    #if defined(_WIN32)
+        HINSTANCE handle_dll[MAX_NB_SHARED_LIB]; /* INVALID_HANDLE_VALUE */
+    #else
+        void* handle_dll[MAX_NB_SHARED_LIB];
+    #endif
     size_t nb_handle; /*= 0 primitive initialized by default */
     char* directory_path; /* default initialized to NULL ? bad current_dir  */
 };
@@ -81,7 +91,11 @@ void plugin_manager_clear(plugin_mgr_t *plg_manager)
     CLOG_DEBUG("Destructor nb dll %d\n", plg_manager->nb_handle);
 
     for(i = 0; i < plg_manager->nb_handle; i++) {
-        FreeLibrary(plg_manager->handle_dll[i]);
+        #if defined(_WIN32)
+            FreeLibrary(plg_manager->handle_dll[i]);
+        #else
+            dlclose(plg_manager->handle_dll[i]);
+        #endif
         plg_manager->handle_dll[i] = NULL;
         CLOG_DEBUG("Remove shared lib from handle %ld\n", (long)i);
     }
@@ -126,9 +140,15 @@ void plugin_manager_set_directory(plugin_mgr_t *plg_manager, const char * direct
     strcpy( plg_manager->directory_path, local_dir);
 }
 
+/* very windows dependent, or maybe not so much in fact */
 int plugin_manager_load_shared_library(plugin_mgr_t *plg_manager, const char *filename)
 {
+#if defined(_WIN32)
     HINSTANCE handle;
+#else
+    void* handle;
+#endif
+
     char *fullname;
     bool b_delete_dir = false; /* flag if need deallocation of dir */
     char *dir = plg_manager->directory_path;
@@ -154,7 +174,11 @@ int plugin_manager_load_shared_library(plugin_mgr_t *plg_manager, const char *fi
 
     /* FreeLibrary(handle) to call to be clean, but after use !! crash.. 
        Need encapsulation to keep handle valid */
+#if defined(_WIN32)
     handle = LoadLibrary(fullname); /*"libmorpion.dll");*/
+#else
+    handle = dlopen(fullname, RTLD_LAZY);
+#endif
     if( !handle)
     {
         CLOG_ERR("Error loading library %s\n", fullname);
@@ -182,14 +206,20 @@ int plugin_manager_load_shared_library(plugin_mgr_t *plg_manager, const char *fi
 /*void  (*get_funct_from_last_inserted(const char *name)(void*)*/
 ptr_plugin_funct plugin_manager_get_game_ptrf( const plugin_mgr_t* manager, const char *name)
 {
+#if defined(_WIN32)
     HINSTANCE current_handle;
     FARPROC fptr; /* typedef INT_PTR (*FARPROC)() , INT_PTR long long*/
+#else
+    void* current_handle;
+    void* fptr;
+#endif
 
     ptr_plugin_funct funct_casted;
 
     current_handle = manager->handle_dll[manager->nb_handle-1];
     assert( current_handle != NULL );
 
+#if defined(_WIN32)
     fptr = GetProcAddress(current_handle, name);
     if( fptr == (FARPROC)NULL ) 
     {
@@ -197,8 +227,17 @@ ptr_plugin_funct plugin_manager_get_game_ptrf( const plugin_mgr_t* manager, cons
         printf("Error cannot find function %s in library", name);
         return NULL;
     }
+#else
+    fptr = dlsym( current_handle, name);
+    if( fptr == NULL) {
+        CLOG_ERR("Error cannot find function %s in linux library", name);
+        printf("Error cannot find function %s in linux library", name);
+        return NULL;
+    }
+#endif
+
     /* only GCC : error: cast between incompatible function types from 'FARPROC' {aka 'long long int (*)()'} to */
-    /* if add (void*) pedantic error throw */
+    /* if add (void*) pedantic error throw */ /* and on linux ?? */
 #if defined(__GNUC__) || defined(__GNUG__)   
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wcast-function-type"

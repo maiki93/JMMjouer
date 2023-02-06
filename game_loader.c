@@ -125,7 +125,7 @@ static int load_shared_game(game_loader_t *gload)
 
     /* 2 functional style */
     CLOG_DEBUG("load all shared librairies in directory: %s\n", search_directory);
-    retour = for_files_with_extension( search_directory, "dll", 
+    retour = for_files_with_extension( search_directory, "so", /*'dll'*/
                                        &load_game_dll_callback, 
                                        (clist_gen_t *)gload->map_game );
     /* to check retour or return directly */

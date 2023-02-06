@@ -11,7 +11,6 @@
 
 game_loader_t * gload;
 
-
 static int setup(void **state) {
     (void) state;
     gload = game_loader_new();
@@ -132,8 +131,13 @@ static void get_ptr_games_from_name()
 
     assert_non_null( pfgame1 );
     assert_non_null( pfgame2 );
+    /* not working on linux, same version ?? */
+    /*
     assert_uint_equal( 0x10, pfgame1 );
     assert_uint_equal( 0x20, pfgame2 );
+    */
+    assert_int_equal( 0x10, pfgame1 );
+    assert_int_equal( 0x20, pfgame2 );
 }
 
 /* static void get_ptr_games_from_indices() {
@@ -166,7 +170,7 @@ static void list_plugins_functional()
     int retour;
     plugin_manager_set_directory( plugin_manager_get_instance(), "test_plugins");
     game_loader_init( gload );
-    retour = for_files_with_extension("test_plugins", "dll", //"lib", 
+    retour = for_files_with_extension("test_plugins", "so", //"dll", //"lib", 
                                       &load_game_dll_callback, 
                                       (clist_gen_t *)gload->map_game);
 

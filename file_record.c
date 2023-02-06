@@ -187,7 +187,9 @@ int extract_one_record(file_record_t *this, char *line, joueur_t *joueur)
     /*sscanf( line, "\n%s %d\n", &joueur->person.nom, &joueur->person.is_daltonien );*/
     retour = sscanf( line, "\n%s %d\n", name_record, &is_daltonien );
     /* return errno or nb correct assignement == 2 */
-    strncpy_s( joueur->person.nom, MAX_SIZE_NOM_PERSON, name_record, MAX_SIZE_NOM_PERSON);
+    /* only microsoft bullshit and never standard */
+    /*strncpy_s( joueur->person.nom, MAX_SIZE_NOM_PERSON, name_record, MAX_SIZE_NOM_PERSON);*/
+    strncpy( joueur->person.nom, name_record, MAX_SIZE_NOM_PERSON);
     joueur->person.is_daltonien = is_daltonien;
 
 
