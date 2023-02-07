@@ -6,6 +6,8 @@
 # many tricks
 # https://stackoverflow.com/questions/53136024/makefile-to-compile-all-c-files-without-needing-to-specify-them
 # https://accu.org/journals/overload/14/71/miller_2004/ famous paper: recursive make considered harmful
+# https://stackoverflow.com/questions/7891097/what-are-double-colon-rules-in-a-makefile-for
+# https://stackoverflow.com/questions/2145590/what-is-the-purpose-of-phony-in-a-makefile
 
 # debug option, override with make all debug=no CFLAGS=-std=c99
 # yes, use in code of JMMJ_DEBUG (example in main.c), and -g four building in debug mode( possibility to use a debugger)
@@ -107,7 +109,7 @@ libgame_morpion.so : game_morpion.o game_morpion.h victory.o
 	$(CC) -shared $(CFLAGS) $^ -o $@
 
 # include the description for each module
-include $(patsubst %,%/Module.mk,$(MODULES))
+include $(patsubst %,%/Module.linux.mk,$(MODULES))
 
 # call clean here and in subdirectories
 clean::

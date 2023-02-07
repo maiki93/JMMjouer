@@ -94,7 +94,7 @@ test_arcade: $(MODDIR_TESTS)/test_arcade.o $(OBJS_NO_ARCADE) game_pendu.o
 	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
 test_mastermind: $(MODDIR_TESTS)/test_mastermind.o utils.o victory.o
-	@echo "Building test_game_loader @ :    $@"  # target name
+	@echo "Building test_mastermind @ :    $@"  # target name
 	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 	
 # use only interface header in test

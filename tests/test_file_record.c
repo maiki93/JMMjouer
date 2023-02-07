@@ -130,9 +130,7 @@ static void joueur_with_historic()
 static void default_init_joueur_with_historic()
 {
     joueur_t joueur;
-    struct pair_game_victory_t pair_out;
-
-
+    
     file_record_t *file = file_record_new();
     file_record_init( file, "test_record_file.txt");
 

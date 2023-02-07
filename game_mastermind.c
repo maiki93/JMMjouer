@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <assert.h>
 
 /* colors in console
     #include <conio.h>  // color in console, only for windows ? and very old
@@ -289,10 +290,13 @@ void mm_affiche_resultat_guess_blackwhite( char* p_string, const int nb_bien_pla
     /* from devdocs.io */
     const char *fmt = "B:%d / M:%d";
 
-    int sz = snprintf(NULL, 0, fmt, nb_bien_place, nb_mal_place);
-    printf("sz : %d", sz);
+    /*int sz = snprintf(NULL, 0, fmt, nb_bien_place, nb_mal_place);*/
+    /*printf("sz : %d", sz);*/
     /* TODO CHECK SIZE, sz +1 should be ? */
-    snprintf(buffer, sizeof(buffer), fmt, nb_bien_place, nb_mal_place);
+    /* snprintf C99, only sprintf available*/
+    /*int sz = snprintf(buffer, sizeof(buffer), fmt, nb_bien_place, nb_mal_place);*/
+    int sz = sprintf(buffer, fmt, nb_bien_place, nb_mal_place);
+    assert( sz < LINE_SIZE_ON_SCREEN );
     printf("buffer:%s\n", buffer);
     /* cat original and buffer */
     strcat( p_string, buffer );

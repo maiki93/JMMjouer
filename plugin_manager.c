@@ -242,7 +242,9 @@ ptr_plugin_funct plugin_manager_get_game_ptrf( const plugin_mgr_t* manager, cons
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wcast-function-type"
 #endif
-    funct_casted = (ptr_plugin_funct) fptr;
+    funct_casted = (ptr_plugin_funct) fptr; /* pragma still warning on linux (-pedantic)*/
+/* certainly not seen #pragma , only windows */
+
     /* #pragma GCC diagnostic ignored "-Wpedantic"
     pf_game = (ptr_game_t) (void*) fptr; */
 #if defined(__GNUC__) || defined(__GNUG__)
