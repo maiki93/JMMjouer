@@ -1,0 +1,50 @@
+{
+    "makefile.buildBeforeLaunch": false,
+    "makefile.makefilePath": "Makefile.linux",
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/michael/source/JMMjouer",
+            "binaryPath": "/home/michael/source/JMMjouer/test_clist_generic",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "/home/michael/source/JMMjouer",
+            "binaryPath": "/home/michael/source/JMMjouer/test_clist_cstring",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "/home/michael/source/JMMjouer",
+            "binaryPath": "/home/michael/source/JMMjouer/test_clogger",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "/home/michael/source/JMMjouer",
+            "binaryPath": "/home/michael/source/JMMjouer/test_cmap_game_ptrf",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "/home/michael/source/JMMjouer",
+            "binaryPath": "/home/michael/source/JMMjouer/test_cmap_game_victories",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "/home/michael/source/JMMjouer",
+            "binaryPath": "/home/michael/source/JMMjouer/test_mastermind",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "/home/michael/source/JMMjouer",
+            "binaryPath": "/home/michael/source/JMMjouer/test_file_record",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "/home/michael/source/JMMjouer",
+            "binaryPath": "/home/michael/source/JMMjouer/test_game_loader",
+            "binaryArgs": []
+        }
+    ],
+    "files.associations": {
+        "dirent.h": "c",
+        "stdio.h": "c"
+    }
+}
