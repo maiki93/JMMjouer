@@ -24,6 +24,9 @@ MODULES := tests
 # -Wstrict-overflow=5, make pass game_morpion compilation
 # -Wunused -W (included already)
 # -fPIC on Windows, not adviced ?
+#       on linux not for performance ? but cannot comile, give error !
+# -g3 : all debug information + MACRO (-g0 : no debug ), -g default 2
+# -ggdb : include gdb extension if possible (not tested)
 CFLAGS = -Wall -Wextra -pedantic -Wno-variadic-macros #-Wno-strict-overflow
 # to include again:  -Werror, better than Wno-X warning appears but compiles fine
 
@@ -36,7 +39,7 @@ STD = -std=c90
 # 	or declare directly here ? better will apply to all files without need to include a common header ?
 ifeq ($(debug),yes)          # separator mandatory between ifeq and '('
 # use specific code for the project, g3 to include MACRO definition as variables
-	CFLAGS += -g -g3 -O0 -DJMMJ_DEBUG
+	CFLAGS += -g3 -O0 -DJMMJ_DEBUG
 else
 # kind of standard with gcc projects
 	CFLAGS += -DNDEBUG -O2
@@ -103,8 +106,8 @@ libgame_pendu.dll : game_pendu.o game_pendu.h victory.o
 #	$(CC) -shared game_morpion.o -o libmorpion.dll
 
 # windows style, with importing lib, not used at run-time link anyway
-libmorpion.dll : game_morpion.o game_morpion.h victory.o
-	$(CC) -shared $(CFLAGS) $^ -o libmorpion.dll -Wl,--out-implib,libmorpion.lib
+libgame_morpion.dll : game_morpion.o game_morpion.h victory.o
+	$(CC) -shared $(CFLAGS) $^ -o $@ -Wl,--out-implib,libgame_morpion.lib
 
 # include the description for each module
 include $(patsubst %,%/Module.mingw64_gcc.mk,$(MODULES))

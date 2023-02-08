@@ -170,7 +170,7 @@ static void list_plugins_functional()
     int retour;
     plugin_manager_set_directory( plugin_manager_get_instance(), "test_plugins");
     game_loader_init( gload );
-    retour = for_files_with_extension("test_plugins", "so", //"dll", //"lib", 
+    retour = for_files_with_extension("test_plugins", EXT_DLL, //"dll", //"lib", 
                                       &load_game_dll_callback, 
                                       (clist_gen_t *)gload->map_game);
 

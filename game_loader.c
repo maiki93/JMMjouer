@@ -23,6 +23,12 @@
 /* Define games known at compilation in a separate file, always included */
 #include "default_games.h"
 
+#if defined(_WIN32)
+    #define EXT_DLL "dll"
+#else
+    #define EXT_DLL "so"
+#endif
+
 /* full definition, a bit overkill this class with one data member but clear design and extendable */
 struct game_loader_type {
     cmap_ptrf_game_t *map_game;
@@ -125,7 +131,7 @@ static int load_shared_game(game_loader_t *gload)
 
     /* 2 functional style */
     CLOG_DEBUG("load all shared librairies in directory: %s\n", search_directory);
-    retour = for_files_with_extension( search_directory, "so", /*'dll'*/
+    retour = for_files_with_extension( search_directory, EXT_DLL,
                                        &load_game_dll_callback, 
                                        (clist_gen_t *)gload->map_game );
     /* to check retour or return directly */

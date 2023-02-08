@@ -14,10 +14,11 @@
 const char* DIR_PLUGINS = "test_plugins";
 /* coud use only specific extension + macro to create the name?*/
 #if defined(_WIN32)
-    const char* NAME_DLL_MORPION = "libmorpion.dll";
+    const char* NAME_DLL_MORPION = "libgame_morpion.dll";
 #else
     const char* NAME_DLL_MORPION = "libgame_morpion.so";
 #endif
+
 const char* START_GAME_FUNCTION = "start_game_morpion";
 
 /* because inclusion of *c file, can check private data */
