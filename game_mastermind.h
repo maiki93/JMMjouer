@@ -4,12 +4,7 @@
 #include "person.h"
 #include "victory.h"
 
-#if defined(_WIN32)
-    #define SHARED_LIB __declspec(dllexport)
-#else
-    #undef SHARED_LIB
-#endif
-
-victory_t SHARED_LIB start_game_mastermind(person_t person);
+/* Mastermind included in source code, no need to export anything */
+victory_t start_game_mastermind(person_t person);
 
 #endif

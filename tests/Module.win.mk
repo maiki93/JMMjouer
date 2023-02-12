@@ -10,6 +10,8 @@ MODDIR_TESTS := tests
 CFLAGS_TESTS = /nologo /W4 /D_CRT_SECURE_NO_WARNINGS /wd4113
 # other variables taken for the main Makefile
 
+# may pass for all executables in LFLAGS_TESTS /NOIMPLIB /NOEXP
+
 ## CMocka it is 64 bit compilation
 INCLUDE_CMOCKA = C:\dev\cmocka_local_msvc\include
 LIB_CMOCKA = C:\dev\cmocka_local_msvc\lib
@@ -59,7 +61,7 @@ test_game_loader: $(MODDIR_TESTS)/test_game_loader.obj cmap_ptrf_game.obj clist_
 				clist_cstring.obj clogger.obj plugin_manager.obj utils.obj utils_file.obj \
 				victory.obj game_pendu.obj game_mastermind.obj
 	@echo "Building test_game_loader @ :    $@"  # target name
-	$(LINK) $(LFLAGS) /LIBPATH:$(LIB_CMOCKA) cmocka.lib $?
+	$(LINK) $(LFLAGS) /NOIMPLIB /NOEXP /LIBPATH:$(LIB_CMOCKA) cmocka.lib $?
 
 test_clist_generic: $(MODDIR_TESTS)/test_clist_generic.obj clogger.obj
 	echo "Building test_clist_generic @ :    $@"  # target name
@@ -83,7 +85,7 @@ OBJS_NO_ARCADE := $(filter-out arcade.obj, $(OBJS))
 
 test_arcade: $(MODDIR_TESTS)/test_arcade.obj $(OBJS_NO_ARCADE) game_pendu.obj
 	@echo "Building test_arcade @ :    $@"  # target name
-	$(LINK) $(LFLAGS) /LIBPATH:$(LIB_CMOCKA) cmocka.lib $?
+	$(LINK) $(LFLAGS) /NOIMPLIB /NOEXP /LIBPATH:$(LIB_CMOCKA) cmocka.lib $?
 
 test_mastermind: $(MODDIR_TESTS)/test_mastermind.obj utils.obj victory.obj
 	@echo "Building test_mastermind @ :    $@"  # target name

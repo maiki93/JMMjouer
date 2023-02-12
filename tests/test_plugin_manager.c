@@ -13,8 +13,10 @@
 /* constante for tests */
 const char* DIR_PLUGINS = "test_plugins";
 /* coud use only specific extension + macro to create the name?*/
-#if defined(_WIN32)
-    const char* NAME_DLL_MORPION = "libgame_morpion.dll";
+#if defined(_WIN32) && defined (_MSC_VER)
+    const char* NAME_DLL_MORPION = "game_morpion.dll";
+#elif defined(_WIN32) && defined(__GNUC__)
+    const char* NAME_DLL_MORPION = "libgame_morpion.dll"; 
 #else
     const char* NAME_DLL_MORPION = "libgame_morpion.so";
 #endif
