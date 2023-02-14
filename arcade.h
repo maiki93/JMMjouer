@@ -2,7 +2,7 @@
 
 /*#include "plugin_manager_fwd.h"*/
 #include "game_loader.h"
-#include "irecord_fwd.h" /* typedef irecord_t */
+#include "record/irecord_fwd.h" /* typedef irecord_t */
 
 /* forward declaration */
 struct arcade_params_t;

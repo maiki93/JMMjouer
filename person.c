@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "clogger.h"
+#include "clogger/clogger.h"
 
 int person_init(person_t * person, const char * name, bool is_daltonien )
 {

@@ -5,7 +5,7 @@
 #include "person.h"
 #include "victory.h"
 
-#include "clist_cstring.h"
+#include "ccontainer/clist_cstring.h"
 
 /* plg_manager singleton => used only internally but too restrictive */
 /*#include "plugin_manager_fwd.h"*/

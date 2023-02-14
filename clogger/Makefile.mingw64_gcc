@@ -1,0 +1,49 @@
+#
+# First version of library splitting
+# Use a dependent module or Makefile ?
+#
+# try independent Makefile for clogger
+
+debug = yes
+
+CC = gcc
+
+MODULES := tests
+
+CFLAGS = -Wall -Wextra -pedantic -Wno-variadic-macros
+
+STD = -std=c90
+
+ifeq ($(debug),yes)
+# use specific code for the project, g3 to include MACRO definition as variables
+	CFLAGS += -g3 -O0
+else
+# kind of standard with gcc projects
+	CFLAGS += -DNDEBUG -O2
+endif
+
+$(info)
+$(info == CLOGGER ==)
+$(info $$CURDIR is $(CURDIR) )
+$(info $$CC is $(CC) )
+$(info $$CFLAGS is $(CFLAGS) )
+
+.PHONY : libclogger.a
+
+# general rule for compiling c files when header file is available 
+%.o: %.c %.h
+	@echo "Build file generic rule with header in clogger:   $@"
+	$(CC) $(STD) $(CFLAGS) -c $< -o $@
+
+# ar - a Linux tool to create, modify, and extract from archives see the man pages for further information. The options in this case mean:
+# r - replace files existing inside the archive
+# c - create a archive if not already existent
+# s - create an object-file index into the archive
+# static lib just an archive file
+libclogger.a : clogger.o
+	ar rcs $@ $^
+
+clean:
+	@echo "Clean module clogger"
+	rm -f ./clogger.o
+	rm -f ./libclogger.a

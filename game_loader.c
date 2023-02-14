@@ -17,7 +17,7 @@
 #include "cmap_ptrf_game.h"
 #include "plugin_manager.h" /* to get singleton instance */
 #include "utils_file.h"
-#include "clogger.h"
+#include "clogger/clogger.h"
 /* if forward declare in header */
 
 /* Define games known at compilation in a separate file, always included */

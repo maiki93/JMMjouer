@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "cmap_ptrf_game.h"
-#include "clist_generic.h"
+/*#include "ccontainer/clist_generic.h"*/
 
 /*
 #include "victory.h"

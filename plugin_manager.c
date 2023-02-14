@@ -11,7 +11,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "clogger.h"
+#include "clogger/clogger.h"
 
 enum { MAX_NB_SHARED_LIB = 5};
 

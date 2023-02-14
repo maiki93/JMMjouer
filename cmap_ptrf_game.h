@@ -4,7 +4,7 @@
 
 #include "victory.h"
 #include "person.h"
-#include "clist_cstring.h"
+#include "ccontainer/clist_cstring.h"
 
 typedef victory_t(*ptr_game_local_t)(person_t);
 

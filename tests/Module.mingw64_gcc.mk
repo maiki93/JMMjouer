@@ -77,14 +77,14 @@ test_game_loader: $(MODDIR_TESTS)/test_game_loader.o cmap_ptrf_game.o clist_gene
 	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
 # very basic, general
-test_clist_generic: $(MODDIR_TESTS)/test_clist_generic.o clogger.o
-	@echo "Building test_game_loader @ :    $@"  # target name
-	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
+#test_clist_generic: $(MODDIR_TESTS)/test_clist_generic.o clogger.o
+#	@echo "Building test_game_loader @ :    $@"  # target name
+#	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
 # here test with public API only(don't include impl *c), must provide *.o dependencies
-test_clist_cstring: $(MODDIR_TESTS)/test_clist_cstring.o clist_cstring.o clist_generic.o clogger.o
-	@echo "Building test_clist_cstring @ :    $@"  # target name
-	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
+#test_clist_cstring: $(MODDIR_TESTS)/test_clist_cstring.o clist_cstring.o clist_generic.o clogger.o
+#	@echo "Building test_clist_cstring @ :    $@"  # target name
+#	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
 # cmap_game_victories.o not needed include *.c implementation
 test_cmap_game_victories: $(MODDIR_TESTS)/test_cmap_game_victories.o clist_generic.o clogger.o

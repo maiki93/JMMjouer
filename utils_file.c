@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "clogger.h"
+#include "clogger/clogger.h"
 
 /* need windows API header 
     https://learn.microsoft.com/en-us/windows/win32/fileio/listing-the-files-in-a-directory

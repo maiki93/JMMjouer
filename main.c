@@ -19,10 +19,10 @@
 #include "game_loader.h"
 #include "plugin_manager.h"
 
-#include "irecord.h"
-#include "file_record.h"
+#include "record/irecord.h"
+#include "record/file_record.h"
 
-#include "clogger.h"
+#include "clogger/clogger.h"
 #include "utils.h"
 
 /* https://opensource.com/article/19/5/how-write-good-c-main-function */

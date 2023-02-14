@@ -8,7 +8,8 @@
 #include <stdio.h> /*only for printf, may be commented */
 #include <string.h>
 
-#include "../clist_cstring.h"
+/*#include "../clist_cstring.h"*/
+#include "ccontainer/clist_cstring.h"
 
 /* string insertion */
 const char string1[] = "first";

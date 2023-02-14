@@ -12,12 +12,12 @@
 #include "arcade.h"
 #include "joueur.h"         /* person included */
 #include "victory.h"
-#include "irecord.h"
+#include "record/irecord.h"
 #include "game_loader.h"
 #include "plugin_manager.h"
-#include "clogger.h"
+#include "clogger/clogger.h"
 #include "utils.h"           /* clear_stdin */
-#include "clist_cstring.h"
+#include "ccontainer/clist_cstring.h"
 
 /* no more use ?
 enum { STREAM_INPUT_MAX_SIZE = 25 };

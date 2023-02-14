@@ -3,8 +3,9 @@
 /*#include <stdio.h> */ /* only for print, to delete later if use log only */
 /*#include <stdlib.h>*/
 
-#include "clist_generic.h"
-#include "clogger.h"
+/*#include "ccontainer/clist_generic.h"*/
+#include "ccontainer/clist_generic.h"
+#include "clogger/clogger.h"
 
 struct clist_node {
     value_t value;

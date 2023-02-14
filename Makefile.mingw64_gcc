@@ -14,7 +14,8 @@ CC = gcc
 
 # List of subdirectories containing a Module.mk file
 #MODULES := tests tests/test_mock
-MODULES := tests
+# clogger call by an explicit make, no use of module
+MODULES := ccontainer record tests
 
 # see advices (and much more than compilation options) https://matt.sh/howto-c
 # compiler option, activate many warning( here seeems common to gcc and clang)
@@ -27,7 +28,8 @@ MODULES := tests
 #       on linux not for performance ? but cannot comile, give error !
 # -g3 : all debug information + MACRO (-g0 : no debug ), -g default 2
 # -ggdb : include gdb extension if possible (not tested)
-CFLAGS = -Wall -Wextra -pedantic -Wno-variadic-macros #-Wno-strict-overflow
+# add include path current
+CFLAGS = -Wall -Wextra -pedantic -Wno-variadic-macros -I . #-Wno-strict-overflow
 # to include again:  -Werror, better than Wno-X warning appears but compiles fine
 
 # standard configurable
@@ -45,6 +47,9 @@ else
 	CFLAGS += -DNDEBUG -O2
 endif
 
+$(info)
+$(info == CLOGGER ==)
+$(info $$CURDIR is $(CURDIR) )
 $(info $$CC is $(CC) )
 $(info $$CFLAGS is $(CFLAGS) )
 
@@ -57,12 +62,15 @@ $(info $$CFLAGS is $(CFLAGS) )
 
 # Use explicit OBJS, more control
 # do not include main.o
-OBJS = clogger.o utils.o utils_file.o \
-	   clist_generic.o clist_cstring.o  \
-	   victory.o cmap_game_victories.o person.o joueur.o \
+# replace step-by-step by library : 
+# 	clogger : clogger.o,
+#   ccontainer : clist_generic.o clist_cstring.o
+#   record : irecord.o file_record.o
+#   cmap_game_victories.o person.o joueur.o # victory ?? only header ??
+OBJS = utils.o utils_file.o \
+	   victory.o \
 	   plugin_manager.o cmap_ptrf_game.o game_loader.o \
 	   game_mastermind.o \
-	   file_record.o irecord.o \
 	   arcade.o
 
 # define main executable
@@ -72,7 +80,11 @@ EXE  := JMMjouer
 $(info $$OBJS is [$(OBJS)] )
 
 # alternative to target as files
-.PHONY : all clean unit_test
+#.PHONY : all clean unit_test
+
+.PHONY : dep_lib
+
+dep_lib : libclogger.a libccontainer.a libjoueur.dll librecord.dll libgame_pendu.dll
 
 # make all, generic way to use make produce executable JMMjouer
 all: $(EXE)
@@ -90,11 +102,31 @@ unit_test::
 	@echo "Build file generic rule without header in root:   $@"
 	$(CC) $(STD) $(CFLAGS) -c $< -o $@
 
+# intermediate library, victory not needed ??
+libjoueur.dll : person.o joueur.o cmap_game_victories.o libclogger.a
+	$(CC) -shared $(CFLAGS) -o $@ $^ -L. -lccontainer -Wl,--out-implib,libjoueur.lib
+
 # -Wl,-rpath,dir1  or -rpath=dir1 # -Wl to pass argument to linker, rpath runtime to search for lib
-$(EXE): $(OBJS) main.o libgame_pendu.dll
+#$(EXE): $(OBJS) main.o libclogger.a libccontainer.a librecord.a libgame_pendu.dll
+#	@echo "Build $(EXE): all dependencies $^"
+#	$(CC) $(STD) $(CFLAGS) $^ -L. -lgame_pendu -o $@
+
+$(EXE): $(OBJS) main.o libgame_pendu.dll libclogger.a libccontainer.a libjoueur.dll librecord.dll 
 	@echo "Build $(EXE): all dependencies $^"
-#	$(CC) $(STD) $(CFLAGS) $^ -o $@
-	$(CC) $(STD) $(CFLAGS) $^ -L. -lgame_pendu -o $@
+#	$(CC) $(STD) $(CFLAGS) $(OBJS) main.o -L. -lgame_pendu -ljoueur -lrecord -o $@
+# libcontainer not present, already included lrecord, otherwise double definition
+	$(CC) $(STD) $(CFLAGS) $^ -L. -lgame_pendu -ljoueur -lrecord -o $@
+
+#### libraries in dependencies,
+## usefull to copy ? or better to include in a common path (e.g. for TU ?)
+libclogger.a : 
+	cd clogger && make -f Makefile.mingw64_gcc libclogger.a
+	cp clogger/libclogger.a .
+	
+# test with module, target will be included
+#libccontainer.a :
+#	cd ccontainer && make -f Makefile.mingw64_gcc libccontainer.a
+# librecord.dll
 
 ##### compile shared library to include at compile-time
 libgame_pendu.dll : game_pendu.o game_pendu.h victory.o
@@ -112,9 +144,12 @@ libgame_morpion.dll : game_morpion.o game_morpion.h victory.o
 # include the description for each module
 include $(patsubst %,%/Module.mingw64_gcc.mk,$(MODULES))
 
+
+
 # call clean here and in subdirectories
 clean::
 	@echo "Clean in root directory"
+	cd clogger && make -f Makefile.mingw64_gcc clean
 	rm -f ./*.o
-	rm -f ./*.dll ./*.lib
+	rm -f ./*.dll ./*.lib ./*.a
 	rm -f JMMjouer

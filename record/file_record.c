@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "irecord_private.h"
-#include "clogger.h"
+#include "clogger/clogger.h"
 
 #include "cmap_game_victories.h"
 
