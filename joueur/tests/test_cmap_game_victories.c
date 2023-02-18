@@ -6,7 +6,7 @@
 #include "cmocka.h"
 
 /* #include "../clist_generic.c" */
-#include "../cmap_game_victories.c"
+#include "joueur/cmap_game_victories.c"
 
 /* common data, pair_game_victory_t do not use dynamic allocation
     no explicit free needed  */

@@ -2,8 +2,8 @@
 
 #include <stddef.h> /* ask when use in game_loader_, load of dll ? */
 
-#include "victory.h"
-#include "person.h"
+#include "joueur/victory.h"
+#include "joueur/person.h"
 #include "ccontainer/clist_cstring.h"
 
 typedef victory_t(*ptr_game_local_t)(person_t);

@@ -6,7 +6,7 @@
 #include "irecord_private.h"
 #include "clogger/clogger.h"
 
-#include "cmap_game_victories.h"
+#include "joueur/cmap_game_victories.h"
 
 /* complete declaration of file_record_t */
 typedef struct {

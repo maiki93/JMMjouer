@@ -15,7 +15,7 @@ CC = gcc
 # List of subdirectories containing a Module.mk file
 #MODULES := tests tests/test_mock
 # clogger call by an explicit make, no use of module
-MODULES := ccontainer record tests
+MODULES := ccontainer joueur record game_loader tests
 
 # see advices (and much more than compilation options) https://matt.sh/howto-c
 # compiler option, activate many warning( here seeems common to gcc and clang)
@@ -47,12 +47,6 @@ else
 	CFLAGS += -DNDEBUG -O2
 endif
 
-$(info)
-$(info == CLOGGER ==)
-$(info $$CURDIR is $(CURDIR) )
-$(info $$CC is $(CC) )
-$(info $$CFLAGS is $(CFLAGS) )
-
 # search for all *.c files and make *.o files
 # keep for example
 #SRCS := $(wildcard *.c)
@@ -66,24 +60,27 @@ $(info $$CFLAGS is $(CFLAGS) )
 # 	clogger : clogger.o,
 #   ccontainer : clist_generic.o clist_cstring.o
 #   record : irecord.o file_record.o
-#   cmap_game_victories.o person.o joueur.o # victory ?? only header ??
-OBJS = utils.o utils_file.o \
-	   victory.o \
-	   plugin_manager.o cmap_ptrf_game.o game_loader.o \
-	   game_mastermind.o \
-	   arcade.o
+#   joueur :cmap_game_victories.o person.o joueur.o # victory ?? only header ??
+#		then include victory.o
+#   game_loader : plugin_manager.o cmap_ptrf_game.o game_loader.o
+OBJS = utils.o utils_file.o arcade.o
+	   
+
+OBJS_CORE += $(OBJS)
 
 # define main executable
 EXE  := JMMjouer
 
 # inspect variables
+$(info == ROOT ==)
 $(info $$OBJS is [$(OBJS)] )
+$(info $$OBJS is [$(OBJS_CORE)] )
+
+STD_TESTS = -std=c99
 
 # alternative to target as files
 #.PHONY : all clean unit_test
-
 .PHONY : dep_lib
-
 dep_lib : libclogger.a libccontainer.a libjoueur.dll librecord.dll libgame_pendu.dll
 
 # make all, generic way to use make produce executable JMMjouer
@@ -102,20 +99,66 @@ unit_test::
 	@echo "Build file generic rule without header in root:   $@"
 	$(CC) $(STD) $(CFLAGS) -c $< -o $@
 
+# include the description for each module
+include $(patsubst %,%/Module.mingw64_gcc.mk,$(MODULES))
+
 # intermediate library, victory not needed ??
-libjoueur.dll : person.o joueur.o cmap_game_victories.o libclogger.a
-	$(CC) -shared $(CFLAGS) -o $@ $^ -L. -lccontainer -Wl,--out-implib,libjoueur.lib
+# here or in own module... best ??
+#libjoueur.dll : person.o joueur.o cmap_game_victories.o libclogger.a
+#	$(CC) -shared $(CFLAGS) -o $@ $^ -L. -lccontainer -Wl,--out-implib,libjoueur.lib
 
 # -Wl,-rpath,dir1  or -rpath=dir1 # -Wl to pass argument to linker, rpath runtime to search for lib
 #$(EXE): $(OBJS) main.o libclogger.a libccontainer.a librecord.a libgame_pendu.dll
-#	@echo "Build $(EXE): all dependencies $^"
+#	@echo "Build $(EXE): all dependencies $^" \
 #	$(CC) $(STD) $(CFLAGS) $^ -L. -lgame_pendu -o $@
 
-$(EXE): $(OBJS) main.o libgame_pendu.dll libclogger.a libccontainer.a libjoueur.dll librecord.dll 
-	@echo "Build $(EXE): all dependencies $^"
+$(info)
+$(info == ROOT 2 ==)
+$(info $$OBJS is [$(OBJS)] )
+$(info $$OBJS_CORE is [$(OBJS_CORE)] )
+$(info $$OBJS_GM is [$(OBJS_GM)] )
+$(info dir: $(dir $(lastword $(MAKEFILE_LIST))) )
+
+# seems very convenient !
+currentDir = $(dir $(lastword $(MAKEFILE_LIST)))
+
+# libgame_loader.dll 
+# libjoueur_dll.lib
+#$(EXE): $(OBJS_CORE) $(OBJS_GM) main.o libgame_pendu.dll libclogger.a libccontainer.a librecord.dll
+#	@echo "Build $(EXE): all dependencies $^"
+#	@echo "Build with OBJS_CORE $(OBJS_CORE)"
+# libcontainer not present, already included lrecord, otherwise double definition
+# indeed it was already in the list $^
+#	$(CC) $(STD) $(CFLAGS) -o $@ $^ -L. -lgame_pendu -ljoueur_dll -lrecord 
+
+# with libgame_loader.dll (exporting all symbols)
+# ok, do not care of multiple definitions
+#$(EXE): main.o arcade.o libgame_loader.dll libclogger.a libccontainer.a librecord.dll
+#	@echo "Build $(EXE): all dependencies $^"
+#	@echo "Build with OBJS_CORE $(OBJS_CORE)"
 #	$(CC) $(STD) $(CFLAGS) $(OBJS) main.o -L. -lgame_pendu -ljoueur -lrecord -o $@
 # libcontainer not present, already included lrecord, otherwise double definition
-	$(CC) $(STD) $(CFLAGS) $^ -L. -lgame_pendu -ljoueur -lrecord -o $@
+# indeed it was already in the list $^
+#	$(CC) $(STD) $(CFLAGS) -o $@ $^ -L. -lgame_pendu -ljoueur_dll -lrecord
+# yep working, but all in libgame_loader ! 
+#	
+
+# with libgame_loader as static
+$(EXE): main.o $(OBJS) libgame_loader.lib libclogger.a libccontainer.a librecord.dll
+	@echo "Build $(EXE): all dependencies $^"
+	@echo "Build with OBJS_CORE $(OBJS_CORE)"	
+	$(CC) $(STD) $(CFLAGS) -o $@ $^ -L. -ljoueur_dll
+
+# working
+#gcc -std=c90 -Wall -Wextra -pedantic -Wno-variadic-macros -I .  -g3 -O0 -DJMMJ_DEBUG -o JMMjouer \
+#	utils.o utils_file.o game_mastermind.o arcade.o main.o \
+#	game_loader/cmap_ptrf_game.o game_loader/plugin_manager.o game_loader/game_loader.o \
+#	libgame_pendu.dll libclogger.a libccontainer.a libjoueur.dll librecord.dll -L. -lgame_pendu -ljoueur -lrecord
+
+## Version full static
+JMMjouer_static : main.o $(OBJS) $(OBJS_CCONTAINER) $(OBJS_JOUEUR) $(OBJS_GAME_LOADER) $(OBJS_RECORD) clogger/clogger.o
+	$(CC) $(STD) $(CFLAGS) -o $@ $^
+
 
 #### libraries in dependencies,
 ## usefull to copy ? or better to include in a common path (e.g. for TU ?)
@@ -128,9 +171,6 @@ libclogger.a :
 #	cd ccontainer && make -f Makefile.mingw64_gcc libccontainer.a
 # librecord.dll
 
-##### compile shared library to include at compile-time
-libgame_pendu.dll : game_pendu.o game_pendu.h victory.o
-	$(CC) -shared $(CFLAGS) $^ -o $@ -Wl,--out-implib,libgame_pendu.lib
 
 ##### compile shared library to include at run-time (game_morpion)
 # version unix-like available more recently in mingw
@@ -138,13 +178,13 @@ libgame_pendu.dll : game_pendu.o game_pendu.h victory.o
 #	$(CC) -shared game_morpion.o -o libmorpion.dll
 
 # windows style, with importing lib, not used at run-time link anyway
-libgame_morpion.dll : game_morpion.o game_morpion.h victory.o
-	$(CC) -shared $(CFLAGS) $^ -o $@ -Wl,--out-implib,libgame_morpion.lib
-
-# include the description for each module
-include $(patsubst %,%/Module.mingw64_gcc.mk,$(MODULES))
-
-
+# if no joueur/victory.o => undefined victory_init
+# can include joueur/victory.o (already in libjoueur)
+#libgame_morpion.dll : game_morpion.o game_morpion.h joueur/victory.o
+#	$(CC) -shared $(CFLAGS) $^ -o $@ -Wl,--out-implib,libgame_morpion.lib
+# link to libjoueur throught libjoueur.lib , fine also
+libgame_morpion.dll : game_morpion.o game_morpion.h
+	$(CC) -shared $(CFLAGS) -o $@ $^ -L. -ljoueur_dll -Wl,--out-implib,libgame_morpion_dll.lib
 
 # call clean here and in subdirectories
 clean::
@@ -152,4 +192,6 @@ clean::
 	cd clogger && make -f Makefile.mingw64_gcc clean
 	rm -f ./*.o
 	rm -f ./*.dll ./*.lib ./*.a
-	rm -f JMMjouer
+	rm -f JMMjouer JMMjouer_static
+# should not be here
+	rm -f test*.exe

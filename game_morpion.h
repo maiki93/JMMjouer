@@ -1,8 +1,8 @@
 #ifndef MORPION_H_INCLUDED
 #define MORPION_H_INCLUDED
 
-#include "person.h"
-#include "victory.h"
+#include "joueur/person.h"
+#include "joueur/victory.h"
 
 #if defined(_WIN32)
     #define SHARED_LIB __declspec(dllexport)

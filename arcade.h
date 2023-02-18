@@ -1,7 +1,7 @@
 #pragma once
 
 /*#include "plugin_manager_fwd.h"*/
-#include "game_loader.h"
+#include "game_loader/game_loader.h"
 #include "record/irecord_fwd.h" /* typedef irecord_t */
 
 /* forward declaration */

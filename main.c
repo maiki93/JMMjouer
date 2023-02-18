@@ -16,8 +16,8 @@
 #include "arcade.h"
 /* storage of available games + in charge of loading dll (composition)
    injected in arcade (plugin manager is singleton) */
-#include "game_loader.h"
-#include "plugin_manager.h"
+#include "game_loader/game_loader.h"
+#include "game_loader/plugin_manager.h"
 
 #include "record/irecord.h"
 #include "record/file_record.h"

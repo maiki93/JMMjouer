@@ -1,6 +1,6 @@
 
-#include "game_mastermind.h"
-#include "game_pendu.h"
+#include "game_loader/game_mastermind.h"
+#include "game_loader/game_pendu.h"
 
 /* @brief List the games known at compilation.
 

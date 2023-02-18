@@ -43,6 +43,9 @@ $(info $$CFLAGS is $(CFLAGS) )
 libclogger.a : clogger.o
 	ar rcs $@ $^
 
+#test_clogger : tests/test_clogger.c
+	
+
 clean:
 	@echo "Clean module clogger"
 	rm -f ./clogger.o

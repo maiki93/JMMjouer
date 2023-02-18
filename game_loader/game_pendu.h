@@ -1,8 +1,8 @@
 #ifndef GAME_PENDU_H_INCLUDED
 #define GAME_PENDU_H_INCLUDED
 
-#include "person.h"
-#include "victory.h"
+#include "joueur/person.h"
+#include "joueur/victory.h"
 
 /* needed to produce the lib file with the dll */
 /* on windows declaration of declspec(dllexport) generates *lib and *exp files

@@ -1,9 +1,8 @@
 #pragma once
 
-
 /* needed for ptr_game_t definition */
-#include "person.h"
-#include "victory.h"
+#include "joueur/person.h"
+#include "joueur/victory.h"
 
 #include "ccontainer/clist_cstring.h"
 
@@ -36,9 +35,10 @@
   */
 
 /* pointer to function type to run the game */
+/* if void possible, much less dependencies */
 typedef victory_t(*ptr_game_t)(person_t);
 
-/* to get a better API, to try namespace ERR_GAME_LOADER::GAME_LOADER_OK */
+/* to get a better API, to try "namespace" ERR_GAME_LOADER::GAME_LOADER_OK */
 enum {
     GAME_LOADER_OK = 0,
     GAME_LOADER_ERROR_FILE = 1,

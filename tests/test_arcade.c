@@ -8,7 +8,7 @@
 
 #include "../arcade.c"
 
-#include "../file_record.h"
+#include "record/file_record.h"
 
 file_record_t *file_record;
 

@@ -9,8 +9,8 @@
     other link https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
     https://i.stack.imgur.com/9UVnC.png
 */
-#include "game_mastermind.h"
-#include "victory.h"
+#include "game_loader/game_mastermind.h"
+/*#include "victory.h"*/ /* included in .h */
 #include "utils.h"
 
 /* if we want to mock by redefinition,

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "irecord_fwd.h" /* define irecord_t */
-#include "joueur.h"      /* define Joueur with full structure available */
+#include "joueur/joueur.h"      /* define Joueur with full structure available */
 
 /* @brief Interface record storage of saved data (joueurs and scores)
     Try to follow c++ interface, abstract class with pure virtual functions.

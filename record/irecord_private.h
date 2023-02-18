@@ -1,6 +1,6 @@
 #pragma once
 
-#include "joueur.h"
+#include "joueur/joueur.h"
 
 /* hide structure declarationn, in a private file for use by derived class only */
 typedef struct {

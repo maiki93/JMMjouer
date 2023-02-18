@@ -10,11 +10,11 @@
 /* order of include important */
 #include "arcade_params.h"
 #include "arcade.h"
-#include "joueur.h"         /* person included */
-#include "victory.h"
+#include "joueur/joueur.h"         /* person included */
+#include "joueur/victory.h"
 #include "record/irecord.h"
-#include "game_loader.h"
-#include "plugin_manager.h"
+#include "game_loader/game_loader.h" /* already in h */
+#include "game_loader/plugin_manager.h"
 #include "clogger/clogger.h"
 #include "utils.h"           /* clear_stdin */
 #include "ccontainer/clist_cstring.h"

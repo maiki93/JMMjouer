@@ -11,7 +11,7 @@
 
 /* in  fact not used, mm_algo not declared in header
     2nde version, include directly *.c file */
-#include "../game_mastermind.c"
+#include "game_loader/game_mastermind.c"
 
 /***************
     Found 2 librairies for specific C testing and active maintenance/dev :

@@ -6,6 +6,7 @@ JMMjouer.layout
 
 **/.o
 **/*.dll
+**/*.lib
 # except worng dll in test_plugins
 **/*.so
 **/*.a

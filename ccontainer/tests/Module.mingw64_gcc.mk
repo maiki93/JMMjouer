@@ -28,8 +28,8 @@ unit_test :: test_clist_generic test_clist_cstring
 
 # static library linkage is done as any other object file
 test_clist_generic: $(MODDIR_CCONTAINER_TESTS)/test_clist_generic.o libclogger.a
-	@echo "Building test_game_loader @ :    $@"  # target name
-	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ -L $(LIB_CMOCKA) -lcmocka
+	@echo "Building test_clist_generic @ :    $@"  # target name
+	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
 # here test with public API only(don't include impl *c), must provide *.o dependencies
 test_clist_cstring: $(MODDIR_CCONTAINER_TESTS)/test_clist_cstring.o $(MODDIR_CCONTAINER)/clist_generic.o \

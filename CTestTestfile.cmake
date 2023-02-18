@@ -4,7 +4,8 @@
 # Create output in default Testing\Temporary\LastTest.log
 #
 
-add_test (test_clogger "test_clogger")
+# specific makefile, where best to make test ? in jmmjouer/tests ?
+# add_test (test_clogger "test_clogger")
 add_test (test_clist_generic "test_clist_generic")
 add_test (test_clist_cstring "test_clist_cstring")
 add_test (test_cmap_game_ptrf "test_cmap_game_ptrf")

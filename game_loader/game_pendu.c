@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "game_pendu.h"
+#include "game_loader/game_pendu.h"
 #include "utils.h"
 
 /*#define NB_TOUR 10*/

@@ -41,8 +41,8 @@ enum /*PLG_MGR : short */
 /* typedef struct plugin_manager plugin_mgr_t; */
 #include "plugin_manager_fwd.h"
 
-#include "victory.h"
-#include "person.h"
+#include "joueur/victory.h"
+#include "joueur/person.h"
 
 /*typedef int(*ptr_plugin_funct)();*/ /* strange, no paramater was working ? */
 typedef victory_t(*ptr_plugin_funct)(person_t);
