@@ -3,6 +3,8 @@
 #include <string.h>
 #include <assert.h>
 
+/*#include "file_record.h"*/
+
 #include "irecord_private.h"
 #include "clogger/clogger.h"
 
@@ -32,7 +34,8 @@ static bool search_record_joueur_by_name(file_record_t *this, char *line, const 
 /* from char* to joueur & victories */
 static int extract_name_joueur(const char *line, char *name_joueur);
 static int extract_one_record(file_record_t *this, char *line, joueur_t *joueur);
-int extract_map_victories( file_record_t *this, char *line, cmap_game_victories_t *map);
+
+static int extract_map_victories( file_record_t *this, char *line, cmap_game_victories_t *map);
 
 /** utilities function **/
 static bool next_record(file_record_t *this, char *line);

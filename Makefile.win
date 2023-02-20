@@ -10,6 +10,7 @@ CC = cl.exe
 
 # linker
 LINK = link.exe
+
 # ilk files generated, incremental link
 #   https://learn.microsoft.com/en-us/cpp/build/reference/incremental-link-incrementally?view=msvc-170
 # exp files, import/export libraries
@@ -18,7 +19,8 @@ LINK = link.exe
 LFLAGS = /nologo
 
 # List of subdirectories containing a Module.win.mk file
-MODULES := tests
+# for windows, use all modules and no recursive (!= ming64)
+MODULES := clogger ccontainer joueur record game_loader tests
 
 # Compile source, default name *obj on windows, adviced to keep it
 # /O1, /O2 optimisation , /Ox 'best' optimization'
@@ -29,7 +31,7 @@ MODULES := tests
 # /std:c11,c17, /Za closer to C89
 # /Zi : generate PDB for use when debugging (do not affect optimisation) and pass option /DEBUG to linker
 # /D_CRT_SECURE_NO_WARNINGS warning microsoft strcpy_s,scanf_s etc
-CFLAGS = /nologo /W4 /D_CRT_SECURE_NO_WARNINGS /wd4131
+CFLAGS = /nologo /W4 /D_CRT_SECURE_NO_WARNINGS /wd4131 -I.
 # /WX to add again after debug
 # /Wall = > /wd4255 /wd5045 and still more + cmocka problems
 # 4131 for getopt "declarateur obsolete"
@@ -42,12 +44,14 @@ CFLAGS = /nologo /W4 /D_CRT_SECURE_NO_WARNINGS /wd4131
 ifeq ($(debug),yes)          # separator mandatory between ifeq and '('
 # use specific code for the project, g3 to include MACRO definition as variables
 	CFLAGS += /Zi /Od /DJMMJ_DEBUG
-	LFLAGS += /DEBUG
+#	LFLAGS += /DEBUG
 else
 # 'best' optimization msvc
 	CFLAGS += /Ox
 endif
 
+$(info == Makefile ROOT ==)
+$(info $$CC is $(CC) )
 $(info $$CFLAGS is $(CFLAGS) )
 $(info $$LINK is $(LINK) )
 $(info $$LFLAGS is $(LFLAGS) )
@@ -60,19 +64,18 @@ $(info $$LFLAGS is $(LFLAGS) )
 
 # Use explicit OBJS, more control
 # do not include main.o
-OBJS = getopt.obj clogger.obj utils.obj utils_file.obj \
-	   clist_generic.obj clist_cstring.obj  \
-	   victory.obj cmap_game_victories.obj person.obj joueur.obj \
-	   plugin_manager.obj cmap_ptrf_game.obj game_loader.obj \
-	   game_mastermind.obj \
-	   file_record.obj irecord.obj \
-	   arcade.obj
+OBJS_EXE = getopt.obj utils.obj utils_file.obj arcade.obj
+
+# updated from visit in all modules, no need to define here (would still be better)
+#OBJS_ALL_STATIC = ''
+#OBJS_ALL_TESTS = ''
 
 # define main executable
 EXE  := JMMjouer
 
+# define list of unit_test found in all the hierarchy
 # inspect variables
-$(info $$OBJS is [$(OBJS)] )
+$(info $$OBJS is [$(OBJS_EXE)] )
 
 # alternative to target as files
 .PHONY : all clean unit_test
@@ -84,15 +87,30 @@ all: $(EXE) unit_test
 # unit_test:: not needed, at least until only one target defined in Module
 # unit_test_mock::
 
-# general rule for compiling c files when header file is available 
+# general rule for compiling c files when header file is available
+# msvc must extract directory path for option /Fo (output directory)
+# filename fixed 
 %.obj: %.c %.h
 	@echo "Build file generic rule with header in root:   $@"
-	$(CC) $(STD) $(CFLAGS) /c $<
+	@echo "<:   $<"
+	@echo "?:   $?"
+	@echo "dir from target: $(dir $@)"
+	$(CC) $(STD) $(CFLAGS) /c $< /Fo"$(dir $@)"
 
 # general rule, no header file associated (ex. main.c)
 %.obj: %.c
 	@echo "Build file generic rule without header in root:   $@"
 	$(CC) $(STD) $(CFLAGS) /c $<
+
+# to try generic rule to build TU
+
+
+# include the description for each module
+include $(patsubst %,%/Module.win.mk,$(MODULES))
+$(info == ROOT after include modules ==)
+$(info $$OBJS_ALL_STATIC is $(OBJS_ALL_STATIC) )
+$(info $$OBJS_ALL_TESTS  is $(OBJS_ALL_TESTS) )
+
 
 # specific rule for getopt, only for windows
 getopt.obj : getopt.c getopt.h
@@ -100,9 +118,25 @@ getopt.obj : getopt.c getopt.h
 	$(CC) $(STD) /nologo /W4 /wd4131 /wd4100 /D_CRT_SECURE_NO_WARNINGS /c $<
 
 # -Wl,-rpath,dir1  or -rpath=dir1 # -Wl to pass argument to linker, rpath runtime to search for lib
-$(EXE): $(OBJS) main.obj game_pendu.dll
+#game_pendu.dll librecord_dll.lib 
+# now compile (still JMMjouer.lib produced), but with static record library
+$(EXE): $(OBJS_EXE) main.obj libgame_loader.lib libjoueur_dll.lib \
+					libccontainer_dll.lib libclogger_dll.lib 
 	@echo "Build $(EXE): all dependencies $^"
-	$(LINK) $(LFLAGS) /OUT:JMMjouer.exe main.obj $(OBJS) /LIBPATH:. game_pendu.lib
+#	$(LINK) $(LFLAGS) /OUT:JMMjouer.exe $^
+#	$(LINK) $(LFLAGS) /OUT:JMMjouer.exe $^ /LIBPATH:. librecord.dll
+	$(LINK) $(LFLAGS) /OUT:JMMjouer.exe $^ librecord.lib
+#	$(LINK) $(LFLAGS) /OUT:JMMjouer.exe main.obj $(OBJS_EXE) /LIBPATH:. game_pendu.lib
+
+# it produces *lib and *exp files , certianly because of exporting 
+JMMjouer_static : main.obj $(OBJS_EXE) $(OBJS_ALL_STATIC)
+	@echo "Build STATIC JMMjouer ^: all dependencies $^"
+	@echo "Build STATIC JMMjouer <: all dependencies $<"
+# order is important !! in fact not...
+#	$(LINK) $(LFLAGS) $^ /OUT:JMMjouer_static.exe
+#	$(LINK) $(LFLAGS) /OUT:JMMjouer_static.exe $^
+	$(LINK) /OUT:JMMjouer_static.exe $^
+#	$(LINK) $(LFLAGS) /OUT:JMMjouer_static.exe $^ /LIBPATH:. game_pendu.lib
 
 #### games ####
 # pendu is a game provided in a shared library, known at link time (no plugin)
@@ -125,17 +159,20 @@ game_morpion.dll : game_morpion.obj victory.obj
 	$(LINK) $(LFLAGS) /DLL /NOIMPLIB $^ /OUT:game_morpion.dll
 #	cp $@ .\plugins, do not mage to copy Copy-Item
 
-# include the description for each module
-include $(patsubst %,%/Module.win.mk,$(MODULES))
 
 # call clean here and in subdirectories
 clean::
 	echo "Clean in root directory"
-	del $(OBJS), main.obj
+	del $(OBJS_EXE), main.obj
+# should be done before
+	del utils_file.obj utils.obj arcade.obj
 	del JMMjouer.exe,JMMjouer.ilk,JMMjouer.pdb,JMMjouer.exp
+	del JMMjouer_static.exe JMMjouer_static.ilk  JMMjouer_static.pdb
+#JMMjouer_static.exp   JMMjouer_static.lib
 	del game_morpion.obj, game_morpion.dll, \
 		game_morpion.ilk,game_morpion.exp, game_morpion.pdb
 	del game_pendu.obj, game_pendu.lib, game_pendu.dll, game_pendu.exp, \
 		game_pendu.ilk, game_pendu.pdb
 	del vc140.pdb
+
 

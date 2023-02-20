@@ -32,6 +32,8 @@ Etat actuel :
     good to combine ?
 */
 
+/* nothing to export ? strange ? not anymore in main ?*/
+
 enum /*PLG_MGR : short */ 
     { PLG_MANAGER_OK = 0,
       PLG_MANAGER_DLL_NOT_FOUND = -1,

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "shared_EXPORTS.h"
+
 /* @brief Strucutre describing the result(s) of one or more round of a game.
     Also used for storic the historic in records. */
 typedef struct {
@@ -8,5 +10,5 @@ typedef struct {
     int nb_equality;
 } victory_t;
 
-void victory_init( victory_t *victory );
+SHARED_EXPORT void victory_init( victory_t *victory );
 

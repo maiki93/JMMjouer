@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 
+#include "shared_EXPORTS.h"
+
 /* const int MAX_SIZE_NOM = 50; // not a constant expression */
 /* #define MAX_SIZE_NOM 50     // macro possible */
 enum { MAX_SIZE_NOM_PERSON = 20 };    /* or enum considerered as constant expression */
@@ -34,7 +36,7 @@ int person_default_init(person_t *person);
 
 /* @brief Return if a joueur is valid or not.
     To check if previous command succeeded or not */
-bool person_is_valid(person_t *person);
+SHARED_EXPORT bool person_is_valid(person_t *person);
 /* @brief Return the name of a person or a joueur
     Explicit cast to person_t needed if use with joueur */
 const char* person_name(person_t *person);

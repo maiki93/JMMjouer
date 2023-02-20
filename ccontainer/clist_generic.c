@@ -3,7 +3,6 @@
 /*#include <stdio.h> */ /* only for print, to delete later if use log only */
 /*#include <stdlib.h>*/
 
-/*#include "ccontainer/clist_generic.h"*/
 #include "ccontainer/clist_generic.h"
 #include "clogger/clogger.h"
 

@@ -6,6 +6,10 @@
 
 #include "ccontainer/clist_cstring.h"
 
+/* not exported as shared library */
+/*#include "shared_EXPORTS.h"*/
+/*#undef SHARED_EXPORT*/
+
 /* plg_manager singleton => used only internally but too restrictive */
 /*#include "plugin_manager_fwd.h"*/
 /*#include "plugin_manager.h" *//* in charge of shared libraries */
@@ -51,22 +55,22 @@ typedef struct game_loader_type game_loader_t;
 /***
  * Constructor / Destructor 
 ***/
-game_loader_t* game_loader_new();
-void game_loader_init( game_loader_t *gameldr);
+/*SHARED_EXPORT*/ game_loader_t* game_loader_new();
+/*SHARED_EXPORT*/ void game_loader_init( game_loader_t *gameldr);
 /* Clear content and delete memory */
-void game_loader_delete( game_loader_t *gameldr);
+/*SHARED_EXPORT*/ void game_loader_delete( game_loader_t *gameldr);
 
 /* @brief Load all games: static + shared
     Directory providied by plugin_mamanger instance() singleton 
     TODO better */
-int game_loader_load_all(game_loader_t *gameldr);
+/*SHARED_EXPORT*/ int game_loader_load_all(game_loader_t *gameldr);
 
-clist_cstring_t * game_loader_get_names(const game_loader_t *gameldr);
+/*SHARED_EXPORT*/ clist_cstring_t * game_loader_get_names(const game_loader_t *gameldr);
 /* @brief Return an array with the game names.
    It is copy, the caller owns the array and is responsible of the deallocation 
    TO DO clist_cstring as return
    \return != 0 if error */
-int game_loader_get_array_names(const game_loader_t *gameldr, char ***list_out, size_t *size_list);
+/*SHARED_EXPORT*/ int game_loader_get_array_names(const game_loader_t *gameldr, char ***list_out, size_t *size_list);
 
 /* @brief Get pointer to game function given its name */
-ptr_game_t game_loader_get_ptr_game(const game_loader_t *gameldr, const char * name_game);
+/*SHARED_EXPORT*/ ptr_game_t game_loader_get_ptr_game(const game_loader_t *gameldr, const char * name_game);

@@ -6,6 +6,8 @@
 #include "joueur/person.h"
 #include "ccontainer/clist_cstring.h"
 
+/* nothing to export from here ? */
+
 typedef victory_t(*ptr_game_local_t)(person_t);
 
 /* @brief C-style map to store a list of the game_name and their corresponding

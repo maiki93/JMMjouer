@@ -1,7 +1,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "clist_cstring.h"
+#include "ccontainer/clist_cstring.h"
 
 /*** private ***/
 static value_t make_value_cstring( const char* text_to_insert);
