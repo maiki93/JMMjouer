@@ -7,6 +7,8 @@
 #include "irecord_private.h"
 #include "clogger/clogger.h"
 
+/*#include "irecord.h"*/
+
 /* typedef (in private_header) would avoid recopy of complex type */
 joueur_t __find_joueur_error( void *this, const char *name);
 

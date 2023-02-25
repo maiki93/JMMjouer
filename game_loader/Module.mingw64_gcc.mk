@@ -1,22 +1,28 @@
 
 MODDIR_GAME_LOADER := game_loader
 MODULES_TESTS = $(MODDIR_GAME_LOADER)/tests
-# seems necessary... currentDir bad idea
-# no need here, child knows MODDIR_GAME_LOADER
-# MODDIR_GL_TESTS = $(MODDIR_GAME_LOADER)/tests
+
+SRCS_GAME_LOADER := $(wildcard $(MODDIR_GAME_LOADER)/*.c)
+OBJS_GAME_LOADER = $(patsubst %.c, %.o, $(SRCS_GAME_LOADER))
+
+# update global variable
+OBJS_ALL_STATIC += $(OBJS_GAME_LOADER)
 
 $(info)
 $(info == GAME_LOADER ==)
-$(info $$CURDIR is $(CURDIR) )
-$(info $$OBJS is $(OBJS) )
+$(info == GAME_LOADER ==)
+$(info $$SRCS_GAME_LOADER is [$(SRCS_GAME_LOADER)] )
+$(info $$OBJS_GAME_LOADER is [$(OBJS_GAME_LOADER)] )
+#$(info $$CURDIR is $(CURDIR) )
+#$(info $$OBJS is $(OBJS) )
 
-OBJS_GAME_LOADER = $(MODDIR_GAME_LOADER)/cmap_ptrf_game.o $(MODDIR_GAME_LOADER)/plugin_manager.o \
-		$(MODDIR_GAME_LOADER)/game_pendu.o  $(MODDIR_GAME_LOADER)/game_mastermind.o \
-		$(MODDIR_GAME_LOADER)/game_loader.o
+#OBJS_GAME_LOADER = $(MODDIR_GAME_LOADER)/cmap_ptrf_game.o $(MODDIR_GAME_LOADER)/plugin_manager.o \
+#		$(MODDIR_GAME_LOADER)/game_pendu.o  $(MODDIR_GAME_LOADER)/game_mastermind.o \
+#		$(MODDIR_GAME_LOADER)/game_loader.o
 
-$(info == GAME_LOADER after ==)
-$(info $$OBJS is $(OBJS) )
-$(info $$OBJS_GAME_LOADER is $(OBJS_GAME_LOADER) )
+#$(info == GAME_LOADER after ==)
+#$(info $$OBJS is $(OBJS) )
+#$(info $$OBJS_GAME_LOADER is $(OBJS_GAME_LOADER) )
 
 # undefined start_game_pendu, start_game_mastermind, for_files_with_extension
 #  then by inclusion dependencies to utils.o clear_stdin()
@@ -45,8 +51,8 @@ libgame_loader.lib : $(OBJS_GAME_LOADER)
 #	ar rcs $@ $^
 
 ##### compile shared library to include at compile-time
-libgame_pendu.dll : $(MODDIR_GAME_LOADER)/game_pendu.o $(MODDIR_GAME_LOADER)/game_pendu.h joueur/victory.o
-	$(CC) -shared $(CFLAGS) $^ -o $@ -Wl,--out-implib,libgame_pendu.lib
+#libgame_pendu.dll : $(MODDIR_GAME_LOADER)/game_pendu.o $(MODDIR_GAME_LOADER)/game_pendu.h joueur/victory.o
+#	$(CC) -shared $(CFLAGS) $^ -o $@ -Wl,--out-implib,libgame_pendu.lib
 
 # include description for each module
 include $(patsubst %,%/Module.mingw64_gcc.mk,$(MODULES_TESTS))
@@ -55,5 +61,6 @@ include $(patsubst %,%/Module.mingw64_gcc.mk,$(MODULES_TESTS))
 # can compile manually
 # gcc -shared -o libtoto.dll game_loader.o cmap_ptrf_game.o plugin_manager.o ../utils.o ../utils_file.o ../game_pendu.o ../game_mastermind.o -L.. -lccontainer -lclogger -ljoueur -Wl,--out-implib,libtoto.lib
 clean ::
+	@echo "Clean module game_loader"
 	rm -f $(MODDIR_GAME_LOADER)/*.o
 

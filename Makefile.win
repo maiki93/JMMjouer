@@ -70,13 +70,21 @@ OBJS_EXE = getopt.obj utils.obj utils_file.obj arcade.obj
 #OBJS_ALL_STATIC = ''
 #OBJS_ALL_TESTS = ''
 
+
+WITH_LIB = /DwithLIB
+ifeq ($(WITH_LIB),/DwithLIB)
+	EXE:= JMMjouer
+else
+	EXE:= JMMjouer_nolib
+endif
+
 # define main executable
-EXE  := JMMjouer
+#EXE  := JMMjouer
 
 # define list of unit_test found in all the hierarchy
 # inspect variables
 $(info $$OBJS is [$(OBJS_EXE)] )
-
+$(info $$EXE is $(EXE) )
 # alternative to target as files
 .PHONY : all clean unit_test
 
@@ -120,22 +128,22 @@ getopt.obj : getopt.c getopt.h
 # -Wl,-rpath,dir1  or -rpath=dir1 # -Wl to pass argument to linker, rpath runtime to search for lib
 #game_pendu.dll librecord_dll.lib 
 # now compile (still JMMjouer.lib produced), but with static record library
-$(EXE): $(OBJS_EXE) main.obj libgame_loader.lib libjoueur_dll.lib \
-					libccontainer_dll.lib libclogger_dll.lib 
+JMMjouer: $(OBJS_EXE) main.obj libgame_loader.lib libjoueur_dll.lib \
+					libccontainer_dll.lib librecord_dll.lib libclogger_dll.lib 
 	@echo "Build $(EXE): all dependencies $^"
-#	$(LINK) $(LFLAGS) /OUT:JMMjouer.exe $^
+	$(LINK) $(LFLAGS) /OUT:JMMjouer.exe $^
 #	$(LINK) $(LFLAGS) /OUT:JMMjouer.exe $^ /LIBPATH:. librecord.dll
-	$(LINK) $(LFLAGS) /OUT:JMMjouer.exe $^ librecord.lib
+#	$(LINK) $(LFLAGS) /OUT:JMMjouer.exe $^ librecord.lib
 #	$(LINK) $(LFLAGS) /OUT:JMMjouer.exe main.obj $(OBJS_EXE) /LIBPATH:. game_pendu.lib
 
 # it produces *lib and *exp files , certianly because of exporting 
-JMMjouer_static : main.obj $(OBJS_EXE) $(OBJS_ALL_STATIC)
-	@echo "Build STATIC JMMjouer ^: all dependencies $^"
-	@echo "Build STATIC JMMjouer <: all dependencies $<"
+JMMjouer_nolib : main.obj $(OBJS_EXE) $(OBJS_ALL_STATIC)
+	@echo "Build JMMjouer_nolib ^: all dependencies $^"
+	@echo "Build JMMjouer_nolib <: all dependencies $<"
 # order is important !! in fact not...
 #	$(LINK) $(LFLAGS) $^ /OUT:JMMjouer_static.exe
 #	$(LINK) $(LFLAGS) /OUT:JMMjouer_static.exe $^
-	$(LINK) /OUT:JMMjouer_static.exe $^
+	$(LINK) /OUT:JMMjouer_nolib.exe $^
 #	$(LINK) $(LFLAGS) /OUT:JMMjouer_static.exe $^ /LIBPATH:. game_pendu.lib
 
 #### games ####
@@ -167,7 +175,8 @@ clean::
 # should be done before
 	del utils_file.obj utils.obj arcade.obj
 	del JMMjouer.exe,JMMjouer.ilk,JMMjouer.pdb,JMMjouer.exp
-	del JMMjouer_static.exe JMMjouer_static.ilk  JMMjouer_static.pdb
+	del JMMjouer_nolib.*
+#	del JMMjouer_static.exe JMMjouer_static.ilk  JMMjouer_static.pdb
 #JMMjouer_static.exp   JMMjouer_static.lib
 	del game_morpion.obj, game_morpion.dll, \
 		game_morpion.ilk,game_morpion.exp, game_morpion.pdb

@@ -7,12 +7,10 @@
 debug = yes
 
 CC = gcc
+CFLAGS = -Wall -Wextra -pedantic -Wno-variadic-macros
+STD = -std=c90
 
 MODULES := tests
-
-CFLAGS = -Wall -Wextra -pedantic -Wno-variadic-macros
-
-STD = -std=c90
 
 ifeq ($(debug),yes)
 # use specific code for the project, g3 to include MACRO definition as variables
@@ -40,7 +38,7 @@ $(info $$CFLAGS is $(CFLAGS) )
 # c - create a archive if not already existent
 # s - create an object-file index into the archive
 # static lib just an archive file
-libclogger.a : clogger.o
+libclogger.lib : clogger.o
 	ar rcs $@ $^
 
 #test_clogger : tests/test_clogger.c

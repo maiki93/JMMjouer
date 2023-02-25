@@ -12,7 +12,7 @@ $(info == CLOGGER ==)
 # needed ONLY for passing -Dshared_export now
 $(OBJS_CCONTAINER): %.obj: %.c
 	@echo "Build file specific rule in ccontainer : $@"
-	$(CC) -Dshared_EXPORTS $(STD) $(CFLAGS) /c $< /Fo"$(dir $@)"
+	$(CC) $(WITH_LIB) /Dshared_EXPORTS $(STD) $(CFLAGS) /c $< /Fo"$(dir $@)"
 
 libccontainer_dll.lib : libccontainer.dll
 
@@ -24,4 +24,4 @@ libccontainer.dll : $(OBJS_CCONTAINER) libclogger_dll.lib
 clean ::
 	@echo "Clean module ccontainer"
 	del $(MODDIR_CCONTAINER)\*.obj
-	del libccontainer.dll, libccontainer_dll.lib 
+	del libccontainer.dll, libccontainer_dll.lib , libccontainer_dll.exp

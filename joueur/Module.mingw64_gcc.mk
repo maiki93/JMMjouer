@@ -2,19 +2,21 @@
 
 MODDIR_JOUEUR := joueur
 
-$(info)
+SRCS_JOUEUR := $(wildcard $(MODDIR_JOUEUR)/*.c)
+OBJS_JOUEUR = $(patsubst %.c, %.o, $(SRCS_JOUEUR))
+
+# update global variable
+OBJS_ALL_STATIC += $(OBJS_JOUEUR)
+
 $(info == JOUEUR ==)
 $(info $$CURDIR is $(CURDIR) )
-
-OBJS_JOUEUR = $(MODDIR_JOUEUR)/person.o $(MODDIR_JOUEUR)/victory.o \
-		$(MODDIR_JOUEUR)/cmap_game_victories.o $(MODDIR_JOUEUR)/joueur.o
+$(info $$OBJS_JOUEUR is [$(OBJS_JOUEUR)] )
 
 # include static library without special directive, normal dependencies
-libjoueur.dll : $(OBJS_JOUEUR) libccontainer.a libclogger.a
-#	@echo $(CC) -shared $(CFLAGS) -o $@ $^  -Wl,--out-implib,libjoueur_dll.lib
+libjoueur.dll : $(OBJS_JOUEUR) libccontainer.lib libclogger.lib
 	$(CC) -shared $(CFLAGS) -o $@ $^  -Wl,--out-implib,libjoueur_dll.lib
 
-
+############### UNIT TESTS #########################
 ## do not make a test Module for only a few function
 unit_test :: test_cmap_game_victories
 

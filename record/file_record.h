@@ -5,10 +5,6 @@
 
 #include "shared_EXPORTS.h"
 
-/* forward declaration, need to use struct X in main caller */
-/* TODO try the trick with tpyedef struct name1 name2 fwd.h*/
-/*struct file_record_t;*/
-/* easier to use */
 typedef struct file_record_type file_record_t;
 
 SHARED_EXPORT file_record_t* file_record_new();

@@ -1,0 +1,7 @@
+LIBRARY   librecord
+EXPORTS
+    record_get_storage_info   @1
+    record_find_joueur_from_name  @2 
+    file_record_new   @3
+    file_record_init   @4
+    file_record_delete   @5

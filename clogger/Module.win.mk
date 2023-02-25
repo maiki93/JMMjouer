@@ -1,4 +1,6 @@
 
+#
+# For windows msvc, usual module
 
 MODDIR_CLOGGER = clogger
 
@@ -13,8 +15,9 @@ OBJS_ALL_STATIC += $(OBJS_CLOGGER)
 # needed ONLY for passing -Dshared_export now
 $(OBJS_CLOGGER): %.obj: %.c
 	@echo "Build file specific rule with header in clogger : $@"
-#	$(CC) -Dshared_EXPORTS $(STD) $(CFLAGS) /c $< /Fo"$(MODDIR_CLOGGER)"
-	$(CC) -Dshared_EXPORTS $(STD) $(CFLAGS) /c $< /Fo"$(dir $@)"
+#	$(CC) -Dshared_EXPORTS $(STD) $(CFLAGS) /c $< /Fo"$(dir $@)"
+	$(CC) $(STD) $(CFLAGS) $(WITH_LIB) /Dshared_EXPORTS $(STD) $(CFLAGS) /c $< /Fo"$(dir $@)"
+# FULL_STATIC = /Dfull_static or empty
 
 # Windows shared library with *_dll.lib associated
 # implib generated only if exported symbol !
@@ -29,4 +32,4 @@ libclogger_dll.lib : libclogger.dll
 clean ::
 	@echo "Clean module clogger"
 	del $(MODDIR_CLOGGER)\*.obj
-	del libclogger.dll, libclogger_dll.lib
+	del libclogger.dll, libclogger_dll.lib, libclogger_dll.exp

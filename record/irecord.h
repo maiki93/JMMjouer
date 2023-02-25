@@ -1,6 +1,6 @@
 #pragma once
 
-#include "irecord_fwd.h"      /* define irecord_t */
+#include "irecord_fwd.h"     /* define irecord_t */
 #include "joueur/joueur.h"    /* define Joueur with full structure available */
 
 #include "shared_EXPORTS.h"

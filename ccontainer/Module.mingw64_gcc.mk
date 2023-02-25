@@ -7,18 +7,18 @@
 MODDIR_CCONTAINER := ccontainer
 
 MODULES_TESTS = $(MODDIR_CCONTAINER)/tests
+
+OBJS_CCONTAINER = $(MODDIR_CCONTAINER)/clist_generic.o \
+				  $(MODDIR_CCONTAINER)/clist_cstring.o
+
+OBJS_ALL_STATIC += $(OBJS_CCONTAINER)
 # defined here, used in tests/Module.X.mk
 MODDIR_CCONTAINER_TESTS = $(MODDIR_CCONTAINER)/tests
 
-OBJS_CCONTAINER = $(MODDIR_CCONTAINER)/clist_generic.o $(MODDIR_CCONTAINER)/clist_cstring.o
-
 $(info)
 $(info == CCONTAINER : $(MODDIR_CCONTAINER) ==)
-$(info $$CURDIR is $(CURDIR) ) 
-$(info $$CCONTAINER is $(CCONTAINER) )
 
-#libccontainer.a : $(MODDIR_CCONTAINER)/clist_generic.o $(MODDIR_CCONTAINER)/clist_cstring.o
-libccontainer.a : $(OBJS_CCONTAINER)
+libccontainer.lib : $(OBJS_CCONTAINER)
 	ar rcs $@ $^
 
 # include description for each module

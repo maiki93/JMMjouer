@@ -63,17 +63,17 @@ endif
 #   joueur :cmap_game_victories.o person.o joueur.o # victory ?? only header ??
 #		then include victory.o
 #   game_loader : plugin_manager.o cmap_ptrf_game.o game_loader.o
-OBJS = utils.o utils_file.o arcade.o
-	   
+OBJS_EXE = utils.o utils_file.o arcade.o
 
-OBJS_CORE += $(OBJS)
+# will be created
+#OBJS_CORE += $(OBJS)
 
 # define main executable
 EXE  := JMMjouer
 
 # inspect variables
 $(info == ROOT ==)
-$(info $$OBJS is [$(OBJS)] )
+$(info $$OBJS_EXE is [$(OBJS_EXE)] )
 $(info $$OBJS is [$(OBJS_CORE)] )
 
 STD_TESTS = -std=c99
@@ -120,7 +120,7 @@ $(info $$OBJS_GM is [$(OBJS_GM)] )
 $(info dir: $(dir $(lastword $(MAKEFILE_LIST))) )
 
 # seems very convenient !
-currentDir = $(dir $(lastword $(MAKEFILE_LIST)))
+#currentDir = $(dir $(lastword $(MAKEFILE_LIST)))
 
 # libgame_loader.dll 
 # libjoueur_dll.lib
@@ -144,7 +144,7 @@ currentDir = $(dir $(lastword $(MAKEFILE_LIST)))
 #	
 
 # with libgame_loader as static
-$(EXE): main.o $(OBJS) libgame_loader.lib libclogger.a libccontainer.a librecord.dll
+JMMjouer: main.o $(OBJS_EXE) libgame_loader.lib libclogger.lib libccontainer.lib librecord.dll
 	@echo "Build $(EXE): all dependencies $^"
 	@echo "Build with OBJS_CORE $(OBJS_CORE)"	
 	$(CC) $(STD) $(CFLAGS) -o $@ $^ -L. -ljoueur_dll
@@ -156,15 +156,16 @@ $(EXE): main.o $(OBJS) libgame_loader.lib libclogger.a libccontainer.a librecord
 #	libgame_pendu.dll libclogger.a libccontainer.a libjoueur.dll librecord.dll -L. -lgame_pendu -ljoueur -lrecord
 
 ## Version full static
-JMMjouer_static : main.o $(OBJS) $(OBJS_CCONTAINER) $(OBJS_JOUEUR) $(OBJS_GAME_LOADER) $(OBJS_RECORD) clogger/clogger.o
+JMMjouer_nolib : main.o $(OBJS_EXE) $(OBJS_ALL_STATIC) clogger/clogger.o
+	@echo "Build JMMjouer_nolib ^: all dependencies $^"
 	$(CC) $(STD) $(CFLAGS) -o $@ $^
 
 
 #### libraries in dependencies,
 ## usefull to copy ? or better to include in a common path (e.g. for TU ?)
-libclogger.a : 
-	cd clogger && make -f Makefile.mingw64_gcc libclogger.a
-	cp clogger/libclogger.a .
+libclogger.lib : 
+	cd clogger && make -f Makefile.mingw64_gcc $@
+	cp clogger/libclogger.lib .
 	
 # test with module, target will be included
 #libccontainer.a :

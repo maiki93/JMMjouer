@@ -15,13 +15,14 @@ $(info $$OBJS_RECORD is [$(OBJS_RECORD)] )
 # needed ONLY for passing -Dshared_export now
 $(OBJS_RECORD): %.obj: %.c
 	@echo "Build file specific rule in ccontainer : $@"
-	$(CC) -Dshared_EXPORTS $(STD) $(CFLAGS) /c $< /Fo"$(dir $@)"
+#	$(CC) -Dshared_EXPORTS $(STD) $(CFLAGS) /c $< /Fo"$(dir $@)"
+	$(CC) $(STD) $(CFLAGS) $(WITH_LIB) /c $< /Fo"$(dir $@)"
 
 
 #libclogger_dll.lib needed ? not imported by joueur ? (little child)
 librecord.dll : $(OBJS_RECORD) libjoueur_dll.lib libclogger_dll.lib
 	@echo "Create shared library -- record"
-	$(LINK) $(LFLAGS) /DLL $^  /IMPLIB:librecord_dll.lib /OUT:librecord.dll
+	$(LINK) $(LFLAGS) /DLL $^ /DEF:record/record_dll.def /IMPLIB:librecord_dll.lib /OUT:librecord.dll
 
 librecord_dll.lib : librecord.dll
 
@@ -34,4 +35,4 @@ librecord_dll.lib : librecord.dll
 clean ::
 	@echo "Clean module record"
 	del $(MODDIR_RECORD)\*.obj
-	del librecord.dll, librecord_dll.lib
+	del librecord.dll, librecord_dll.lib, librecord_dll.exp
