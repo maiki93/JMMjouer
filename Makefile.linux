@@ -19,9 +19,12 @@ debug = yes
 CC = gcc
 #CC = clang
 
+LINK = ld
+#LFLAGS
+
 # List of subdirectories containing a Module.mk file
 #MODULES := tests tests/test_mock
-MODULES := tests
+MODULES := clogger ccontainer joueur record game_loader #tests
 
 # see advices (and much more than compilation options) https://matt.sh/howto-c
 # compiler option, activate many warning( here seeems common to gcc and clang)
@@ -34,7 +37,7 @@ MODULES := tests
 #       on linux not for performance ? but cannot comile, give error !
 # -g3 : all debug information + MACRO (-g0 : no debug ), -g default 2
 # -ggdb : include gdb extension if possible (not tested)
-CFLAGS = -Wall -Wextra -pedantic -fPIC -Wno-variadic-macros #-Wno-strict-overflow
+CFLAGS = -Wall -Wextra -pedantic -fPIC -I . -Wno-variadic-macros #-Wno-strict-overflow
 # to include again:  -Werror, better than Wno-X warning appears but compiles fine
 
 # standard configurable
@@ -52,30 +55,64 @@ else
 	CFLAGS += -DNDEBUG -O2
 endif
 
+WITH_LIB ?= 1
+# equivalent is
+#ifeq ($(origin WITH_LIB), undefined)
+# WITH_LIB = 1
+#endif
+
+#ifndef $(WITH_LIB)
+#	WITH_LIB = 1
+#else
+#	WITH_LIB = 0
+#endif
+
+$(info == Makefile ROOT ==)
+$(info $$WITH_LIB is $(WITH_LIB) )
 $(info $$CC is $(CC) )
 $(info $$CFLAGS is $(CFLAGS) )
+$(info $$LINK is $(LINK) )
+$(info $$LFLAGS is $(LFLAGS) )
+$(info $$MAKECMDGOALS is $(MAKECMDGOALS) )
 
 # Use explicit OBJS, more control
 # do not include main.o
-OBJS = clogger.o utils.o utils_file.o \
-	   clist_generic.o clist_cstring.o  \
-	   victory.o cmap_game_victories.o person.o joueur.o \
-	   plugin_manager.o cmap_ptrf_game.o game_loader.o \
-	   game_mastermind.o \
-	   file_record.o irecord.o \
-	   arcade.o
+OBJS_EXE = utils.o utils_file.o arcade.o
 
+# updated from visit in all modules, no need to define here (would still be better)
+#OBJS_ALL_STATIC = ''
+#OBJS_ALL_TESTS = ''
+
+#NO_LIB = /DwithLIB
+#ifeq ($(WITH_LIB),/DwithLIB)
+ifeq ($(WITH_LIB),1)
+	EXE:= JMMjouer
+else
+	EXE:= JMMjouer_nolib
+endif
+
+$(info $$EXE is $(EXE) )
 # define main executable
-EXE  := JMMjouer
+#EXE  := JMMjouer
+#EXE  := JMMjouer_nolib
 
+#LIB_STATIC = libclogger libccontainer
+#LIB_STATIC = libclogger libccontainer
+#LIB_DYNAMIC =  libjoueur libgame_loader librecord
+
+LIB_STATIC = libclogger libccontainer libjoueur libgame_loader
+LIB_DYNAMIC = librecord
+
+# define list of unit_test found in all the hierarchy
 # inspect variables
-$(info $$OBJS is [$(OBJS)] )
+$(info $$OBJS is [$(OBJS_EXE)] )
+$(info $$EXE is $(EXE) )
 
 # alternative to target as files
 .PHONY : all clean unit_test
-
 # make all, generic way to use make produce executable JMMjouer
 all: $(EXE)
+
 # specific target for unit testing in tests/ , dependencies with CMocka
 unit_test::
 
@@ -89,15 +126,30 @@ unit_test::
 	@echo "Build file generic rule without header in root:   $@"
 	$(CC) $(STD) $(CFLAGS) -c $< -o $@
 
+# include the description for each module
+include $(patsubst %,%/Module.linux.mk,$(MODULES))
+$(info == ROOT after include modules ==)
+$(info $$OBJS_ALL_STATIC is $(OBJS_ALL_STATIC) )
+$(info $$OBJS_ALL_TESTS  is $(OBJS_ALL_TESTS) )
+
+###### Main executables 
 # -Wl,-rpath,dir1  or -rpath=dir1 # -Wl to pass argument to linker, rpath runtime to search for lib
-$(EXE): $(OBJS) main.o libgame_pendu.so
+#JMMjouer: $(OBJS_EXE) main.o libgame_pendu.so
+#JMMjouer: $(OBJS_EXE) main.o libclogger.so
+JMMjouer: $(OBJS_EXE) main.o $(LIB_STATIC) $(LIB_DYNAMIC)
 	@echo "Build $(EXE): all dependencies $^"
-	$(CC) $(STD) $(CFLAGS) $^ -L. -lgame_pendu -o $@
+	$(CC) -o $@ $(OBJS_EXE) main.o -L .  -lgame_loader -lrecord -ljoueur -lccontainer -lclogger
+
+JMMjouer_nolib : main.o $(OBJS_EXE) $(OBJS_ALL_STATIC)
+	@echo "Build JMMjouer_nolib ^: all dependencies $^"
+	@echo "Build JMMjouer_nolib <: all dependencies $<"
+	$(CC) $(STD) $(CFLAGS) -o $@ $^
+
 
 ##### compile shared library to include at compile-time
 # linux, ask only for shared or static
-libgame_pendu.so : game_pendu.o game_pendu.h victory.o
-	$(CC) -shared $(CFLAGS) $^ -o $@
+#libgame_pendu.so : game_pendu.o game_pendu.h victory.o
+#	$(CC) -shared $(CFLAGS) $^ -o $@
 
 ##### compile shared library to include at run-time (game_morpion)
 # version unix-like available more recently in mingw
@@ -108,12 +160,9 @@ libgame_pendu.so : game_pendu.o game_pendu.h victory.o
 libgame_morpion.so : game_morpion.o game_morpion.h victory.o
 	$(CC) -shared $(CFLAGS) $^ -o $@
 
-# include the description for each module
-include $(patsubst %,%/Module.linux.mk,$(MODULES))
-
 # call clean here and in subdirectories
 clean::
 	@echo "Clean in root directory"
 	rm -f ./*.o
 	rm -f ./*.so ./*.a
-	rm -f JMMjouer
+	rm -f JMMjouer JMMjouer_nolib
