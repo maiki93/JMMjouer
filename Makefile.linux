@@ -92,13 +92,6 @@ else
 endif
 
 $(info $$EXE is $(EXE) )
-# define main executable
-#EXE  := JMMjouer
-#EXE  := JMMjouer_nolib
-
-#LIB_STATIC = libclogger libccontainer
-#LIB_STATIC = libclogger libccontainer
-#LIB_DYNAMIC =  libjoueur libgame_loader librecord
 
 LIB_STATIC = libclogger libccontainer libjoueur libgame_loader
 LIB_DYNAMIC = librecord
@@ -112,6 +105,14 @@ $(info $$EXE is $(EXE) )
 .PHONY : all clean unit_test
 # make all, generic way to use make produce executable JMMjouer
 all: $(EXE)
+
+### FOR TU
+CFLAGS_TESTS = -g3 -W -Wall -fPIC -Wunused -Wextra -pedantic -Wstrict-overflow=5 -Wno-unused-local-typedefs -fno-inline
+# need c99 standard to use cmocka
+# gnu implements inline -std=gnu89 or -fgnu89-inline but does not seem to work. Other errors appears with c89
+STD_TESTS = -std=c99
+INCLUDE_CMOCKA = C:\dev\cmocka_local_mingw\include
+LIB_CMOCKA = C:\dev\cmocka_local_mingw\lib
 
 # specific target for unit testing in tests/ , dependencies with CMocka
 unit_test::
@@ -131,6 +132,13 @@ include $(patsubst %,%/Module.linux.mk,$(MODULES))
 $(info == ROOT after include modules ==)
 $(info $$OBJS_ALL_STATIC is $(OBJS_ALL_STATIC) )
 $(info $$OBJS_ALL_TESTS  is $(OBJS_ALL_TESTS) )
+
+# default build for test_X, must be defined after include Modules
+# can be ovewritten in specific modules
+$(OBJS_ALL_TESTS): %.o: %.c
+	@echo "Build *.o overriden generic rules for tests:   $@"
+	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -c $< -o $@ -I . -I $(INCLUDE_CMOCKA)
+
 
 ###### Main executables 
 # -Wl,-rpath,dir1  or -rpath=dir1 # -Wl to pass argument to linker, rpath runtime to search for lib

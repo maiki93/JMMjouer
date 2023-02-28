@@ -26,20 +26,8 @@ $(info TEST: $(findstring libclogger,$(LIB_STATIC)) )
 ifneq ($(findstring libclogger,$(LIB_STATIC)),)
 libclogger : libclogger.a
 else
-# ifneq ($(findstring libclogger,$(LIB_DYNAMIC)),)
 libclogger : libclogger.so
-#else
-#$(info ERROR!!!)
-#$(error NO CASE)
 endif
-
-#libclogger :
-#	ifneq ($(findstring libclogger,$(LIB_STATIC)),)
-#		libclogger.a
-#	else
-#		libclogger.so
-#	endif
-
 
 clean ::
 	@echo "Clean module clogger"

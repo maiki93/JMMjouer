@@ -7,6 +7,9 @@ OBJS_GAME_LOADER := $(patsubst %.c, %.o, $(SRCS_GAME_LOADER))
 # update global variable
 OBJS_ALL_STATIC += $(OBJS_GAME_LOADER)
 
+# define tests file
+MODDIR_GAME_LOADER_TESTS = $(MODDIR_GAME_LOADER)/tests
+
 $(info == GAME_LOADER ==)
 $(info $$SRCS_GAME_LOADER is [$(SRCS_GAME_LOADER)] )
 $(info $$OBJS_GAME_LOADER is [$(OBJS_GAME_LOADER)] )
@@ -26,7 +29,9 @@ else
 libgame_loader : libgame_loader.so
 endif
 
+include $(patsubst %,%/Module_test.linux.mk,$(MODDIR_GAME_LOADER_TESTS))
+
 clean ::
-	@echo "Clean module record"
+	@echo "Clean module game_loader"
 	rm -f $(MODDIR_GAME_LOADER)/*.o
 	rm -f libgame_loader.so libgame_loader.a

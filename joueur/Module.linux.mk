@@ -2,18 +2,17 @@
 MODDIR_JOUEUR = joueur
 
 SRCS_JOUEUR := $(wildcard $(MODDIR_JOUEUR)/*.c)
-OBJS_JOUEUR = $(patsubst %.c, %.o, $(SRCS_JOUEUR))
+OBJS_JOUEUR := $(patsubst %.c, %.o, $(SRCS_JOUEUR))
 
 # update global variable
 OBJS_ALL_STATIC += $(OBJS_JOUEUR)
 
+# define tests file
+MODDIR_JOUEUR_TESTS = $(MODDIR_JOUEUR)/tests
+
 $(info == JOUEUR ==)
 $(info $$SRCS_JOUEUR is [$(SRCS_JOUEUR)] )
 $(info $$OBJS_JOUEUR is [$(OBJS_JOUEUR)] )
-
-#libjoueur.so : $(OBJS_JOUEUR) libclogger.so libccontainer.so
-#	@echo "Create shared library -- joueur"
-#	$(CC) -shared -o $@ $(OBJS_JOUEUR) -L . -lclogger -lccontainer
 
 libjoueur.so : $(OBJS_JOUEUR) libclogger libccontainer
 	@echo "Create shared library -- joueur"
@@ -29,7 +28,10 @@ else
 libjoueur : libjoueur.so
 endif
 
+#include $(patsubst %,%/Module.linux.mk,$(MODDIR_JOUEUR)/tests))
+include $(patsubst %,%/Module_test.linux.mk,$(MODDIR_JOUEUR_TESTS))
+
 clean ::
 	@echo "Clean module joueur"
-	rm -f $(MODDIR_JOUEUR)/*.o
+	rm -f $(OBJS_JOUEUR)
 	rm -f libjoueur.so libjoueur.a

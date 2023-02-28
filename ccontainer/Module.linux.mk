@@ -7,11 +7,13 @@ OBJS_CCONTAINER := $(patsubst %.c, %.o, $(SRCS_CCONTAINER))
 # update global variable
 OBJS_ALL_STATIC += $(OBJS_CCONTAINER)
 
+# defined here, used in tests/Module.X.mk
+MODDIR_CCONTAINER_TESTS = $(MODDIR_CCONTAINER)/tests
+
 $(info == CCONTAINER ==)
 $(info $$SRCS_CCONTAINER is [$(SRCS_CCONTAINER)] )
 $(info $$OBJS_CCONTAINER is [$(OBJS_CCONTAINER)] )
 
-#libccontainer.so : $(OBJS_CCONTAINER) libclogger.so
 libccontainer.so : $(OBJS_CCONTAINER) libclogger
 	@echo "Create shared library -- ccontainer"
 	$(CC) -shared -o $@ $(OBJS_CCONTAINER) -L . -lclogger
@@ -25,6 +27,9 @@ libccontainer : libccontainer.a
 else
 libccontainer : libccontainer.so
 endif
+
+# include description for each module
+include $(patsubst %,%/Module.linux.mk,$(MODDIR_CCONTAINER_TESTS))
 
 clean ::
 	@echo "Clean module ccontainer"
