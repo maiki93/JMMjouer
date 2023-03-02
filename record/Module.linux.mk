@@ -17,7 +17,9 @@ $(info $$OBJS_RECORD is [$(OBJS_RECORD)] )
 
 librecord.so : $(OBJS_RECORD) libclogger libccontainer libjoueur
 	@echo "Create shared library -- record"
-	$(CC) -shared -o $@ $(OBJS_RECORD) -L . -ljoueur -lclogger -lccontainer 
+#	$(CC) -shared -o $@ $(OBJS_RECORD) -L . -ljoueur -lclogger -lccontainer
+#	$(LINK) $(LFLAGS) -o $@ $(OBJS_RECORD) -L . -ljoueur -lclogger -lccontainer
+	$(LINK) $(LFLAGS) -o $@ $(OBJS_RECORD) -L. -ljoueur
 
 #librecord.a : $(OBJS_RECORD) libclogger.so libccontainer.so
 librecord.a : $(OBJS_RECORD)

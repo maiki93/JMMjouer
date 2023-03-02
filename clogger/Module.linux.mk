@@ -13,7 +13,8 @@ OBJS_ALL_STATIC += $(OBJS_CLOGGER)
 
 libclogger.so : $(OBJS_CLOGGER)
 	@echo "Create library -- clogger"
-	$(CC) -shared -o $@ $^
+#	$(CC) -shared -o $@ $^
+	$(LINK) $(LFLAGS) -o $@ $^
 
 # r means to insert with replacement
 # c means to create a new archive

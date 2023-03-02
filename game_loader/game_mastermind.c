@@ -11,7 +11,7 @@
 */
 #include "game_loader/game_mastermind.h"
 /*#include "victory.h"*/ /* included in .h */
-#include "utils.h"
+#include "jmmjouer/utils.h"
 
 /* if we want to mock by redefinition,
     must define weak symbol( or use objdump intermediate ) */

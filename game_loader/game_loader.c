@@ -16,7 +16,7 @@
 #include "game_loader.h"
 #include "cmap_ptrf_game.h"
 #include "plugin_manager.h" /* to get singleton instance */
-#include "utils_file.h"
+#include "jmmjouer/utils_file.h"
 #include "clogger/clogger.h"
 /* if forward declare in header */
 

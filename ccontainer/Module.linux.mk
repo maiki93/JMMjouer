@@ -16,7 +16,8 @@ $(info $$OBJS_CCONTAINER is [$(OBJS_CCONTAINER)] )
 
 libccontainer.so : $(OBJS_CCONTAINER) libclogger
 	@echo "Create shared library -- ccontainer"
-	$(CC) -shared -o $@ $(OBJS_CCONTAINER) -L . -lclogger
+	$(LINK) $(LFLAGS) -o $@ $(OBJS_CCONTAINER) -L . -lclogger
+#	$(CC) -shared -o $@ $(OBJS_CCONTAINER) -L . -lclogger
 
 libccontainer.a : $(OBJS_CCONTAINER)
 	echo "Create static library -- ccontainer"

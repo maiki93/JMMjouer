@@ -12,8 +12,8 @@
     #include <getopt.h>
 #endif
 
-#include "arcade_params.h"
-#include "arcade.h"
+#include "jmmjouer/arcade_params.h"
+#include "jmmjouer/arcade.h"
 /* storage of available games + in charge of loading dll (composition)
    injected in arcade (plugin manager is singleton) */
 #include "game_loader/game_loader.h"
@@ -23,7 +23,7 @@
 #include "record/file_record.h"
 
 #include "clogger/clogger.h"
-#include "utils.h"
+#include "jmmjouer/utils.h"
 
 /* https://opensource.com/article/19/5/how-write-good-c-main-function */
 #define OPTSTR "vahd:" 

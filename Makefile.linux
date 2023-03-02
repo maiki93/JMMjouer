@@ -13,18 +13,49 @@
 # yes, use in code of JMMJ_DEBUG (example in main.c), and -g four building in debug mode( possibility to use a debugger)
 # no, compile with optimization -O2
 debug = yes
-#debug = no
+RELEASE ?= 1
+ifeq ($(RELEASE),1)
+	debug = no
+endif
 
 # compilers, may give different errors/warning
+# “-save-temps" to see *.i file
 CC = gcc
 #CC = clang
 
 LINK = ld
-#LFLAGS
+## -r --relocatable
+## --just-symbols=filename
+# -t --trace
+# --fatal-warnings
+# -M --print-map / --cref / -Map mapfile
+# -u --undefined=symbol
+# -x / -X --discard_X
+# -Bdynamic / -Bstatic : see: -Bstatic -shared (for joueur)
+# -Bsymbolic : change default
+# --no-undefined / -z defs
+# --allow-shlib-undefined / --no-allow...(allow default)
+# --unresolved-symbols=method (default 'report-all')
+# --warn-common / --warn-X
+# --wrap : e.g. cmocka, malloc
+# MyCStock -g -shared -Wl,-z,defs (not undefined in)
+# -Wl,--no-allow-shlib-undefined
+
+# PE386 specificity : --export-all-symbols ( default, if NO EXPORT)
+#     --output-def file
+# -Wl,--subsystem,windows (for PE target)
+#LFLAGS = --verbose --print-map -Map mapfile_joueur
+# --no-undefined-version : ?
+# -z defs : Disallows undefined symbols in object files. Undefined symbols in
+#		shared libraries are still allowed
+# this options implies use of -lc, linkage to glibc (for malloc,free... definitions) 
+# --no-allow-shlib-undefined : makes the linker treat any undefined symbols in shared libraries linked in as errors. 
+#      In other words, this option prevents linker from creating shared libraries that are missing indirect dependencies.
+LFLAGS = --warn-common -shared -z defs --no-allow-shlib-undefined -lc
 
 # List of subdirectories containing a Module.mk file
 #MODULES := tests tests/test_mock
-MODULES := clogger ccontainer joueur record game_loader #tests
+MODULES := clogger ccontainer joueur record game_loader # tests_integration
 
 # see advices (and much more than compilation options) https://matt.sh/howto-c
 # compiler option, activate many warning( here seeems common to gcc and clang)
@@ -37,7 +68,8 @@ MODULES := clogger ccontainer joueur record game_loader #tests
 #       on linux not for performance ? but cannot comile, give error !
 # -g3 : all debug information + MACRO (-g0 : no debug ), -g default 2
 # -ggdb : include gdb extension if possible (not tested)
-CFLAGS = -Wall -Wextra -pedantic -fPIC -I . -Wno-variadic-macros #-Wno-strict-overflow
+# -fno-common : 
+CFLAGS = -Wall -Wextra -pedantic -fPIC -fno-common -I . -Wno-variadic-macros #-Wno-strict-overflow
 # to include again:  -Werror, better than Wno-X warning appears but compiles fine
 
 # standard configurable
@@ -60,41 +92,33 @@ WITH_LIB ?= 1
 #ifeq ($(origin WITH_LIB), undefined)
 # WITH_LIB = 1
 #endif
-
-#ifndef $(WITH_LIB)
-#	WITH_LIB = 1
-#else
-#	WITH_LIB = 0
-#endif
-
-$(info == Makefile ROOT ==)
-$(info $$WITH_LIB is $(WITH_LIB) )
-$(info $$CC is $(CC) )
-$(info $$CFLAGS is $(CFLAGS) )
-$(info $$LINK is $(LINK) )
-$(info $$LFLAGS is $(LFLAGS) )
-$(info $$MAKECMDGOALS is $(MAKECMDGOALS) )
-
-# Use explicit OBJS, more control
-# do not include main.o
-OBJS_EXE = utils.o utils_file.o arcade.o
-
-# updated from visit in all modules, no need to define here (would still be better)
-#OBJS_ALL_STATIC = ''
-#OBJS_ALL_TESTS = ''
-
-#NO_LIB = /DwithLIB
-#ifeq ($(WITH_LIB),/DwithLIB)
 ifeq ($(WITH_LIB),1)
 	EXE:= JMMjouer
 else
 	EXE:= JMMjouer_nolib
 endif
 
+$(info == Makefile ROOT ==)
+$(info $$WITH_LIB is $(WITH_LIB) )
+$(info $$RELEASE is $(RELEASE) )
+$(info $$CC is $(CC) )
+$(info $$CFLAGS is $(CFLAGS) )
+$(info $$LINK is $(LINK) )
+$(info $$LFLAGS is $(LFLAGS) )
+$(info $$MAKECMDGOALS is $(MAKECMDGOALS) )
+
+# updated from visit in all modules, no need to define here (would still be better)
+#OBJS_ALL_STATIC = ''
+#OBJS_ALL_TESTS = ''
+# MAKELIST
+
+
 $(info $$EXE is $(EXE) )
 
-LIB_STATIC = libclogger libccontainer libjoueur libgame_loader
-LIB_DYNAMIC = librecord
+LIB_STATIC = libclogger libccontainer libgame_loader
+# libjouer : linked with -shared -Bstatic against libclogger and libccontainer
+# librecord need only libjoueur ! (good, bad ?) cannot really works ?
+LIB_DYNAMIC = libjoueur librecord
 
 # define list of unit_test found in all the hierarchy
 # inspect variables
@@ -129,6 +153,13 @@ unit_test::
 
 # include the description for each module
 include $(patsubst %,%/Module.linux.mk,$(MODULES))
+
+# include core in jmmjouer
+include jmmjouer/Module.linux.mk
+
+# only for plugins
+include src_plugin/Module.linux.mk
+
 $(info == ROOT after include modules ==)
 $(info $$OBJS_ALL_STATIC is $(OBJS_ALL_STATIC) )
 $(info $$OBJS_ALL_TESTS  is $(OBJS_ALL_TESTS) )
@@ -144,14 +175,14 @@ $(OBJS_ALL_TESTS): %.o: %.c
 # -Wl,-rpath,dir1  or -rpath=dir1 # -Wl to pass argument to linker, rpath runtime to search for lib
 #JMMjouer: $(OBJS_EXE) main.o libgame_pendu.so
 #JMMjouer: $(OBJS_EXE) main.o libclogger.so
-JMMjouer: $(OBJS_EXE) main.o $(LIB_STATIC) $(LIB_DYNAMIC)
-	@echo "Build $(EXE): all dependencies $^"
-	$(CC) -o $@ $(OBJS_EXE) main.o -L .  -lgame_loader -lrecord -ljoueur -lccontainer -lclogger
+#JMMjouer: $(OBJS_EXE) main.o $(LIB_STATIC) $(LIB_DYNAMIC)
+#	@echo "Build $(EXE): all dependencies $^"
+#	$(CC) -o $@ $(OBJS_EXE) main.o -L .  -lgame_loader -lrecord -ljoueur -lccontainer -lclogger
 
-JMMjouer_nolib : main.o $(OBJS_EXE) $(OBJS_ALL_STATIC)
-	@echo "Build JMMjouer_nolib ^: all dependencies $^"
-	@echo "Build JMMjouer_nolib <: all dependencies $<"
-	$(CC) $(STD) $(CFLAGS) -o $@ $^
+#JMMjouer_nolib : main.o $(OBJS_EXE) $(OBJS_ALL_STATIC)
+#	@echo "Build JMMjouer_nolib ^: all dependencies $^"
+#	@echo "Build JMMjouer_nolib <: all dependencies $<"
+#	$(CC) $(STD) $(CFLAGS) -o $@ $^
 
 
 ##### compile shared library to include at compile-time
@@ -165,12 +196,12 @@ JMMjouer_nolib : main.o $(OBJS_EXE) $(OBJS_ALL_STATIC)
 #	$(CC) -shared game_morpion.o -o libmorpion.dll
 
 # windows style, with importing lib, not used at run-time link anyway
-libgame_morpion.so : game_morpion.o game_morpion.h victory.o
-	$(CC) -shared $(CFLAGS) $^ -o $@
+#libgame_morpion.so : game_morpion.o game_morpion.h victory.o
+#	$(CC) -shared $(CFLAGS) $^ -o $@
 
 # call clean here and in subdirectories
 clean::
 	@echo "Clean in root directory"
 	rm -f ./*.o
 	rm -f ./*.so ./*.a
-	rm -f JMMjouer JMMjouer_nolib
+#	rm -f JMMjouer JMMjouer_nolib

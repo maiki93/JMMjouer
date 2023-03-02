@@ -19,6 +19,7 @@ typedef struct {
     shared export not needed if internal module ?? */
 /*SHARED_EXPORT*/ value_t make_value_victory( struct pair_game_victory_t victory );
 /*SHARED_EXPORT*/ struct pair_game_victory_t extract_value_victory( const value_t* value);
+
 /*
 void deleter(value_t* value)
 */

@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include "game_loader/game_pendu.h"
-#include "utils.h"
+#include "jmmjouer/utils.h"
 
 /*#define NB_TOUR 10*/
 enum { NB_TOUR=10 };

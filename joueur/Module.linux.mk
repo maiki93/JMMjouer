@@ -14,9 +14,12 @@ $(info == JOUEUR ==)
 $(info $$SRCS_JOUEUR is [$(SRCS_JOUEUR)] )
 $(info $$OBJS_JOUEUR is [$(OBJS_JOUEUR)] )
 
+# all dependencies are coming statically linked (need clogger and ccontainer static)
 libjoueur.so : $(OBJS_JOUEUR) libclogger libccontainer
 	@echo "Create shared library -- joueur"
-	$(CC) -shared -o $@ $(OBJS_JOUEUR) -L . -lclogger -lccontainer
+#	$(CC) -shared -o $@ $(OBJS_JOUEUR) -L . -lclogger -lccontainer
+#	$(LINK) $(LFLAGS) -o $@ $(OBJS_JOUEUR) -L. -lclogger -lccontainer
+	$(LINK) $(LFLAGS) -Bstatic -o $@ $(OBJS_JOUEUR) -L. -lclogger -lccontainer
 
 libjoueur.a : $(OBJS_JOUEUR)
 	@echo "Create static library -- joueur"
