@@ -9,6 +9,8 @@
 
 #include "joueur/cmap_game_victories.h"
 
+#define _unused(x) ((void)(x))
+
 /* complete declaration of file_record_t */
 /* moved into private header */
 typedef struct {
@@ -62,7 +64,10 @@ void file_record_init( file_record_t *this, const char *file_txt_name)
     byte = sprintf( tmp_description, 
                     "Record: a simple text file\nfilename %s\n", 
                     file_txt_name);
+    /* maybe not an assert here, in release also can happen if file mix-up */
     assert( byte <= 100 );
+    _unused(byte);
+
     /* base class init */
     irecord_init( (irecord_t *)this, tmp_description );
     /* data member init */
@@ -215,7 +220,10 @@ int extract_map_victories( file_record_t *this, char *line, cmap_game_victories_
     char *delimiter = ":";
     size_t pos_delimiter;
 
-    fgets(line, MAX_LINE_SIZE,  this->fp);
+    /*fgets(line, MAX_LINE_SIZE,  this->fp);*/
+    if( fgets(line, MAX_LINE_SIZE,  this->fp) == NULL ) {
+        return 1;
+    }
 
     while( line[0] != '+' )
     {
@@ -233,7 +241,9 @@ int extract_map_victories( file_record_t *this, char *line, cmap_game_victories_
                                             , & pair_victory.victories.nb_lost);
         
         game_victories_insert( map, pair_victory );
-        fgets(line, MAX_LINE_SIZE,  this->fp);
+        if( !fgets(line, MAX_LINE_SIZE,  this->fp) ) {
+            return 1;
+        }
     }
     return 0;
 }
@@ -290,7 +300,8 @@ int increment( void* input, void* output )
     size_t *int_in = (size_t*)input;
     size_t *int_out = (size_t*)output;
     assert( int_out != NULL);
-    /* *int_in = (*int_in)+1; */
+    _unused( int_out ); 
+
     (*int_in)++;
     return 0;
 }

@@ -24,7 +24,9 @@ bool ask_yesno_question(const char* message)
 
     do {
         printf("%s", message );
-        scanf("%c", &answer_char );
+        if( scanf("%c", &answer_char ) == EOF ) {
+            printf("ERROR\n");
+        }
         clean_stdin();
 
         switch( answer_char ) {
@@ -70,7 +72,13 @@ void clear_screen()
             printf("clear screen _win32\n");
         #endif
     #else
-        system("cls");
+        /*system("cls");*/
+        /* error return depend on command */
+        
+        if( system("clear") == -1) {
+            printf("Error system call cls %d\n", 0);
+        }
+        
         #ifdef JMMJ_DEBUG
             printf("clear screen NOT _win32\n");
         #endif

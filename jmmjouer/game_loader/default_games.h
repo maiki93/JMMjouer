@@ -1,11 +1,14 @@
 
-#include "game_loader/game_mastermind.h"
-#include "game_loader/game_pendu.h"
+#include "jmmjouer/game_loader/game_mastermind.h"
+#include "jmmjouer/game_loader/game_pendu.h"
 
 /* @brief List the games known at compilation.
 
     Mastermind: included in source code
     Pendu: use shared library, but header available at compilation
+
+    Pb recent, store adress in array => cannot link later
+    Before adress retrieved by loading at run-time ? how exactly ?
 */
 
 /* not a "good practice" to define variable in header

@@ -63,7 +63,7 @@ const char* plugin_manager_get_directory(const plugin_mgr_t *plg_manager);
     Make an internal copy of the input */
 void plugin_manager_set_directory( plugin_mgr_t *plg_manager, const char *directory);
 
-/* @brief Load dll "filename" in currenttly set directory */
+/* @brief Load dll "filename"(.so or .dll) in currently set directory */
 int plugin_manager_load_shared_library( plugin_mgr_t *plg_manager, const char *filename);
 
 /* restrictive must be call on the last inserted, need better container

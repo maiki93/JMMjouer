@@ -1,5 +1,6 @@
 
-MODDIR_GAME_LOADER := game_loader
+# path relative to root, more flexible
+MODDIR_GAME_LOADER := jmmjouer/game_loader
 
 SRCS_GAME_LOADER := $(wildcard $(MODDIR_GAME_LOADER)/*.c)
 OBJS_GAME_LOADER := $(patsubst %.c, %.o, $(SRCS_GAME_LOADER))

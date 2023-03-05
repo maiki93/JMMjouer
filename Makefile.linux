@@ -13,7 +13,7 @@
 # yes, use in code of JMMJ_DEBUG (example in main.c), and -g four building in debug mode( possibility to use a debugger)
 # no, compile with optimization -O2
 debug = yes
-RELEASE ?= 1
+RELEASE ?= 0
 ifeq ($(RELEASE),1)
 	debug = no
 endif
@@ -55,7 +55,8 @@ LFLAGS = --warn-common -shared -z defs --no-allow-shlib-undefined -lc
 
 # List of subdirectories containing a Module.mk file
 #MODULES := tests tests/test_mock
-MODULES := clogger ccontainer joueur record game_loader # tests_integration
+# game_loader moved into jmmjouer
+MODULES := clogger ccontainer joueur record # game_loader # tests_integration
 
 # see advices (and much more than compilation options) https://matt.sh/howto-c
 # compiler option, activate many warning( here seeems common to gcc and clang)
@@ -68,8 +69,8 @@ MODULES := clogger ccontainer joueur record game_loader # tests_integration
 #       on linux not for performance ? but cannot comile, give error !
 # -g3 : all debug information + MACRO (-g0 : no debug ), -g default 2
 # -ggdb : include gdb extension if possible (not tested)
-# -fno-common : 
-CFLAGS = -Wall -Wextra -pedantic -fPIC -fno-common -I . -Wno-variadic-macros #-Wno-strict-overflow
+# -fno-common : to look more, advice not clear
+CFLAGS = -Wall -Wextra -pedantic -fPIC -I . -Wno-variadic-macros
 # to include again:  -Werror, better than Wno-X warning appears but compiles fine
 
 # standard configurable
@@ -83,7 +84,7 @@ ifeq ($(debug),yes)          # separator mandatory between ifeq and '('
 # use specific code for the project, g3 to include MACRO definition as variables
 	CFLAGS += -g3 -O0 -DJMMJ_DEBUG
 else
-# kind of standard with gcc projects
+# -DNDEBUG kind of standard with gcc projects
 	CFLAGS += -DNDEBUG -O2
 endif
 

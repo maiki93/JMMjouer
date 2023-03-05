@@ -7,6 +7,9 @@
 #include "irecord_private.h"
 #include "clogger/clogger.h"
 
+/* https://stackoverflow.com/questions/777261/avoiding-unused-variables-warnings-when-using-assert-in-a-release-build */
+#define _unused(x) ((void)(x))
+
 /*#include "irecord.h"*/
 
 /* typedef (in private_header) would avoid recopy of complex type */
@@ -72,7 +75,9 @@ joueur_t __find_joueur_error( void *this, const char *name)
 {
     joueur_t joueur;
     assert(this != NULL);
+    _unused(this); /* nice trick working in release mode, both gcc/msvc*/
     assert(name); /* msvc forces to use argument variable */
+    _unused(name);
     
     joueur_init(&joueur, "invalid", false);
     printf("-- In record base __get_joueur_error --\n");

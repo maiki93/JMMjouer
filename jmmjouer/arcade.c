@@ -243,7 +243,9 @@ static void print_identification_menu(char *try_name)
     printf("\n---- Identifaction ----\n");
     printf("Quel est votre nom ? ");
     /* fgets more secure with size and add automatically a '\0' caracter */
-    fgets( try_name, MAX_SIZE_NOM_PERSON, stdin);
+    if( fgets( try_name, MAX_SIZE_NOM_PERSON, stdin) == NULL) {
+        CLOG_ERR("Error in fgets, not treated %d", 0);
+    }
     /* case where \n is not present to treat (longer than MAX_SIZE)
         https://stackoverflow.com/questions/2693776/removing-trailing-newline-character-from-fgets-input */
     try_name[strcspn(try_name, "\n")] = 0; /* <=> '\n' => '\0' */
@@ -276,7 +278,11 @@ static int print_game_menu(clist_cstring_t *clist_game_name)
 
     do {
         printf("Votre choix : ");
-        scanf("%d", &choice_game);
+
+        if( scanf("%d", &choice_game) == EOF) {
+            CLOG_ERR("Error in scanf, EOF not treated %d", EOF);
+        };
+
         clean_stdin();
         /* check entry is valid */
         if( choice_game >= 0 && choice_game < nb_game ) {

@@ -14,6 +14,9 @@ $(info == CORE JMMJOUER ==)
 #$(info $$SRCS_JMMJOUER is [$(SRCS_JMMJOUER)] )
 $(info $$OBJS_JMMJOUER is [$(OBJS_JMMJOUER)] )
 
+# subdirectory in jmmjouer core
+# update same global list : OBJS_ALL_STATIC, OBJS_ALL_TESTS
+include jmmjouer/game_loader/Module.linux.mk
 
 ###### Main executables
 

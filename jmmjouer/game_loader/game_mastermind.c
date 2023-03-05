@@ -9,7 +9,7 @@
     other link https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
     https://i.stack.imgur.com/9UVnC.png
 */
-#include "game_loader/game_mastermind.h"
+#include "jmmjouer/game_loader/game_mastermind.h"
 /*#include "victory.h"*/ /* included in .h */
 #include "jmmjouer/utils.h"
 
@@ -297,6 +297,8 @@ void mm_affiche_resultat_guess_blackwhite( char* p_string, const int nb_bien_pla
     /*int sz = snprintf(buffer, sizeof(buffer), fmt, nb_bien_place, nb_mal_place);*/
     int sz = sprintf(buffer, fmt, nb_bien_place, nb_mal_place);
     assert( sz < LINE_SIZE_ON_SCREEN );
+    (void)sz;
+    
     printf("buffer:%s\n", buffer);
     /* cat original and buffer */
     strcat( p_string, buffer );
