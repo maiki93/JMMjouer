@@ -1,13 +1,12 @@
-## similar Makefile but with windows tools
-# speicify only windows specific options
-
+## similar Makefile for use with windows msvc tools
 debug = yes
+RELEASE ?= 0
+ifeq ($(RELEASE),1)
+	debug = no
+endif
 
-# compilers, may give different errors/warning
-# can use $(CC) if correct environment ?
+# compiler msvc and linker
 CC = cl.exe
-#CC = clang
-
 # linker
 LINK = link.exe
 
@@ -19,8 +18,8 @@ LINK = link.exe
 LFLAGS = /nologo
 
 # List of subdirectories containing a Module.win.mk file
-# for windows, use all modules and no recursive (!= ming64)
-MODULES := clogger ccontainer joueur record game_loader tests
+# for windows, use all modules and no recursive (!= ming64 for clogger)
+MODULES := clogger ccontainer joueur record # game_loader tests
 
 # Compile source, default name *obj on windows, adviced to keep it
 # /O1, /O2 optimisation , /Ox 'best' optimization'
@@ -31,30 +30,61 @@ MODULES := clogger ccontainer joueur record game_loader tests
 # /std:c11,c17, /Za closer to C89
 # /Zi : generate PDB for use when debugging (do not affect optimisation) and pass option /DEBUG to linker
 # /D_CRT_SECURE_NO_WARNINGS warning microsoft strcpy_s,scanf_s etc
-CFLAGS = /nologo /W4 /D_CRT_SECURE_NO_WARNINGS /wd4131 -I.
+CFLAGS = /nologo /W4 /D_CRT_SECURE_NO_WARNINGS -I.
 # /WX to add again after debug
 # /Wall = > /wd4255 /wd5045 and still more + cmocka problems
 # 4131 for getopt "declarateur obsolete"
 
+# 4113 : parameter void **state missing in unit test function
+CFLAGS_TESTS = /nologo /W4 /D_CRT_SECURE_NO_WARNINGS /wd4113 -I.
+
+## TU library: CMocka it is 64 bit compilation
+INCLUDE_CMOCKA = C:\dev\cmocka_local_msvc\include
+LIB_CMOCKA = C:\dev\cmocka_local_msvc\lib
+
 # standard configurable
 # /std:c11
 # msvc /za closer to c89
-#STD = /Za #winnt error !
+#STD = /Za # winnt error !
+
+# can choose which modules are build as static or shared libraries
+LIB_DYNAMIC =  libccontainer libclogger librecord
+# problem of (not) export in game_loader, need static only for this module
+LIB_STATIC = libgame_loader libjoueur
+
+# define main executable and with NO_LIB=1 no libraries created
+NO_LIB ?= 0
+ifeq ($(NO_LIB),0)
+	EXE:= JMMjouer
+	SHARED_EXPORT = /DwithLIB /Dshared_EXPORTS
+else
+	EXE:= JMMjouer_nolib
+	undefine SHARED_EXPORT
+	undefine LIB_STATIC
+	undefine LIB_DYNAMIC
+endif
 
 ifeq ($(debug),yes)          # separator mandatory between ifeq and '('
-# use specific code for the project, g3 to include MACRO definition as variables
 	CFLAGS += /Zi /Od /DJMMJ_DEBUG
-#	LFLAGS += /DEBUG
+	CFLAGS_TESTS += /Zi /Od /DJMMJ_DEBUG
 else
 # 'best' optimization msvc
 	CFLAGS += /Ox
+	CFLAGS_TESTS += /Ox
 endif
 
-$(info == Makefile ROOT ==)
+$(info == Makefile Windows ROOT ==)
+$(info $$RELEASE is $(RELEASE) )
+$(info $$MAKECMDGOALS is $(MAKECMDGOALS) )
+$(info $$NO_LIB is $(NO_LIB) )
 $(info $$CC is $(CC) )
 $(info $$CFLAGS is $(CFLAGS) )
+$(info $$CFLAGS_TESTS is $(CFLAGS_TESTS) )
 $(info $$LINK is $(LINK) )
 $(info $$LFLAGS is $(LFLAGS) )
+$(info $$EXE is $(EXE) )
+$(info $$LIB_STATIC is $(LIB_STATIC) )
+$(info $$LIB_DYNAMIC is $(LIB_DYNAMIC) )
 
 # search for all *.c files and make *.o files
 # SRCS := $(wildcard *.c)
@@ -62,89 +92,56 @@ $(info $$LFLAGS is $(LFLAGS) )
 # take away main.o to avoid mutliple main() functions
 # OBJS := $(filter-out main.o, $(OBJS))
 
-# Use explicit OBJS, more control
-# do not include main.o
-OBJS_EXE = getopt.obj utils.obj utils_file.obj arcade.obj
-
-# updated from visit in all modules, no need to define here (would still be better)
-#OBJS_ALL_STATIC = ''
-#OBJS_ALL_TESTS = ''
-
-
-WITH_LIB = /DwithLIB
-ifeq ($(WITH_LIB),/DwithLIB)
-	EXE:= JMMjouer
-else
-	EXE:= JMMjouer_nolib
-endif
-
-# define main executable
-#EXE  := JMMjouer
-
-# define list of unit_test found in all the hierarchy
-# inspect variables
-$(info $$OBJS is [$(OBJS_EXE)] )
-$(info $$EXE is $(EXE) )
-# alternative to target as files
-.PHONY : all clean unit_test
-
-# make all, generic way to use make produce executable JMMjouer and all unit test
+#.PHONY : all clean unit_test
+# make all, generic way to use make produce executable JMMjouer
 all: $(EXE) unit_test
 
-# specific target for unit testing in tests/ , dependencies with CMocka
-# unit_test:: not needed, at least until only one target defined in Module
-# unit_test_mock::
+
 
 # general rule for compiling c files when header file is available
 # msvc must extract directory path for option /Fo (output directory)
-# filename fixed 
+# acthung ! $SHARED_EXPORT only for dynamic linkage (export _imp_ )
+#     https://stackoverflow.com/questions/4841719/dllimport-dllexport-and-static-libraries-compilation-under-visual-c
+
+# filename fixed , not used anymore ??
 %.obj: %.c %.h
 	@echo "Build file generic rule with header in root:   $@"
-	@echo "<:   $<"
-	@echo "?:   $?"
+	@echo "<:   $<" # all dependencies
+	@echo "^:   $^" # all dependencies
+	@echo "?:   $?" # all dependencies newer than target
 	@echo "dir from target: $(dir $@)"
-	$(CC) $(STD) $(CFLAGS) /c $< /Fo"$(dir $@)"
+# apply export symbol in all, must use SHARED_LIB to be effective
+#	$(CC) $(STD) $(CFLAGS) /DwithLIB /Dshared_EXPORTS /c $< /Fo"$(dir $@)"
+	$(CC) $(STD) $(CFLAGS) $(SHARED_EXPORT) /c $< /Fo"$(dir $@)"
 
 # general rule, no header file associated (ex. main.c)
 %.obj: %.c
 	@echo "Build file generic rule without header in root:   $@"
-	$(CC) $(STD) $(CFLAGS) /c $<
-
-# to try generic rule to build TU
-
+#	$(CC) $(STD) $(CFLAGS) /DwithLIB /Dshared_EXPORTS /c $< /Fo"$(dir $@)"
+	$(CC) $(STD) $(CFLAGS) $(SHARED_EXPORT) /c $< /Fo"$(dir $@)"
 
 # include the description for each module
 include $(patsubst %,%/Module.win.mk,$(MODULES))
+
+# include core in jmmjouer
+include jmmjouer/Module.win.mk
+
+# only for plugins
+include src_plugin/Module.win.mk
+
+# to try generic rule to build TU
+# not possible on windows, depends if linked to static or shared lib, really ?
+# still used ? yes for some test_X main test executable
+$(OBJS_ALL_TESTS): %.obj: %.c
+	@echo "Build *.o overriden generic rules in root for all tests:   $@"
+	@echo "dir @ : $(dir $@)"
+# with LIB no change for ccontainer tests...
+	$(CC) /Zi $(CFLAGS_TESTS) /c $< /I. /I"$(INCLUDE_CMOCKA)" /Fo"$(dir $@)"
+#	$(CC) /Zi $(CFLAGS_TESTS) /DwithLIB /c $< /I. /I"$(INCLUDE_CMOCKA)" /Fo"$(dir $@)"
+
 $(info == ROOT after include modules ==)
 $(info $$OBJS_ALL_STATIC is $(OBJS_ALL_STATIC) )
 $(info $$OBJS_ALL_TESTS  is $(OBJS_ALL_TESTS) )
-
-
-# specific rule for getopt, only for windows
-getopt.obj : getopt.c getopt.h
-	@echo "Build windows version getopt:   $@"
-	$(CC) $(STD) /nologo /W4 /wd4131 /wd4100 /D_CRT_SECURE_NO_WARNINGS /c $<
-
-# -Wl,-rpath,dir1  or -rpath=dir1 # -Wl to pass argument to linker, rpath runtime to search for lib
-#game_pendu.dll librecord_dll.lib 
-# now compile (still JMMjouer.lib produced), but with static record library
-JMMjouer: $(OBJS_EXE) main.obj libgame_loader.lib libjoueur_dll.lib \
-					libccontainer_dll.lib librecord_dll.lib libclogger_dll.lib 
-	@echo "Build $(EXE): all dependencies $^"
-	$(LINK) $(LFLAGS) /OUT:JMMjouer.exe $^
-#	$(LINK) $(LFLAGS) /OUT:JMMjouer.exe $^ /LIBPATH:. librecord.dll
-#	$(LINK) $(LFLAGS) /OUT:JMMjouer.exe $^ librecord.lib
-#	$(LINK) $(LFLAGS) /OUT:JMMjouer.exe main.obj $(OBJS_EXE) /LIBPATH:. game_pendu.lib
-
-# it produces *lib and *exp files , certianly because of exporting 
-JMMjouer_nolib : main.obj $(OBJS_EXE) $(OBJS_ALL_STATIC)
-	@echo "Build JMMjouer_nolib ^: all dependencies $^"
-	@echo "Build JMMjouer_nolib <: all dependencies $<"
-# order is important !! in fact not...
-#	$(LINK) $(LFLAGS) $^ /OUT:JMMjouer_static.exe
-#	$(LINK) $(LFLAGS) /OUT:JMMjouer_static.exe $^
-	$(LINK) /OUT:JMMjouer_nolib.exe $^
-#	$(LINK) $(LFLAGS) /OUT:JMMjouer_static.exe $^ /LIBPATH:. game_pendu.lib
 
 #### games ####
 # pendu is a game provided in a shared library, known at link time (no plugin)
@@ -158,30 +155,23 @@ JMMjouer_nolib : main.obj $(OBJS_EXE) $(OBJS_ALL_STATIC)
 # finally lib.exe is certainly called at the final stage, could choose what to export
 
 # compile shared library to include at compile-time
-game_pendu.dll : game_pendu.obj victory.obj
-	$(LINK) $(LFLAGS) /DLL $^ /IMPLIB:game_pendu.lib /OUT:game_pendu.dll
+#game_pendu.dll : game_pendu.obj victory.obj
+#	$(LINK) $(LFLAGS) /DLL $^ /IMPLIB:game_pendu.lib /OUT:game_pendu.dll
 
 # compile shared library to include at run-time (game_morpion)
-# windows style, without lib generation for plugins use
-game_morpion.dll : game_morpion.obj victory.obj
-	$(LINK) $(LFLAGS) /DLL /NOIMPLIB $^ /OUT:game_morpion.dll
+# windows style, without lib generation for use as a run-time plugin
+#game_morpion.dll : game_morpion.obj victory.obj
+#	$(LINK) $(LFLAGS) /DLL /NOIMPLIB $^ /OUT:game_morpion.dll
 #	cp $@ .\plugins, do not mage to copy Copy-Item
-
 
 # call clean here and in subdirectories
 clean::
 	echo "Clean in root directory"
-	del $(OBJS_EXE), main.obj
+#	del $(OBJS_EXE), main.obj
 # should be done before
-	del utils_file.obj utils.obj arcade.obj
-	del JMMjouer.exe,JMMjouer.ilk,JMMjouer.pdb,JMMjouer.exp
-	del JMMjouer_nolib.*
-#	del JMMjouer_static.exe JMMjouer_static.ilk  JMMjouer_static.pdb
-#JMMjouer_static.exp   JMMjouer_static.lib
+	del JMMjouer.exe, JMMjouer_nolib.exe
 	del game_morpion.obj, game_morpion.dll, \
 		game_morpion.ilk,game_morpion.exp, game_morpion.pdb
 	del game_pendu.obj, game_pendu.lib, game_pendu.dll, game_pendu.exp, \
 		game_pendu.ilk, game_pendu.pdb
 	del vc140.pdb
-
-

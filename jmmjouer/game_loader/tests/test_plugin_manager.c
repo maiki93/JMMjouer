@@ -62,7 +62,6 @@ static void load_one_existing_dll()
     assert_int_equal(PLG_MANAGER_OK, retour);
     // bacause internal access
     assert_int_equal( 1, singleton->nb_handle);
-
     plugin_manager_free();
 }
 

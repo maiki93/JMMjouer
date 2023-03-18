@@ -5,8 +5,8 @@
 #include <stdint.h>
 #include "cmocka.h"
 
-/*#include "../clist_generic.c"*/
 #include "ccontainer/clist_generic.c"
+
 
 /* TODO Check comparison by string, when possible/not */
 /* MSVC void **state argument or warning c4113 */

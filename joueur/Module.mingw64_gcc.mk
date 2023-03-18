@@ -8,13 +8,29 @@ OBJS_JOUEUR = $(patsubst %.c, %.o, $(SRCS_JOUEUR))
 # update global variable
 OBJS_ALL_STATIC += $(OBJS_JOUEUR)
 
+# define tests file
+MODDIR_JOUEUR_TESTS = $(MODDIR_JOUEUR)/tests
+
 $(info == JOUEUR ==)
 $(info $$CURDIR is $(CURDIR) )
+$(info $$SRCS_JOUEUR is [$(SRCS_JOUEUR)] )
 $(info $$OBJS_JOUEUR is [$(OBJS_JOUEUR)] )
 
 # include static library without special directive, normal dependencies
-libjoueur.dll : $(OBJS_JOUEUR) libccontainer.lib libclogger.lib
-	$(CC) -shared $(CFLAGS) -o $@ $^  -Wl,--out-implib,libjoueur_dll.lib
+libjoueur.dll : $(OBJS_JOUEUR) libccontainer #libclogger
+	$(CC) -shared $(CFLAGS) -o $@ $(OBJS_JOUEUR) -Wl,--out-implib,libjoueur_dll.a -L. -lccontainer -lclogger
+
+libjoueur.a : $(OBJS_JOUEUR)
+	ar rcs $@ $^
+ 
+ifneq ($(findstring libjoueur,$(LIB_STATIC)),)
+libjoueur : libjoueur.a
+else
+libjoueur : libjoueur.dll
+endif
+
+# include module of tests
+#include $(patsubst %,%/Module.mingw64_gcc.mk,$(MODDIR_JOUEUR_TESTS))
 
 ############### UNIT TESTS #########################
 ## do not make a test Module for only a few function
@@ -33,4 +49,4 @@ test_cmap_game_victories: $(MODDIR_JOUEUR)/tests/test_cmap_game_victories.o libc
 clean ::
 	rm -f $(MODDIR_JOUEUR)/*.o
 	rm -f $(MODDIR_JOUEUR)/tests/*.o
-	rm -f libjoueur.dll
+	rm -f libjoueur.dll libjoueur_dll.a libjoueur.a

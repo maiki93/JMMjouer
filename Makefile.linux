@@ -70,7 +70,7 @@ MODULES := clogger ccontainer joueur record # game_loader # tests_integration
 # -g3 : all debug information + MACRO (-g0 : no debug ), -g default 2
 # -ggdb : include gdb extension if possible (not tested)
 # -fno-common : to look more, advice not clear
-CFLAGS = -Wall -Wextra -pedantic -fPIC -I . -Wno-variadic-macros
+CFLAGS = -Wall -Wextra -pedantic -fPIC -Wno-variadic-macros -I .
 # to include again:  -Werror, better than Wno-X warning appears but compiles fine
 
 # standard configurable

@@ -8,7 +8,7 @@
 /* variant from cmap, include header */
 /* #include "../cmap_ptrf_game.h" */
 /* No ! main test is make_value / extract_value, others are only recopy */
-#include "../cmap_ptrf_game.c"
+#include "jmmjouer/game_loader/cmap_ptrf_game.c"
 
 /* function to pointer test, explicit correct argument */
 static victory_t test1(person_t person) {

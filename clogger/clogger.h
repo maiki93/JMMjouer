@@ -1,14 +1,6 @@
 #pragma once
 
 #include "shared_EXPORTS.h"
-/*
-#if defined(_WIN32) && defined(_MSC_VER)
-    #define SHARED_LIB __declspec(dllexport)
-#else
-    #define SHARED_LIB __declspec(dllimport)
-    #undef SHARED_LIB
-#endif
-*/
 
 /* inclusion of a logger, see test/c89_test
    other variables (not so portable : __func__, __FUNCTION__, __PRETTY_FUNCTION__

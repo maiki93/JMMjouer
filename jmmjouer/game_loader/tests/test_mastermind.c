@@ -11,7 +11,7 @@
 
 /* in  fact not used, mm_algo not declared in header
     2nde version, include directly *.c file */
-#include "game_loader/game_mastermind.c"
+#include "jmmjouer/game_loader/game_mastermind.c"
 
 /***************
     Found 2 librairies for specific C testing and active maintenance/dev :
@@ -110,7 +110,7 @@ static void test_BBRR_JRBB(void **state) {
 }
 
 /***** test start_game_mastermind : correct update of nb_victoire / defaite *****/
-// mock une parite
+// mock une partie
 
 
 /****************

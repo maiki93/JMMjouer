@@ -67,7 +67,7 @@ test_arcade: $(MODDIR_JMMJOUER_TESTS)/test_arcade.o $(OBJS_NO_ARCADE) librecord 
 #	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
 clean::
-	@echo "Clean unit tests in MODDIR_C = $(MODDIR_TESTS) "
+	@echo "Clean unit tests in $(MODDIR_JMMJOUER_TESTS)"
 	rm -f $(OBJS_JMMJOUER_TESTS)
 	rm -f test_arcade
 #	rm -f $(EXE_JMMJOUER_TESTS_BIN)

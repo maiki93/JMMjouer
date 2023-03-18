@@ -106,7 +106,7 @@ void plugin_manager_clear(plugin_mgr_t *plg_manager)
     }
 }
 
-void plugin_manager_free() /*plugin_mgr_t *plg_manager)*/
+void plugin_manager_free()
 {
     if( singleton == NULL)
         return;
@@ -175,7 +175,7 @@ int plugin_manager_load_shared_library(plugin_mgr_t *plg_manager, const char *fi
     /* FreeLibrary(handle) to call to be clean, but after use !! crash.. 
        Need encapsulation to keep handle valid */
 #if defined(_WIN32)
-    handle = LoadLibrary(fullname); /*"libmorpion.dll");*/
+    handle = LoadLibrary(fullname);
 #else
     handle = dlopen(fullname, RTLD_LAZY);
 #endif

@@ -6,7 +6,7 @@
 
 #include "cmocka.h"
 
-#include "../arcade.c"
+#include "jmmjouer/arcade.c"
 
 #include "record/file_record.h"
 

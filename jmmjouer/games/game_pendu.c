@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "jmmjouer/game_loader/game_pendu.h"
+#include "jmmjouer/games/game_pendu.h"
 #include "jmmjouer/utils.h"
 
 /*#define NB_TOUR 10*/

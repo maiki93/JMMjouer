@@ -7,7 +7,7 @@
 
 /* available system-wide only with gnu / glibc, found one implementation for windows */
 #if defined(_WIN32) && defined(_MSC_VER)
-    #include "getopt.h"
+    #include "jmmjouer/getopt.h"
 #else /* LINUX or gcc mingw */
     #include <getopt.h>
 #endif

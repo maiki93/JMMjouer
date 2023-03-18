@@ -2,20 +2,25 @@
 # https://stackoverflow.com/questions/53136024/makefile-to-compile-all-c-files-without-needing-to-specify-them
 # https://accu.org/journals/overload/14/71/miller_2004/ famous paper: recursive make considered harmful
 
-# debug option, override with make all debug=no CFLAGS=-std=c99
-# yes, use in code of JMMJ_DEBUG (example in main.c), and -g four building in debug mode( possibility to use a debugger)
-# no, compile with optimization -O2
+# default
 debug = yes
-#debug = no
+RELEASE ?= 0
+ifeq ($(RELEASE),1)
+	debug = no
+endif
 
 # compilers, may give different errors/warning
 CC = gcc
 #CC = clang
 
+LINK = ld
+LFLAGS = --warn-common -shared -z defs --no-allow-shlib-undefined -lc
+
 # List of subdirectories containing a Module.mk file
 #MODULES := tests tests/test_mock
 # clogger call by an explicit make, no use of module
-MODULES := ccontainer joueur record game_loader tests
+# game_loader moved into jmmjouer
+MODULES := ccontainer joueur record # game_loader #tests
 
 # see advices (and much more than compilation options) https://matt.sh/howto-c
 # compiler option, activate many warning( here seeems common to gcc and clang)
@@ -29,12 +34,14 @@ MODULES := ccontainer joueur record game_loader tests
 # -g3 : all debug information + MACRO (-g0 : no debug ), -g default 2
 # -ggdb : include gdb extension if possible (not tested)
 # add include path current
-CFLAGS = -Wall -Wextra -pedantic -Wno-variadic-macros -I . #-Wno-strict-overflow
+CFLAGS = -Wall -Wextra -pedantic -Wno-variadic-macros -I .
 # to include again:  -Werror, better than Wno-X warning appears but compiles fine
 
 # standard configurable
 # gcc c89/90 : -ansi, -std=c90 or -std=iso9899:1990
 STD = -std=c90
+
+#STD_TESTS = -std=c99
 
 # standard gcc defines usually NDEBUG for release code (assert.h affected)
 # code uses internally a JMMJ_DEBUG, defined in preprocessor stage 
@@ -69,27 +76,57 @@ OBJS_EXE = utils.o utils_file.o arcade.o
 #OBJS_CORE += $(OBJS)
 
 # define main executable
-EXE  := JMMjouer
+WITH_LIB ?= 1
+ifeq ($(WITH_LIB),1)
+	EXE:= JMMjouer
+else
+	EXE:= JMMjouer_nolib
+endif
 
 # inspect variables
-$(info == ROOT ==)
-$(info $$OBJS_EXE is [$(OBJS_EXE)] )
-$(info $$OBJS is [$(OBJS_CORE)] )
+$(info == Makefile ROOT ==)
+$(info $$WITH_LIB is $(WITH_LIB) )
+$(info $$RELEASE is $(RELEASE) )
+$(info $$CC is $(CC) )
+$(info $$CFLAGS is $(CFLAGS) )
+$(info $$LINK is $(LINK) )
+$(info $$LFLAGS is $(LFLAGS) )
+$(info $$MAKECMDGOALS is $(MAKECMDGOALS) )
+#$(info $$OBJS_EXE is [$(OBJS_EXE)] )
+#$(info $$OBJS is [$(OBJS_CORE)] )
+$(info $$EXE is $(EXE) )
 
-STD_TESTS = -std=c99
+# libclogger apart
+LIB_STATIC = libccontainer #libgame_loader
+# libjouer : linked with -shared -Bstatic against libclogger and libccontainer
+# librecord need only libjoueur ! (good, bad ?) cannot really works ?
+LIB_DYNAMIC = libgame_loader libjoueur librecord
 
 # alternative to target as files
 #.PHONY : all clean unit_test
-.PHONY : dep_lib
-dep_lib : libclogger.a libccontainer.a libjoueur.dll librecord.dll libgame_pendu.dll
+# commented, maybe not bad..
+#.PHONY : dep_lib
+#dep_lib : libclogger.a libccontainer.a libjoueur.dll librecord.dll libgame_pendu.dll
+.PHONY : all clean unit_test
 
 # make all, generic way to use make produce executable JMMjouer
 all: $(EXE)
+
+### FOR TU
+CFLAGS_TESTS = -g3 -W -Wall -fPIC -Wunused -Wextra -pedantic -Wstrict-overflow=5 -Wno-unused-local-typedefs -fno-inline
+# need c99 standard to use cmocka
+# gnu implements inline -std=gnu89 or -fgnu89-inline but does not seem to work. Other errors appears with c89
+STD_TESTS = -std=c99
+INCLUDE_CMOCKA = C:\dev\cmocka_local_mingw\include
+LIB_CMOCKA = C:\dev\cmocka_local_mingw\lib
+
 # specific target for unit testing in tests/ , dependencies with CMocka
 unit_test::
 # unit_test_mock::
 
-# general rule for compiling c files when header file is available 
+# general rule for compiling c files when header file is available
+# gcc, but on windows. should be better named *.obj or *.o ?
+# objdump -a *.o gives pe-x86-64, default format is bsd 
 %.o: %.c %.h
 	@echo "Build file generic rule with header in root:   $@"
 	$(CC) $(STD) $(CFLAGS) -c $< -o $@
@@ -101,6 +138,23 @@ unit_test::
 
 # include the description for each module
 include $(patsubst %,%/Module.mingw64_gcc.mk,$(MODULES))
+
+# include core in jmmjouer
+include jmmjouer/Module.mingw64_gcc.mk
+
+# only for plugins
+include src_plugin/Module.mingw64_gcc.mk
+
+$(info == ROOT after include modules ==)
+$(info $$OBJS_ALL_STATIC is $(OBJS_ALL_STATIC) )
+$(info $$OBJS_ALL_TESTS  is $(OBJS_ALL_TESTS) )
+
+# default build for test_X, must be defined after include Modules
+# can be ovewritten in specific modules
+$(OBJS_ALL_TESTS): %.o: %.c
+	@echo "Build *.o overriden generic rules for tests:   $@"
+	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -c $< -o $@ -I . -I $(INCLUDE_CMOCKA)
+
 
 # intermediate library, victory not needed ??
 # here or in own module... best ??
@@ -144,10 +198,10 @@ $(info dir: $(dir $(lastword $(MAKEFILE_LIST))) )
 #	
 
 # with libgame_loader as static
-JMMjouer: main.o $(OBJS_EXE) libgame_loader.lib libclogger.lib libccontainer.lib librecord.dll
-	@echo "Build $(EXE): all dependencies $^"
-	@echo "Build with OBJS_CORE $(OBJS_CORE)"	
-	$(CC) $(STD) $(CFLAGS) -o $@ $^ -L. -ljoueur_dll
+#JMMjouer: main.o $(OBJS_EXE) libgame_loader.lib libclogger.lib libccontainer.lib librecord.dll
+#	@echo "Build $(EXE): all dependencies $^"
+#	@echo "Build with OBJS_CORE $(OBJS_CORE)"	
+#	$(CC) $(STD) $(CFLAGS) -o $@ $^ -L. -ljoueur_dll
 
 # working
 #gcc -std=c90 -Wall -Wextra -pedantic -Wno-variadic-macros -I .  -g3 -O0 -DJMMJ_DEBUG -o JMMjouer \
@@ -156,16 +210,16 @@ JMMjouer: main.o $(OBJS_EXE) libgame_loader.lib libclogger.lib libccontainer.lib
 #	libgame_pendu.dll libclogger.a libccontainer.a libjoueur.dll librecord.dll -L. -lgame_pendu -ljoueur -lrecord
 
 ## Version full static
-JMMjouer_nolib : main.o $(OBJS_EXE) $(OBJS_ALL_STATIC) clogger/clogger.o
-	@echo "Build JMMjouer_nolib ^: all dependencies $^"
-	$(CC) $(STD) $(CFLAGS) -o $@ $^
+#JMMjouer_nolib : main.o $(OBJS_EXE) $(OBJS_ALL_STATIC) clogger/clogger.o
+#	@echo "Build JMMjouer_nolib ^: all dependencies $^"
+#	$(CC) $(STD) $(CFLAGS) -o $@ $^
 
 
 #### libraries in dependencies,
 ## usefull to copy ? or better to include in a common path (e.g. for TU ?)
-libclogger.lib : 
+libclogger : 
 	cd clogger && make -f Makefile.mingw64_gcc $@
-	cp clogger/libclogger.lib .
+	cp clogger/libclogger* .
 	
 # test with module, target will be included
 #libccontainer.a :
@@ -184,15 +238,15 @@ libclogger.lib :
 #libgame_morpion.dll : game_morpion.o game_morpion.h joueur/victory.o
 #	$(CC) -shared $(CFLAGS) $^ -o $@ -Wl,--out-implib,libgame_morpion.lib
 # link to libjoueur throught libjoueur.lib , fine also
-libgame_morpion.dll : game_morpion.o game_morpion.h
-	$(CC) -shared $(CFLAGS) -o $@ $^ -L. -ljoueur_dll -Wl,--out-implib,libgame_morpion_dll.lib
+#libgame_morpion.dll : game_morpion.o game_morpion.h
+#	$(CC) -shared $(CFLAGS) -o $@ $^ -L. -ljoueur_dll -Wl,--out-implib,libgame_morpion_dll.lib
 
 # call clean here and in subdirectories
 clean::
 	@echo "Clean in root directory"
 	cd clogger && make -f Makefile.mingw64_gcc clean
 	rm -f ./*.o
-	rm -f ./*.dll ./*.lib ./*.a
-	rm -f JMMjouer JMMjouer_static
+#	rm -f ./*.dll ./*.lib ./*.a
+#	rm -f JMMjouer JMMjouer_static
 # should not be here
-	rm -f test*.exe
+#	rm -f test*.exe
