@@ -2,35 +2,29 @@
 #defined here rather than in parent, yes better
 MODDIR_GL_TESTS = $(MODDIR_GAME_LOADER)/tests
 
-$(info)
-$(info == GAME_LOADER UNIT_TEST ==)
-$(info $$CFLAGS_TESTS is $(CFLAGS_TESTS))
-$(info $$STD_TESTS is $(STD_TESTS) )
-$(info $$MODDIR_GL_TESTS is $(MODDIR_GL_TESTS) ) 
-$(info dir: $(dir $(lastword $(MAKEFILE_LIST))) )
-
-# seems very convenient ! NO it is not working well, or badly used (rewritten)
-# specific rule was not called, called the generic one
-# currentDir := $(dir $(lastword $(MAKEFILE_LIST)))
-# currentDir2 = game_loader/tests
-#$(info $$currentDir is $(currentDir) )
-
 # If UT are specialized, make sense again to use generic way in some case
 SRCS_GL_TESTS := $(wildcard $(MODDIR_GL_TESTS)/*.c)
-$(info $$SRCS_GL_TESTS is [ $(SRCS_GL_TESTS) ])
-OBJS_GL_TESTS := $(patsubst %.c, %.o, $(SRCS_GL_TESTS)) 
-$(info $$OBJS_GL_TESTS is [$(OBJS_GL_TESTS)])
+OBJS_GL_TESTS := $(patsubst %.c, %.o, $(SRCS_GL_TESTS))
+EXE_GL_TESTS := $(notdir $(patsubst %.c, %, $(SRCS_GL_TESTS) ))
 
+$(info == GAME_LOADER UNIT_TEST : $(MODDIR_GL_TESTS )==)
+$(info $$SRCS_GL_TESTS is [ $(SRCS_GL_TESTS) ] )
+$(info $$OBJS_GL_TESTS is [$(OBJS_GL_TESTS)] )
+$(info $$EXE_GL_TESTS is [$(EXE_GL_TESTS)] )
+$(info dir: $(dir $(lastword $(MAKEFILE_LIST))) )
 
 # Override generic rules for this directory, all format tests/*.c *.o 
-$(OBJS_GL_TESTS): %.o: %.c
-	@echo "Build *.o overriden generic rules in game_loader tests :   $@"
-	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -c $< -o $@ -I. -I $(INCLUDE_CMOCKA)
+#$(OBJS_GL_TESTS): %.o: %.c
+#	@echo "Build *.o overriden generic rules in game_loader tests :   $@"
+#	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -c $< -o $@ -I. -I $(INCLUDE_CMOCKA)
 
-unit_test :: test_mastermind test_cmap_game_ptrf test_plugin_manager test_game_loader
+OBJS_ALL_TESTS += $(OBJS_GL_TESTS)
+
+#unit_test :: test_mastermind test_cmap_game_ptrf test_plugin_manager test_game_loader
+unit_test :: $(EXE_GL_TESTS)
 
 ####
-test_mastermind : $(MODDIR_GL_TESTS)/test_mastermind.o utils.o joueur/victory.o
+test_mastermind : $(MODDIR_GL_TESTS)/test_mastermind.o jmmjouer/utils.o joueur/victory.o
 	@echo "Building test_game_loader @ :    $@"  # target name
 	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
@@ -49,14 +43,11 @@ test_plugin_manager: $(MODDIR_GL_TESTS)/test_plugin_manager.o libclogger.a
 	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
 # need for game_X,  so need for utils
-test_game_loader: $(MODDIR_GL_TESTS)/test_game_loader.o utils.o utils_file.o joueur/victory.o libgame_loader.lib libccontainer.a libclogger.a
+test_game_loader: $(MODDIR_GL_TESTS)/test_game_loader.o jmmjouer/utils.o jmmjouer/utils_file.o joueur/victory.o libgame_loader.a libccontainer.a libclogger.a
 	@echo "Building test_game_loader @ :    $@"  # target name
 	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
 clean ::
-#	@rm -f $(OBJS_TESTS)
-#	@echo "Clean test unit game_loader: $(currentDir)*.o"
-#	@echo $(dir $(lastword $(MAKEFILE_LIST)))
-#	rm -f $(currentDir)*.o
-#	rm -f game_loader/tests/*.o
+	@echo "Clean test unit game_loader: $(MODDIR_GL_TESTS)"
 	rm -f $(MODDIR_GL_TESTS)/*.o
+	rm -f $(EXE_GL_TESTS)

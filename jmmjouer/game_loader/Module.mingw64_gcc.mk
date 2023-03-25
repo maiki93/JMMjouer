@@ -9,7 +9,7 @@ OBJS_GAME_LOADER = $(patsubst %.c, %.o, $(SRCS_GAME_LOADER))
 OBJS_ALL_STATIC += $(OBJS_GAME_LOADER)
 
 # define tests file
-MODDIR_GAME_LOADER_TESTS = $(MODDIR_GAME_LOADER)/tests
+#MODDIR_GAME_LOADER_TESTS = $(MODDIR_GAME_LOADER)/tests
 
 $(info == GAME_LOADER : $(MODDIR_GAME_LOADER) ==)
 $(info $$SRCS_GAME_LOADER is [$(SRCS_GAME_LOADER)] )
@@ -39,21 +39,24 @@ $(info $$OBJS_GAME_LOADER is [$(OBJS_GAME_LOADER)] )
 
 # fine with dll, but include lots of dependencies (and repeat in others)
 # still better with games included here
-libgame_loader.dll : $(OBJS_GAME_LOADER) jmmjouer/utils_file.o jmmjouer/utils.o joueur/victory.o libjoueur libccontainer #libclogger.a
-	@echo "Create static library -- game_loader"
+libgame_loader.dll : $(OBJS_GAME_LOADER) jmmjouer/utils_file.o jmmjouer/utils.o joueur/victory.o libjoueur libccontainer libclogger
+	@echo "Create shared library -- game_loader"
 # like in liunx, libjoueur is not enought, missing clist_cstring modules
 # include libccontainer.lib => multiple definition clist_gen_X free_value...
 #	$(CC) -shared $(CFLAGS) -Wl,--export-all-symbols -o $@ $^ -Wl,--out-implib,libgame_loader_dll.a -L. -ljoueur_dll libccontainer.lib
 # fine with shared lib. to compare linux. same with libccontainer.dll. -ljoueur_dll, victory enough
-	$(CC) -shared $(CFLAGS) -Wl,--export-all-symbols -o $@ $(OBJS_GAME_LOADER) jmmjouer/utils_file.o jmmjouer/utils.o joueur/victory.o -Wl,--out-implib,libgame_loader_dll.a -L. -lccontainer_dll
+# last, need clogger. because --export-all-symbols ?
+	$(CC) -shared $(CFLAGS) -Wl,--export-all-symbols -o $@ $(OBJS_GAME_LOADER) jmmjouer/utils_file.o jmmjouer/utils.o joueur/victory.o -Wl,--out-implib,libgame_loader_dll.a -L. -l$(IMPORT_LIB_CCONTAINER) -l$(IMPORT_LIB_CLOGGER)
 
 libgame_loader.a : $(OBJS_GAME_LOADER)
 	@echo "Create static library -- game_loader"
 	ar rcs $@ $^
 
 ifneq ($(findstring libgame_loader,$(LIB_STATIC)),)
+IMPORT_LIB_GAME_LOADER = game_loader
 libgame_loader : libgame_loader.a
 else
+IMPORT_LIB_GAME_LOADER = game_loader_dll
 libgame_loader : libgame_loader.dll
 endif
 
@@ -62,11 +65,8 @@ endif
 #	$(CC) -shared $(CFLAGS) $^ -o $@ -Wl,--out-implib,libgame_pendu.lib
 
 # include description for each module
-#include $(patsubst %,%/Module.mingw64_gcc.mk,$(MODDIR_GAME_LOADER_TESTS))
+include $(MODDIR_GAME_LOADER)/tests/Module_test.mingw64_gcc.mk
 
-# MAYBE Error MinGW64 gcc : default export all, excepti if ONE __declspec(dllexport)
-# can compile manually
-# gcc -shared -o libtoto.dll game_loader.o cmap_ptrf_game.o plugin_manager.o ../utils.o ../utils_file.o ../game_pendu.o ../game_mastermind.o -L.. -lccontainer -lclogger -ljoueur -Wl,--out-implib,libtoto.lib
 clean ::
 	@echo "Clean module game_loader"
 	rm -f $(MODDIR_GAME_LOADER)/*.o

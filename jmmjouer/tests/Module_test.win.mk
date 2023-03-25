@@ -1,13 +1,12 @@
-## Define a module to compile the tests
+## Define a module to compile the tests of the core
 #
 # version for msvc compilation
 #
-#MODDIR_JMMJOUER_TESTS := jmmjouer\tests
 
 SRCS_JMMJOUER_TESTS := $(wildcard $(MODDIR_JMMJOUER_TESTS)/*.c) # keep full path tests/test_mastermind.c
 OBJS_JMMJOUER_TESTS := $(patsubst %.c, %.obj, $(SRCS_JMMJOUER_TESTS)) # keep full path tests/test_mastermind.o
 # take away extension (patsubst), and all directories  (notdir)
-EXE_JMMJOUER_TESTS_BIN := $(notdir $(patsubst %.c, %, $(SRCS_JMMJOUER_TESTS) ))
+EXE_JMMJOUER_TESTS := $(notdir $(patsubst %.c, %, $(SRCS_JMMJOUER_TESTS) ))
 
 OBJS_ALL_TESTS += $(OBJS_JMMJOUER_TESTS)
 

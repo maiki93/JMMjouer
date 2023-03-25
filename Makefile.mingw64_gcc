@@ -41,8 +41,6 @@ CFLAGS = -Wall -Wextra -pedantic -Wno-variadic-macros -I .
 # gcc c89/90 : -ansi, -std=c90 or -std=iso9899:1990
 STD = -std=c90
 
-#STD_TESTS = -std=c99
-
 # standard gcc defines usually NDEBUG for release code (assert.h affected)
 # code uses internally a JMMJ_DEBUG, defined in preprocessor stage 
 # 	or declare directly here ? better will apply to all files without need to include a common header ?
@@ -70,14 +68,13 @@ endif
 #   joueur :cmap_game_victories.o person.o joueur.o # victory ?? only header ??
 #		then include victory.o
 #   game_loader : plugin_manager.o cmap_ptrf_game.o game_loader.o
-OBJS_EXE = utils.o utils_file.o arcade.o
-
+#OBJS_EXE = utils.o utils_file.o arcade.o
 # will be created
 #OBJS_CORE += $(OBJS)
 
 # define main executable
-WITH_LIB ?= 1
-ifeq ($(WITH_LIB),1)
+NO_LIB ?= 0
+ifeq ($(NO_LIB),0)
 	EXE:= JMMjouer
 else
 	EXE:= JMMjouer_nolib
@@ -85,32 +82,33 @@ endif
 
 # inspect variables
 $(info == Makefile ROOT ==)
-$(info $$WITH_LIB is $(WITH_LIB) )
+$(info $$NO_LIB is $(NO_LIB) )
 $(info $$RELEASE is $(RELEASE) )
 $(info $$CC is $(CC) )
 $(info $$CFLAGS is $(CFLAGS) )
 $(info $$LINK is $(LINK) )
 $(info $$LFLAGS is $(LFLAGS) )
 $(info $$MAKECMDGOALS is $(MAKECMDGOALS) )
-#$(info $$OBJS_EXE is [$(OBJS_EXE)] )
-#$(info $$OBJS is [$(OBJS_CORE)] )
 $(info $$EXE is $(EXE) )
 
 # libclogger apart
-LIB_STATIC = libccontainer #libgame_loader
+LIB_STATIC = libccontainer libclogger libjoueur #libgame_loader
 # libjouer : linked with -shared -Bstatic against libclogger and libccontainer
 # librecord need only libjoueur ! (good, bad ?) cannot really works ?
-LIB_DYNAMIC = libgame_loader libjoueur librecord
+LIB_DYNAMIC = libgame_loader librecord
 
 # alternative to target as files
 #.PHONY : all clean unit_test
 # commented, maybe not bad..
 #.PHONY : dep_lib
 #dep_lib : libclogger.a libccontainer.a libjoueur.dll librecord.dll libgame_pendu.dll
-.PHONY : all clean unit_test
+#.PHONY : all clean unit_test
 
 # make all, generic way to use make produce executable JMMjouer
-all: $(EXE)
+#all: $(EXE)
+# necessary for vscode-makefile.tool ?
+all : JMMjouer
+# unit_test
 
 ### FOR TU
 CFLAGS_TESTS = -g3 -W -Wall -fPIC -Wunused -Wextra -pedantic -Wstrict-overflow=5 -Wno-unused-local-typedefs -fno-inline
@@ -139,10 +137,10 @@ unit_test::
 # include the description for each module
 include $(patsubst %,%/Module.mingw64_gcc.mk,$(MODULES))
 
-# include core in jmmjouer
+# include core in jmmjouer, could be in MODULES
 include jmmjouer/Module.mingw64_gcc.mk
 
-# only for plugins
+# only for plugins, could in MODULES
 include src_plugin/Module.mingw64_gcc.mk
 
 $(info == ROOT after include modules ==)
@@ -156,97 +154,37 @@ $(OBJS_ALL_TESTS): %.o: %.c
 	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -c $< -o $@ -I . -I $(INCLUDE_CMOCKA)
 
 
-# intermediate library, victory not needed ??
-# here or in own module... best ??
-#libjoueur.dll : person.o joueur.o cmap_game_victories.o libclogger.a
-#	$(CC) -shared $(CFLAGS) -o $@ $^ -L. -lccontainer -Wl,--out-implib,libjoueur.lib
-
-# -Wl,-rpath,dir1  or -rpath=dir1 # -Wl to pass argument to linker, rpath runtime to search for lib
-#$(EXE): $(OBJS) main.o libclogger.a libccontainer.a librecord.a libgame_pendu.dll
-#	@echo "Build $(EXE): all dependencies $^" \
-#	$(CC) $(STD) $(CFLAGS) $^ -L. -lgame_pendu -o $@
-
 $(info)
 $(info == ROOT 2 ==)
 $(info $$OBJS is [$(OBJS)] )
 $(info $$OBJS_CORE is [$(OBJS_CORE)] )
 $(info $$OBJS_GM is [$(OBJS_GM)] )
 $(info dir: $(dir $(lastword $(MAKEFILE_LIST))) )
-
-# seems very convenient !
+# seems very convenient ! but not
 #currentDir = $(dir $(lastword $(MAKEFILE_LIST)))
-
-# libgame_loader.dll 
-# libjoueur_dll.lib
-#$(EXE): $(OBJS_CORE) $(OBJS_GM) main.o libgame_pendu.dll libclogger.a libccontainer.a librecord.dll
-#	@echo "Build $(EXE): all dependencies $^"
-#	@echo "Build with OBJS_CORE $(OBJS_CORE)"
-# libcontainer not present, already included lrecord, otherwise double definition
-# indeed it was already in the list $^
-#	$(CC) $(STD) $(CFLAGS) -o $@ $^ -L. -lgame_pendu -ljoueur_dll -lrecord 
-
-# with libgame_loader.dll (exporting all symbols)
-# ok, do not care of multiple definitions
-#$(EXE): main.o arcade.o libgame_loader.dll libclogger.a libccontainer.a librecord.dll
-#	@echo "Build $(EXE): all dependencies $^"
-#	@echo "Build with OBJS_CORE $(OBJS_CORE)"
-#	$(CC) $(STD) $(CFLAGS) $(OBJS) main.o -L. -lgame_pendu -ljoueur -lrecord -o $@
-# libcontainer not present, already included lrecord, otherwise double definition
-# indeed it was already in the list $^
-#	$(CC) $(STD) $(CFLAGS) -o $@ $^ -L. -lgame_pendu -ljoueur_dll -lrecord
-# yep working, but all in libgame_loader ! 
-#	
-
-# with libgame_loader as static
-#JMMjouer: main.o $(OBJS_EXE) libgame_loader.lib libclogger.lib libccontainer.lib librecord.dll
-#	@echo "Build $(EXE): all dependencies $^"
-#	@echo "Build with OBJS_CORE $(OBJS_CORE)"	
-#	$(CC) $(STD) $(CFLAGS) -o $@ $^ -L. -ljoueur_dll
-
-# working
-#gcc -std=c90 -Wall -Wextra -pedantic -Wno-variadic-macros -I .  -g3 -O0 -DJMMJ_DEBUG -o JMMjouer \
-#	utils.o utils_file.o game_mastermind.o arcade.o main.o \
-#	game_loader/cmap_ptrf_game.o game_loader/plugin_manager.o game_loader/game_loader.o \
-#	libgame_pendu.dll libclogger.a libccontainer.a libjoueur.dll librecord.dll -L. -lgame_pendu -ljoueur -lrecord
-
-## Version full static
-#JMMjouer_nolib : main.o $(OBJS_EXE) $(OBJS_ALL_STATIC) clogger/clogger.o
-#	@echo "Build JMMjouer_nolib ^: all dependencies $^"
-#	$(CC) $(STD) $(CFLAGS) -o $@ $^
-
 
 #### libraries in dependencies,
 ## usefull to copy ? or better to include in a common path (e.g. for TU ?)
+
+# should pass if ARCHIVE or SHARED lib to clogger Makefile
+ifneq ($(findstring libccontainer,$(LIB_STATIC)),)
+IMPORT_LIB_CLOGGER = clogger
+TARGET_CLOGGER = libclogger.a
+else
+IMPORT_LIB_CLOGGER = clogger_dll
+TARGET_CLOGGER = libclogger.dll
+endif
+
 libclogger : 
-	cd clogger && make -f Makefile.mingw64_gcc $@
+#	cd clogger && make -f Makefile.mingw64_gcc $@
+# && cd .. necessary ?
+	cd clogger && make -f Makefile.mingw64_gcc $(TARGET_CLOGGER)
 	cp clogger/libclogger* .
-	
-# test with module, target will be included
-#libccontainer.a :
-#	cd ccontainer && make -f Makefile.mingw64_gcc libccontainer.a
-# librecord.dll
-
-
-##### compile shared library to include at run-time (game_morpion)
-# version unix-like available more recently in mingw
-#libmorpion.dll : game_morpion.o game_morpion.h
-#	$(CC) -shared game_morpion.o -o libmorpion.dll
-
-# windows style, with importing lib, not used at run-time link anyway
-# if no joueur/victory.o => undefined victory_init
-# can include joueur/victory.o (already in libjoueur)
-#libgame_morpion.dll : game_morpion.o game_morpion.h joueur/victory.o
-#	$(CC) -shared $(CFLAGS) $^ -o $@ -Wl,--out-implib,libgame_morpion.lib
-# link to libjoueur throught libjoueur.lib , fine also
-#libgame_morpion.dll : game_morpion.o game_morpion.h
-#	$(CC) -shared $(CFLAGS) -o $@ $^ -L. -ljoueur_dll -Wl,--out-implib,libgame_morpion_dll.lib
 
 # call clean here and in subdirectories
 clean::
 	@echo "Clean in root directory"
-	cd clogger && make -f Makefile.mingw64_gcc clean
 	rm -f ./*.o
-#	rm -f ./*.dll ./*.lib ./*.a
-#	rm -f JMMjouer JMMjouer_static
-# should not be here
-#	rm -f test*.exe
+	cd clogger && make -f Makefile.mingw64_gcc clean
+	rm -f libclogger.a libclogger.dll libclogger_dll.a
+

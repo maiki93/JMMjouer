@@ -1,6 +1,7 @@
 {
     "makefile.extensionOutputFolder": "./.vscode",
     "makefile.makePath": "C:\\msys64\\mingw64\\bin",
+    "makefile.makefilePath": "Makefile.mingw64_gcc",
     "makefile.panel.visibility": {},
     "files.associations": {
         "stdio.h": "c",
@@ -30,6 +31,16 @@
             "name": "Default",
             "makeArgs": []
         },
+        /*
+        {
+            "name": "NO_LIB",
+            "makeArgs": ["NO_LIB=1"]
+        },
+        {
+            "name": "Release",
+            "makeArgs": ["RELEASE=1"]
+        },
+        */
         {
             "name": "Print make version",
             "makeArgs": ["--version"]
@@ -76,11 +87,24 @@
             "cwd": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer",
             "binaryPath": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer\\test_cmap_game_ptrf",
             "binaryArgs": []
+        },
+        {
+            "cwd": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer",
+            "binaryPath": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer\\test_arcade",
+            "binaryArgs": []
+        },
+        {
+            "cwd": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer",
+            "binaryPath": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer\\JMMjouer_nolib",
+            "binaryArgs": []
         }
     ],
     "C_Cpp.default.includePath": [
         "C:\\dev\\cmocka_local_mingw\\include",
     ],
+    "makefile.buildBeforeLaunch": false,
+    "makefile.ignoreDirectoryCommands": false,
+    "makefile.loggingLevel": "Verbose",
     /*
     "C_Cpp.default.systemIncludePath": [
         "C:\\dev\\cmocka_local_mingw\\include"

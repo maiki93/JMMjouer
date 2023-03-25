@@ -4,6 +4,20 @@
 #
 # try independent Makefile for clogger
 
+# all file format are pe-x86-64
+#$ objdump.exe -f libclogger.a
+#In archive libclogger.a:
+#
+# clogger.o:     file format pe-x86-64
+# architecture: i386:x86-64, flags 0x00000039:
+# HAS_RELOC, HAS_DEBUG, HAS_SYMS, HAS_LOCALS
+# start address 0x0000000000000000
+#
+# libclogger.dll:     file format pei-x86-64
+# architecture: i386:x86-64, flags 0x0000013b:
+# HAS_RELOC, EXEC_P, HAS_DEBUG, HAS_SYMS, HAS_LOCALS, D_PAGED
+# start address 0x0000000202bc1320
+
 debug = yes
 
 CC = gcc
@@ -23,6 +37,8 @@ endif
 $(info)
 $(info == CLOGGER ==)
 $(info $$CURDIR is $(CURDIR) )
+$(info $$MAKECMDGOALS is $(MAKECMDGOALS) )
+$(info $$LIB_STATIC is $(LIB_STATIC) )
 $(info $$CC is $(CC) )
 $(info $$CFLAGS is $(CFLAGS) )
 
@@ -31,11 +47,13 @@ $(info $$CFLAGS is $(CFLAGS) )
 # general rule for compiling c files when header file is available
 %.o: %.c %.h
 	@echo "Build file generic rule with header in clogger:   $@"
-	$(CC) $(STD) $(CFLAGS) -c $< -o $@
+	$(CC) $(STD) $(CFLAGS) -c $< -o $@ -I.
 
 libclogger.dll : clogger.o
 	@echo "Create shared library -- clogger"
 	$(CC) -shared $(CFLAGS) -o $@ $^ -Wl,--out-implib,libclogger_dll.a
+
+libclogger_dll.a : libclogger.dll
 
 # ar - a Linux tool to create, modify, and extract from archives see the man pages for further information. The options in this case mean:
 # r - replace files existing inside the archive
@@ -43,17 +61,24 @@ libclogger.dll : clogger.o
 # s - create an object-file index into the archive
 # static lib just an archive file
 libclogger.a : clogger.o
+	@echo "Create static library -- clogger"
 	ar rcs $@ $^
 
 #test_clogger : tests/test_clogger.c
 	
 ifneq ($(findstring libclogger,$(LIB_STATIC)),)
-libjoueur : libclogger.a
+libclogger : libclogger.a
 else
-libjoueur : libclogger.dll
+libclogger : libclogger.dll
 endif
+
+#### TU not included in other, module paprt
+#OBJS_ALL_TESTS += $(MODDIR_CLOGGER)/tests/test_clogger.o
+#unit_test :: test_clogger
+
+#test_clogger : $(MODDIR_CLOGGER)/
 
 clean:
 	@echo "Clean module clogger"
 	rm -f ./clogger.o
-	rm -f ./libclogger.a
+	rm -f ./libclogger.a libclogger.dll libclogger_dll.a

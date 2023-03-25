@@ -19,19 +19,21 @@ $(info $$MODDIR_RECORD_TESTS is $(MODDIR_RECORD_TESTS) )
 # mingw64, must add all dpendencies !! 
 # to check on linux
 # dependencies on libjoueur and logger
-librecord.dll : $(OBJS_RECORD) libjoueur #libclogger.lib libjoueur.dll
-# -l libjoueur.dll is enought, no need explicit clogger or ccontainer
-#	$(CC) -shared $(CFLAGS) -o $@ $(OBJS_RECORD) -Wl,--out-implib,librecord_dll.a -L. -ljoueur
-# same !! is because libjoueur included statically ? chance ? nm -gC no undefined a priori 
-	$(CC) -shared $(CFLAGS) -o $@ $(OBJS_RECORD) -Wl,--out-implib,librecord_dll.a -L. -ljoueur_dll
-#	$(CC) -shared $(CFLAGS) -o $@ $(OBJS_RECORD) libclogger.a libjoueur_dll.lib -Wl,--out-implib,librecord_dll.lib
+librecord.dll : $(OBJS_RECORD) libjoueur libclogger libccontainer
+	@echo "Create shared library -- record"
+	$(CC) -shared $(CFLAGS) -o $@ $(OBJS_RECORD) -Wl,--out-implib,librecord_dll.a -L. -l$(IMPORT_LIB_JOUEUR) -l$(IMPORT_LIB_CLOGGER) -l$(IMPORT_LIB_CCONTAINER)
+
+librecord_dll.a : librecord.dll
 
 librecord.a : $(OBJS_RECORD)
+	@echo "Create static library -- record"
 	ar rcs $@ $^
 
 ifneq ($(findstring librecord,$(LIB_STATIC)),)
+IMPORT_LIB_RECORD = record
 librecord : librecord.a
 else
+IMPORT_LIB_RECORD = record_dll
 librecord : librecord.dll
 endif
 

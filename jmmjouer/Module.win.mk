@@ -18,6 +18,10 @@ $(info $$OBJS_JMMJOUER is [$(OBJS_JMMJOUER)] )
 # update same global list : OBJS_ALL_STATIC, OBJS_ALL_TESTS
 include jmmjouer/game_loader/Module.win.mk
 
+# moved above, should still compile
+# include the games : game_pendu compiled as shared library and linked at compilation
+include jmmjouer\games\Module.win.mk
+
 # In this module, we consume all the libraries, overidde SHARED_EXPORTS with import
 
 $(OBJS_JMMJOUER): %.obj: %.c
@@ -49,8 +53,6 @@ main.obj : main.c
 # /MAP filename, /MAPINFO
 # /OPT:{REF | NOREF} : can supprress unused references
 
-# include the games : game_pendu compiled as shared library and linked at compilation
-include jmmjouer\games\Module.win.mk
 
 # now compile (still JMMjouer.lib produced), but with static record library
 # dumpbin.exe /EXPORTS .\JMMjouer.lib => game_pendu.lib / nm -gC also

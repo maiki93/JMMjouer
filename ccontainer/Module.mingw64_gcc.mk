@@ -1,11 +1,11 @@
 
 MODDIR_CCONTAINER := ccontainer
 
+SRCS_CCONTAINER := $(wildcard $(MODDIR_CCONTAINER)/*.c)
+OBJS_CCONTAINER := $(patsubst %.c, %.o, $(SRCS_CCONTAINER))
 
-#SRCS_CCONTAINER := $(wildcard $(MODDIR_CCONTAINER)/*.c)
-#OBJS_CCONTAINER := $(patsubst %.c, %.o, $(SRCS_CCONTAINER))
-OBJS_CCONTAINER = $(MODDIR_CCONTAINER)/clist_generic.o \
-				  $(MODDIR_CCONTAINER)/clist_cstring.o
+#OBJS_CCONTAINER = $(MODDIR_CCONTAINER)/clist_generic.o \
+#				  $(MODDIR_CCONTAINER)/clist_cstring.o
 
 OBJS_ALL_STATIC += $(OBJS_CCONTAINER)
 
@@ -28,20 +28,24 @@ libccontainer.dll : $(OBJS_CCONTAINER) #libclogger
 #	$(CC) -shared -o $@ $(OBJS_CCONTAINER) -L . -lclogger
 	$(CC) -shared $(CFLAGS) -o $@ $(OBJS_CCONTAINER) -Wl,--out-implib,libccontainer_dll.a -L. -lclogger
 
-libccontainer.lib : $(OBJS_CCONTAINER)
+# not so clear, use *lib or *a for windows ?
+# try keeping lib (and see if -lccontainer is working), seems working
+# https://stackoverflow.com/questions/43311621/c-correct-way-to-statically-dynamically-link-with-mingw-w64
+libccontainer.a : $(OBJS_CCONTAINER)
 	ar rcs $@ $^
 
 ifneq ($(findstring libccontainer,$(LIB_STATIC)),)
-libccontainer : libccontainer.lib
+IMPORT_LIB_CCONTAINER = ccontainer
+libccontainer : libccontainer.a
 else
+IMPORT_LIB_CCONTAINER = ccontainer_dll
 libccontainer : libccontainer.dll
 endif
 
 # include description for each module
-include $(patsubst %,%/Module_test.mingw64_gcc.mk,$(MODDIR_CCONTAINER_TESTS))
-#include $(MODDIR_CONTAINER)/tests/Module.mingw64_gcc.mk
+include $(MODDIR_CCONTAINER)/tests/Module_test.mingw64_gcc.mk
 
 clean ::
 	@echo "Clean module ccontainer"
 	rm -f $(MODDIR_CCONTAINER)/*.o
-	rm -f libccontainer.lib libccontainer.dll libccontainer_dll.a
+	rm -f libccontainer.a libccontainer.dll libccontainer_dll.a
