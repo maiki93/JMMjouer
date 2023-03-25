@@ -9,26 +9,17 @@ OBJS_GAME_LOADER := $(patsubst %.c, %.o, $(SRCS_GAME_LOADER))
 OBJS_ALL_STATIC += $(OBJS_GAME_LOADER)
 
 # define tests file
-MODDIR_GAME_LOADER_TESTS = $(MODDIR_GAME_LOADER)/tests
+# MODDIR_GAME_LOADER_TESTS = $(MODDIR_GAME_LOADER)/tests
 
-$(info == GAME_LOADER ==)
+$(info == GAME_LOADER : $(MODDIR_GAME_LOADER) ==)
 $(info $$SRCS_GAME_LOADER is [$(SRCS_GAME_LOADER)] )
 $(info $$OBJS_GAME_LOADER is [$(OBJS_GAME_LOADER)] )
 
-#libgame_loader.so : $(OBJS_GAME_LOADER)
-#	@echo "Create shared library -- game_loader"
-#	$(CC) -shared -o $@ $(OBJS_GAME_LOADER) -L . -lclogger -lccontainer
-#	$(CC) -shared -o $@ $(OBJS_GAME_LOADER)
-# with libjoueur -shared -Bstatic => miss clist_cstring_X fct + utils
-#	$(LINK) $(LFLAGS) -o $@ $(OBJS_GAME_LOADER) -L. -ljoueur
-# miss utils still ( -z defs )
-#	$(LINK) $(LFLAGS) -o $@ $(OBJS_GAME_LOADER) -L. -ljoueur -lccontainer
-
 #OBJS_GAME_LOADER += jmmjouer/utils.o jmmjouer/utils_file.o
 # with utils added pass the undefined constraint
-libgame_loader.so : $(OBJS_GAME_LOADER) jmmjouer/utils.o jmmjouer/utils_file.o libjoueur
+libgame_loader.so : $(OBJS_GAME_LOADER) jmmjouer/utils.o jmmjouer/utils_file.o libjoueur libccontainer libclogger
 	@echo "Create shared library -- game_loader"
-	$(LINK) $(LFLAGS) -o $@ $(OBJS_GAME_LOADER) jmmjouer/utils.o jmmjouer/utils_file.o -L. -ljoueur -lccontainer
+	$(LINK) $(LFLAGS) -o $@ $(OBJS_GAME_LOADER) jmmjouer/utils.o jmmjouer/utils_file.o -L. -ljoueur -lccontainer -lclogger
 
 libgame_loader.a : $(OBJS_GAME_LOADER)
 	@echo "Create static library -- game_loader"
@@ -40,7 +31,8 @@ else
 libgame_loader : libgame_loader.so
 endif
 
-include $(patsubst %,%/Module_test.linux.mk,$(MODDIR_GAME_LOADER_TESTS))
+#include $(patsubst %,%/Module_test.linux.mk,$(MODDIR_GAME_LOADER_TESTS))
+include $(MODDIR_GAME_LOADER)/tests/Module_test.linux.mk
 
 clean ::
 	@echo "Clean module game_loader"

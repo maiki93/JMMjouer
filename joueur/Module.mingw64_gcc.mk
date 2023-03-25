@@ -10,7 +10,7 @@ OBJS_ALL_STATIC += $(OBJS_JOUEUR)
 # define tests file
 MODDIR_JOUEUR_TESTS = $(MODDIR_JOUEUR)/tests
 
-$(info == JOUEUR : $(MODDIR_JOUEUR )==)
+$(info == JOUEUR : $(MODDIR_JOUEUR) ==)
 $(info $$SRCS_JOUEUR is [$(SRCS_JOUEUR)] )
 $(info $$OBJS_JOUEUR is [$(OBJS_JOUEUR)] )
 

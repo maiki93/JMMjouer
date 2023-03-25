@@ -7,20 +7,14 @@ SRCS_GL_TESTS := $(wildcard $(MODDIR_GL_TESTS)/*.c)
 OBJS_GL_TESTS := $(patsubst %.c, %.o, $(SRCS_GL_TESTS))
 EXE_GL_TESTS := $(notdir $(patsubst %.c, %, $(SRCS_GL_TESTS) ))
 
-$(info == GAME_LOADER UNIT_TEST : $(MODDIR_GL_TESTS )==)
+OBJS_ALL_TESTS += $(OBJS_GL_TESTS)
+
+$(info == GAME_LOADER UNIT_TEST : $(MODDIR_GL_TESTS) ==)
 $(info $$SRCS_GL_TESTS is [ $(SRCS_GL_TESTS) ] )
 $(info $$OBJS_GL_TESTS is [$(OBJS_GL_TESTS)] )
 $(info $$EXE_GL_TESTS is [$(EXE_GL_TESTS)] )
 $(info dir: $(dir $(lastword $(MAKEFILE_LIST))) )
 
-# Override generic rules for this directory, all format tests/*.c *.o 
-#$(OBJS_GL_TESTS): %.o: %.c
-#	@echo "Build *.o overriden generic rules in game_loader tests :   $@"
-#	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -c $< -o $@ -I. -I $(INCLUDE_CMOCKA)
-
-OBJS_ALL_TESTS += $(OBJS_GL_TESTS)
-
-#unit_test :: test_mastermind test_cmap_game_ptrf test_plugin_manager test_game_loader
 unit_test :: $(EXE_GL_TESTS)
 
 ####
@@ -49,5 +43,6 @@ test_game_loader: $(MODDIR_GL_TESTS)/test_game_loader.o jmmjouer/utils.o jmmjoue
 
 clean ::
 	@echo "Clean test unit game_loader: $(MODDIR_GL_TESTS)"
-	rm -f $(MODDIR_GL_TESTS)/*.o
+#	rm -f $(MODDIR_GL_TESTS)/*.o
+	rm -f $(OBJS_GL_TESTS)
 	rm -f $(EXE_GL_TESTS)

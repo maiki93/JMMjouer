@@ -6,7 +6,7 @@
 
 #include <cmocka.h>
 
-#include "../clogger.h"
+#include "clogger/clogger.h"
 
 static void create_new_file() 
 {

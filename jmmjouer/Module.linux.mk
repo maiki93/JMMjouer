@@ -10,7 +10,7 @@ OBJS_ALL_STATIC += $(OBJS_JMMJOUER)
 
 MODDIR_JMMJOUER_TESTS = $(MODDIR_JMMJOUER)/tests
 
-$(info == CORE JMMJOUER ==)
+$(info == CORE JMMJOUER : $(MODDIR_JMMOUER) ==)
 #$(info $$SRCS_JMMJOUER is [$(SRCS_JMMJOUER)] )
 $(info $$OBJS_JMMJOUER is [$(OBJS_JMMJOUER)] )
 
@@ -18,22 +18,24 @@ $(info $$OBJS_JMMJOUER is [$(OBJS_JMMJOUER)] )
 # update same global list : OBJS_ALL_STATIC, OBJS_ALL_TESTS
 include jmmjouer/game_loader/Module.linux.mk
 
+# include the games : game_pendu compiled as shared library and linked at compilation
+include jmmjouer/games/Module.linux.mk
+
 ###### Main executables
 
 # -Wl,-rpath,dir1  or -rpath=dir1 # -Wl to pass argument to linker, rpath runtime to search for lib
-#JMMjouer: $(OBJS_EXE) main.o libgame_pendu.so
-#JMMjouer: $(OBJS_EXE) main.o libclogger.so
-JMMjouer: $(OBJS_JMMJOUER) main.o $(LIB_STATIC) $(LIB_DYNAMIC)
+# ldd JMMjouer no link to game_pendu (not called to start_game_pendu?)
+JMMjouer: $(OBJS_JMMJOUER) main.o $(LIB_STATIC) $(LIB_DYNAMIC) libgame_pendu
 	@echo "Build $(EXE): all dependencies $^"
-	$(CC) -o $@ $(OBJS_JMMJOUER) main.o -L .  -lgame_loader -lrecord -ljoueur -lccontainer -lclogger
+	$(CC) -o $@ $(OBJS_JMMJOUER) main.o -L. -lgame_pendu -lgame_loader -lrecord -ljoueur -lccontainer -lclogger
 
+# same, ldd give no game_pendu
 JMMjouer_nolib : main.o $(OBJS_JMMJOUER) $(OBJS_ALL_STATIC)
 	@echo "Build JMMjouer_nolib ^: all dependencies $^"
 	@echo "Build JMMjouer_nolib <: all dependencies $<"
-	$(CC) $(STD) $(CFLAGS) -o $@ $^
+	$(CC) $(STD) $(CFLAGS) -o $@ $^ -L. -lgame_pendu
 
 # test core, integration tests
-#include $(patsubst %,%/Module_test.linux.mk,$(MODDIR_JMMJOUER_TESTS))
 include $(MODDIR_JMMJOUER_TESTS)/Module_test.linux.mk
 
 clean::

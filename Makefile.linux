@@ -70,7 +70,7 @@ MODULES := clogger ccontainer joueur record # game_loader # tests_integration
 # -g3 : all debug information + MACRO (-g0 : no debug ), -g default 2
 # -ggdb : include gdb extension if possible (not tested)
 # -fno-common : to look more, advice not clear
-CFLAGS = -Wall -Wextra -pedantic -fPIC -Wno-variadic-macros -I .
+CFLAGS = -Wall -Wextra -pedantic -fPIC -Wno-variadic-macros -I.
 # to include again:  -Werror, better than Wno-X warning appears but compiles fine
 
 # standard configurable
@@ -88,54 +88,55 @@ else
 	CFLAGS += -DNDEBUG -O2
 endif
 
-WITH_LIB ?= 1
+NO_LIB ?= 0
 # equivalent is
-#ifeq ($(origin WITH_LIB), undefined)
-# WITH_LIB = 1
+#ifeq ($(origin NO_LIB), undefined)
+# NO_LIB = 0
 #endif
-ifeq ($(WITH_LIB),1)
+ifeq ($(NO_LIB),0)
 	EXE:= JMMjouer
 else
 	EXE:= JMMjouer_nolib
 endif
 
 $(info == Makefile ROOT ==)
-$(info $$WITH_LIB is $(WITH_LIB) )
+$(info $$NO_LIB is $(NO_LIB) )
 $(info $$RELEASE is $(RELEASE) )
 $(info $$CC is $(CC) )
 $(info $$CFLAGS is $(CFLAGS) )
 $(info $$LINK is $(LINK) )
 $(info $$LFLAGS is $(LFLAGS) )
 $(info $$MAKECMDGOALS is $(MAKECMDGOALS) )
+$(info $$EXE is $(EXE) )
 
 # updated from visit in all modules, no need to define here (would still be better)
 #OBJS_ALL_STATIC = ''
 #OBJS_ALL_TESTS = ''
 # MAKELIST
 
-
-$(info $$EXE is $(EXE) )
-
+### Libraries compilation
+# libgame_pendu always shared and linked at compilation
 LIB_STATIC = libclogger libccontainer libgame_loader
 # libjouer : linked with -shared -Bstatic against libclogger and libccontainer
 # librecord need only libjoueur ! (good, bad ?) cannot really works ?
 LIB_DYNAMIC = libjoueur librecord
 
-# define list of unit_test found in all the hierarchy
-# inspect variables
-$(info $$OBJS is [$(OBJS_EXE)] )
-$(info $$EXE is $(EXE) )
+#LIB_DYNAMIC = librecord libclogger libccontainer libgame_loader libjoueur 
+#LIB_STATIC = libjoueur libgame_loader librecord
+#LIB_DYNAMIC = libclogger libccontainer
 
 # alternative to target as files
 .PHONY : all clean unit_test
 # make all, generic way to use make produce executable JMMjouer
-all: $(EXE)
+all: $(EXE) unit_test
 
 ### FOR TU
 CFLAGS_TESTS = -g3 -W -Wall -fPIC -Wunused -Wextra -pedantic -Wstrict-overflow=5 -Wno-unused-local-typedefs -fno-inline
 # need c99 standard to use cmocka
 # gnu implements inline -std=gnu89 or -fgnu89-inline but does not seem to work. Other errors appears with c89
 STD_TESTS = -std=c99
+
+# use of Windows CMocka from wsl2-linux !?
 INCLUDE_CMOCKA = C:\dev\cmocka_local_mingw\include
 LIB_CMOCKA = C:\dev\cmocka_local_mingw\lib
 

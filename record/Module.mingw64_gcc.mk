@@ -10,14 +10,14 @@ OBJS_RECORD = $(patsubst %.c, %.o, $(SRCS_RECORD))
 OBJS_ALL_STATIC += $(OBJS_RECORD)
 
 # CC, CFLAGS already defined/ shared across Modules
-MODDIR_RECORD_TESTS = $(MODDIR_RECORD)/tests
+#MODDIR_RECORD_TESTS = $(MODDIR_RECORD)/tests
 
-$(info)
 $(info == RECORD : $(MODDIR_RECORD) ==)
-$(info $$MODDIR_RECORD_TESTS is $(MODDIR_RECORD_TESTS) )
+$(info $$SRCS_RECORD is [$(SRCS_RECORD)] )
+$(info $$OBJS_RECORD is [$(OBJS_RECORD)] )
 
 # mingw64, must add all dpendencies !! 
-# to check on linux
+# to check on linux : use libjoueur -shared -Bstatic (become fully independent, and very small !?)
 # dependencies on libjoueur and logger
 librecord.dll : $(OBJS_RECORD) libjoueur libclogger libccontainer
 	@echo "Create shared library -- record"
@@ -38,7 +38,7 @@ librecord : librecord.dll
 endif
 
 # include module of tests
-include $(patsubst %,%/Module_test.mingw64_gcc.mk,$(MODDIR_RECORD_TESTS))
+include $(patsubst %,%/Module_test.mingw64_gcc.mk,$(MODDIR_RECORD)/tests))
 
 clean ::
 	@echo "Clean module record"

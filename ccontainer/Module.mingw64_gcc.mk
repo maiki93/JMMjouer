@@ -3,10 +3,7 @@ MODDIR_CCONTAINER := ccontainer
 
 SRCS_CCONTAINER := $(wildcard $(MODDIR_CCONTAINER)/*.c)
 OBJS_CCONTAINER := $(patsubst %.c, %.o, $(SRCS_CCONTAINER))
-
-#OBJS_CCONTAINER = $(MODDIR_CCONTAINER)/clist_generic.o \
-#				  $(MODDIR_CCONTAINER)/clist_cstring.o
-
+# update global variable
 OBJS_ALL_STATIC += $(OBJS_CCONTAINER)
 
 # defined here, used in tests/Module.X.mk

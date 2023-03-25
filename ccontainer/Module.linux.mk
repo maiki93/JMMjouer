@@ -1,11 +1,10 @@
 
 MODDIR_CCONTAINER := ccontainer
 # default, overwritten if present in LIB_STATIC
-IMPORT_LIB_CCONTAINER = libccontainer_dll.lib
+#IMPORT_LIB_CCONTAINER = libccontainer_dll.lib
 
 SRCS_CCONTAINER := $(wildcard $(MODDIR_CCONTAINER)/*.c)
 OBJS_CCONTAINER := $(patsubst %.c, %.o, $(SRCS_CCONTAINER))
-
 # update global variable
 OBJS_ALL_STATIC += $(OBJS_CCONTAINER)
 
@@ -26,16 +25,13 @@ libccontainer.a : $(OBJS_CCONTAINER)
 	ar rcs $@ $^
 
 ifneq ($(findstring libccontainer,$(LIB_STATIC)),)
-IMPORT_LIB_CCONTAINER = libccontainer.lib
 libccontainer : libccontainer.a
 else
-IMPORT_LIB_CCONTAINER = libccontainer_dll.lib
 libccontainer : libccontainer.so
 endif
-$(info IMPORT_LIB_CCONTAINER: $(IMPORT_LIB_CCONTAINER) )
 
 # include description for each module
-include $(patsubst %,%/Module.linux.mk,$(MODDIR_CCONTAINER_TESTS))
+include $(patsubst %,%/Module_test.linux.mk,$(MODDIR_CCONTAINER_TESTS))
 
 clean ::
 	@echo "Clean module ccontainer"

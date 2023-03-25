@@ -3,8 +3,6 @@
 # should work !  $(dir $@)
 MODDIR_GL_TESTS = $(MODDIR_GAME_LOADER)\tests
 
-
-
 SRCS_GL_TESTS := $(wildcard $(MODDIR_GL_TESTS)/*.c) # keep full path tests/test_mastermind.c
 OBJS_GL_TESTS := $(patsubst %.c, %.obj, $(SRCS_GL_TESTS)) # keep full path tests/test_mastermind.o
 

@@ -1,3 +1,4 @@
+
 MODDIR_JMMJOUER := jmmjouer
 
 # Use explicit OBJS, more control
@@ -10,7 +11,7 @@ OBJS_ALL_STATIC += $(OBJS_JMMJOUER)
 MODDIR_JMMJOUER_TESTS = $(MODDIR_JMMJOUER)/tests
 
 $(info == CORE JMMJOUER : $(MODDIR_JMMOUER) ==)
-$(info $$SRCS_JMMJOUER is [$(SRCS_JMMJOUER)] )
+#$(info $$SRCS_JMMJOUER is [$(SRCS_JMMJOUER)] )
 $(info $$OBJS_JMMJOUER is [$(OBJS_JMMJOUER)] )
 
 # subdirectory in jmmjouer core

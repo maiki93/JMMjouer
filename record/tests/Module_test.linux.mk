@@ -1,15 +1,14 @@
 
-$(info)
-$(info == RECORD UNIT_TEST ==)
-$(info $$MODDIR_RECORD_TESTS is $(MODDIR_RECORD_TESTS))
-
+MODDIR_RECORD_TESTS := $(MODDIR_RECORD)/tests
 
 SRCS_RECORD_TESTS := $(wildcard $(MODDIR_RECORD_TESTS)/*.c) # keep full path tests/test_mastermind.c
-$(info $$SRCS_TESTS is [ $(SRCS_RECORD_TESTS) ])
 OBJS_RECORD_TESTS := $(patsubst %.c, %.o, $(SRCS_RECORD_TESTS)) # keep full path tests/test_mastermind.o
-$(info $$OBJS_TESTS is [$(OBJS_RECORD_TESTS)])
 
 OBJS_ALL_TESTS += $(OBJS_RECORD_TESTS)
+
+$(info == RECORD UNIT_TEST : $(MODDIR_RECORD_TESTS) ==)
+$(info $$SRCS_RECORD_TESTS is [ $(SRCS_RECORD_TESTS) ])
+$(info $$OBJS_RECORD_TESTS is [$(OBJS_RECORD_TESTS)])
 
 unit_test :: test_file_record
 

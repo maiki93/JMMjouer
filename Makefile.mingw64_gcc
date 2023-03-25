@@ -59,19 +59,6 @@ endif
 # take away main.o to avoid mutliple main() functions
 #OBJS := $(filter-out main.o, $(OBJS))
 
-# Use explicit OBJS, more control
-# do not include main.o
-# replace step-by-step by library : 
-# 	clogger : clogger.o,
-#   ccontainer : clist_generic.o clist_cstring.o
-#   record : irecord.o file_record.o
-#   joueur :cmap_game_victories.o person.o joueur.o # victory ?? only header ??
-#		then include victory.o
-#   game_loader : plugin_manager.o cmap_ptrf_game.o game_loader.o
-#OBJS_EXE = utils.o utils_file.o arcade.o
-# will be created
-#OBJS_CORE += $(OBJS)
-
 # define main executable
 NO_LIB ?= 0
 ifeq ($(NO_LIB),0)

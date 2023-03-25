@@ -3,13 +3,11 @@
 SRCS_JOUEUR_TESTS := $(wildcard $(MODDIR_JOUEUR_TESTS)/*.c)
 OBJS_JOUEUR_TESTS := $(patsubst %.c, %.o, $(SRCS_JOUEUR_TESTS))
 
+OBJS_ALL_TESTS += $(OBJS_JOUEUR_TESTS)
+
 $(info == JOUEUR UNIT_TEST : $(MODDIR_JOUEUR_TESTS) ==)
-$(info $$MODDIR_JOUEUR_TESTS is $(MODDIR_JOUEUR_TESTS))
-$(info $$CFLAGS_TESTS is $(CFLAGS_TESTS))
 $(info $$SRCS_TESTS is [ $(SRCS_JOUEUR_TESTS) ])
 $(info $$OBJS_TESTS is [$(OBJS_JOUEUR_TESTS)])
-
-OBJS_ALL_TESTS += $(OBJS_JOUEUR_TESTS)
 
 unit_test :: test_cmap_game_victories
 
