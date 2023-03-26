@@ -9,7 +9,7 @@
     other link https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
     https://i.stack.imgur.com/9UVnC.png
 */
-#include "jmmjouer/game_loader/game_mastermind.h"
+#include "jmmjouer/games/game_mastermind.h"
 /*#include "victory.h"*/ /* included in .h */
 #include "jmmjouer/utils.h"
 

@@ -15,13 +15,14 @@
 
 #include "game_loader.h"
 #include "cmap_ptrf_game.h"
+
 #include "plugin_manager.h" /* to get singleton instance */
-#include "jmmjouer/utils_file.h"
+#include "jmmjouer/utils_file.h" /* contains algo generic */
 #include "clogger/clogger.h"
 /* if forward declare in header */
 
 /* Define games known at compilation in a separate file, always included */
-#include "default_games.h"
+#include "jmmjouer/games/default_games.h"
 
 #if defined(_WIN32)
     #define EXT_DLL "dll"

@@ -132,7 +132,7 @@ $(info $$EXE is $(EXE) )
 LIB_STATIC = libclogger libccontainer libgame_loader
 # libjouer : linked with -shared -Bstatic against libclogger and libccontainer
 # librecord need only libjoueur ! (good, bad ?) cannot really works ?
-LIB_DYNAMIC = libjoueur librecord
+LIB_DYNAMIC = libjoueur librecord 
 
 # play with different setup, all compile
 #LIB_DYNAMIC = librecord libclogger libccontainer libgame_loader libjoueur 

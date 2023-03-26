@@ -35,7 +35,7 @@ endif
 # ldd JMMjouer no link to game_pendu (not called to start_game_pendu?)
 JMMjouer: $(OBJS_EXEC) $(OBJS_JMMJOUER) $(LIB_STATIC) $(LIB_DYNAMIC) libgame_pendu
 	@echo "Build $(EXE): all dependencies $^"
-	$(CC) -o $@ $(OBJS_EXEC) $(OBJS_JMMJOUER) -L. -lgame_pendu -lgame_loader -lrecord -ljoueur -lccontainer -lclogger
+	$(CC) -o $@ $(OBJS_EXEC) $(OBJS_JMMJOUER) -L. -lgame_loader -lrecord -ljoueur -lgame_pendu -lccontainer -lclogger
 
 # same, ldd give no game_pendu $(OBJS_JMMJOUER)
 JMMjouer_nolib : $(OBJS_EXEC) $(OBJS_ALL_STATIC) libgame_pendu
