@@ -56,7 +56,8 @@ LFLAGS = --warn-common -shared -z defs --no-allow-shlib-undefined -lc
 # List of subdirectories containing a Module.mk file
 #MODULES := tests tests/test_mock
 # game_loader moved into jmmjouer
-MODULES := clogger ccontainer joueur record # game_loader # tests_integration
+MODULES := clogger ccontainer joueur record jmmjouer src_plugin executables
+# game_loader # tests_integration
 
 # see advices (and much more than compilation options) https://matt.sh/howto-c
 # compiler option, activate many warning( here seeems common to gcc and clang)
@@ -77,6 +78,17 @@ CFLAGS = -Wall -Wextra -pedantic -fPIC -Wno-variadic-macros -I.
 # gcc c89/90 : -ansi, -std=c90 or -std=iso9899:1990
 STD = -std=c90
 
+### Apply by default for TU, can be overriden inside each module
+CFLAGS_TESTS = -g3 -W -Wall -fPIC -Wunused -Wextra -pedantic -Wstrict-overflow=5 -Wno-unused-local-typedefs -fno-inline
+# need c99 standard to use cmocka
+# gnu implements inline -std=gnu89 or -fgnu89-inline but does not seem to work. Other errors appears with c89
+STD_TESTS = -std=c99
+
+##### External libraries
+# use of Windows CMocka from wsl2-linux !? yep , working !
+INCLUDE_CMOCKA = C:\dev\cmocka_local_mingw\include
+LIB_CMOCKA = C:\dev\cmocka_local_mingw\lib
+
 # standard gcc defines usually NDEBUG for release code (assert.h affected)
 # code uses internally a JMMJ_DEBUG, defined in preprocessor stage 
 # 	or declare directly here ? better will apply to all files without need to include a common header ?
@@ -88,16 +100,17 @@ else
 	CFLAGS += -DNDEBUG -O2
 endif
 
-NO_LIB ?= 0
+# to move into executables ?
+#NO_LIB ?= 0
 # equivalent is
 #ifeq ($(origin NO_LIB), undefined)
 # NO_LIB = 0
 #endif
-ifeq ($(NO_LIB),0)
-	EXE:= JMMjouer
-else
-	EXE:= JMMjouer_nolib
-endif
+#ifeq ($(NO_LIB),0)
+#	EXE:= JMMjouer
+#else
+#	EXE:= JMMjouer_nolib
+#endif
 
 $(info == Makefile ROOT ==)
 $(info $$NO_LIB is $(NO_LIB) )
@@ -121,24 +134,19 @@ LIB_STATIC = libclogger libccontainer libgame_loader
 # librecord need only libjoueur ! (good, bad ?) cannot really works ?
 LIB_DYNAMIC = libjoueur librecord
 
+# play with different setup, all compile
 #LIB_DYNAMIC = librecord libclogger libccontainer libgame_loader libjoueur 
 #LIB_STATIC = libjoueur libgame_loader librecord
 #LIB_DYNAMIC = libclogger libccontainer
+
+# moved before for EXE
+# include the description for each module
+include $(patsubst %,%/Module.linux.mk,$(MODULES))
 
 # alternative to target as files
 .PHONY : all clean unit_test
 # make all, generic way to use make produce executable JMMjouer
 all: $(EXE) unit_test
-
-### FOR TU
-CFLAGS_TESTS = -g3 -W -Wall -fPIC -Wunused -Wextra -pedantic -Wstrict-overflow=5 -Wno-unused-local-typedefs -fno-inline
-# need c99 standard to use cmocka
-# gnu implements inline -std=gnu89 or -fgnu89-inline but does not seem to work. Other errors appears with c89
-STD_TESTS = -std=c99
-
-# use of Windows CMocka from wsl2-linux !?
-INCLUDE_CMOCKA = C:\dev\cmocka_local_mingw\include
-LIB_CMOCKA = C:\dev\cmocka_local_mingw\lib
 
 # specific target for unit testing in tests/ , dependencies with CMocka
 unit_test::
@@ -154,13 +162,16 @@ unit_test::
 	$(CC) $(STD) $(CFLAGS) -c $< -o $@
 
 # include the description for each module
-include $(patsubst %,%/Module.linux.mk,$(MODULES))
+#include $(patsubst %,%/Module.linux.mk,$(MODULES))
 
 # include core in jmmjouer
-include jmmjouer/Module.linux.mk
+#include jmmjouer/Module.linux.mk
 
 # only for plugins
-include src_plugin/Module.linux.mk
+#include src_plugin/Module.linux.mk
+
+# main executable
+#include executables/Module.linux.mk
 
 $(info == ROOT after include modules ==)
 $(info $$OBJS_ALL_STATIC is $(OBJS_ALL_STATIC) )

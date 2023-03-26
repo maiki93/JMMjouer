@@ -58,7 +58,7 @@ test_clogger : $(MODDIR_CLOGGER)/tests/test_clogger.o $(MODDIR_CLOGGER)/clogger.
 
 clean ::
 	@echo "Clean module clogger"
-#	rm -f $(OBJS_CLOGGER)
+	rm -f $(OBJS_CLOGGER)
 	rm -f $(MODDIR_CLOGGER)/tests/test_clogger.o
 	rm -f libclogger.a libclogger.so
 	rm -f test_clogger
