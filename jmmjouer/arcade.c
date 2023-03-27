@@ -26,7 +26,7 @@ enum { STREAM_INPUT_MAX_SIZE = 25 };
 /* global variable, but static no access from other compile unit */
 static irecord_t *record;
 static game_loader_t *gloader;
-/*static plugin_mgr_t *manager_plg; */ /* got singleton instanc eon demand */
+/*static plugin_mgr_t *manager_plg; */ /* got singleton instance on demand */
 
 /***
  *  private functions declaration 

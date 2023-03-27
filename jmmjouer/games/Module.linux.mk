@@ -13,7 +13,7 @@ MODDIR_GAMES := jmmjouer/games
 
 # add default_games.h /.c here ? $(MODDIR_GAMES)/default_games.o
 # must be added to OBJS_GAME_LOADER in order to build fully the library
-OBJS_GAMES += $(MODDIR_GAMES)/game_mastermind.o
+OBJS_GAMES += $(MODDIR_GAMES)/game_mastermind.o $(MODDIR_GAMES)/default_games.o
 # added to all for no_lib
 OBJS_ALL_STATIC += $(OBJS_GAMES)
 
@@ -26,5 +26,6 @@ libgame_pendu.so : $(MODDIR_GAMES)/game_pendu.o $(MODDIR_JOUEUR)/victory.o
 libgame_pendu : libgame_pendu.so
 
 clean ::
-	rm -f $(MODDIR_GAMES)/*.o
+	rm -f $(OBJS_GAMES)
+	rm -f $(MODDIR_GAMES)/game_pendu.o
 	rm -f libgame_pendu.so

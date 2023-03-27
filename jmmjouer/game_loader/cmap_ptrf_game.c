@@ -4,27 +4,17 @@
 #include <assert.h>
 
 #include "cmap_ptrf_game.h"
-/*#include "ccontainer/clist_generic.h"*/
-
-/*
-#include "victory.h"
-#include "person.h" */
-/* typedef for exact function signature => lots of dependencies
-   may cast at a higher-level ?? */
-/* typedef victory_t(*ptr_game_local_t)(person_t); */
-/*typedef void(*ptr_game_local_t)(void*);*/
 
 struct cmap_ptrf_game_type {
     clist_gen_t *clist; /* first data member, cast to (clist_gen_t*) valid */
 };
-
 
 /* intermediate for storage / value_t specialization 
     Contains heap-allocated memory, but same deleter for value_t
     Only (intermediate) pair must be carefully deallocated */
 struct pair_ptr_game {
     char *game_name; /* variant to pair_game_victory_t, with dyn. allocated */
-    ptr_game_local_t pfgame;
+    ptr_game_t pfgame;
 };
 
 void delete_pair_ptr_game(struct pair_ptr_game *pair)
@@ -41,29 +31,20 @@ void delete_pair_ptr_game(struct pair_ptr_game *pair)
 static value_t make_value_ptr_game( struct pair_ptr_game *pair )
 {
     value_t value_out;
-    /* to follow the serailization */
-   /* char *p_buffer; */
-
-    /* => return 8 (x64) */
-    /*printf("sizeof ptr %ld\n", (long)sizeof(ptr_game_local_t) ); */ /* => 8 */
-
+    
     /* a c-string, include the terminaison caracter
        necessary to retrieve the second field (ptr_game)!
          or need to store the size of the string, more memory (blank forbidden) */
     value_out.len =  strlen(pair->game_name) + 1 /* c-string */
-                     + sizeof (ptr_game_local_t) ; /* ptr_f */
+                     + sizeof (ptr_game_t) ; /* ptr_f */
     value_out.data = (char*)malloc( value_out.len );
     /* strcpy copy '\0' if possible 
         p_buffer not the end of the string, memcpy finally better ?*/
-    /*p_buffer = */
     strcpy( value_out.data, pair->game_name);
-    /*printf("p_buffer - data: %ld\n", (long)(p_buffer - value_out.data));*/ /* => 0, p_buffer useless */
-    /* append ptr_f */
-    /*memcpy( p_buffer, pair->pfgame, sizeof (ptr_game_local_t));*/
-    /*memcpy( p_buffer, &pair->pfgame, 8);*/
-    /* memcpy( p_buffer + strlen(pair->game_name) + 1, &pair->pfgame, 8); */
-    /* could get until the first '\0' cstrpn() */
-    memcpy( value_out.data + strlen(pair->game_name) + 1, &pair->pfgame, 8);
+
+    /* could get until the first '\0' cstrpn(), and avoid 8 ? ok for 8 */
+    /*memcpy( value_out.data + strlen(pair->game_name) + 1, &pair->pfgame, 8);*/
+    memcpy( value_out.data + strlen(pair->game_name) + 1, &pair->pfgame, sizeof(ptr_game_t) );
 
     return value_out;
 }
@@ -78,8 +59,7 @@ static struct pair_ptr_game extract_value_ptr_game(const value_t* value_in)
     pair.game_name = (char*)malloc( name_len + 1);
     strcpy(pair.game_name, value_in->data);
     /* copy ptr_game */
-    /*memcpy(pair.pfgame, value_in->data + name_len + 1, sizeof (ptr_game_local_t));*/
-    memcpy(&pair.pfgame, value_in->data + name_len + 1, sizeof (ptr_game_local_t));
+    memcpy(&pair.pfgame, value_in->data + name_len + 1, sizeof (ptr_game_t));
 
     return pair;
 }
@@ -116,18 +96,13 @@ static void  deleter_pair_ptr_game( value_t *value)
 void game_ptrf_delete(cmap_ptrf_game_t *cmap)
 {
     if( cmap->clist ) {
-        /*clist_gen_clear( cmap->clist, deleter_pair_ptr_game);
-        assert( cmap->clist != NULL);
-        assert( clist_gen_size( cmap->clist) == 0);
-        free(cmap->clist); */
-
         clist_gen_del( cmap->clist, free_value);
         cmap->clist = NULL;
     }
     free(cmap);
 }
 
-struct pair_ptr_game make_pair(const char *name, ptr_game_local_t pfgame_in)
+struct pair_ptr_game make_pair(const char *name, ptr_game_t pfgame_in)
 {
     struct pair_ptr_game pair;
     pair.game_name = (char*)malloc(strlen(name) + 1);
@@ -143,7 +118,7 @@ size_t game_ptrf_size(const cmap_ptrf_game_t *cmap)
 }
 
 /* pair input certainly better */
-int game_ptrf_insert( cmap_ptrf_game_t *cmap, const char *name, ptr_game_local_t pfgame_in)
+int game_ptrf_insert( cmap_ptrf_game_t *cmap, const char *name, ptr_game_t pfgame_in)
 {
     int retour;
     value_t value_in;
@@ -158,7 +133,7 @@ int game_ptrf_insert( cmap_ptrf_game_t *cmap, const char *name, ptr_game_local_t
     return retour;
 }
 
-ptr_game_local_t game_ptrf_get_from_name(const cmap_ptrf_game_t *cmap, const char *name)
+ptr_game_t game_ptrf_get_from_name(const cmap_ptrf_game_t *cmap, const char *name)
 {
     int retour;
     struct pair_ptr_game pair_out;
@@ -178,8 +153,6 @@ ptr_game_local_t game_ptrf_get_from_name(const cmap_ptrf_game_t *cmap, const cha
 
     return pair_out.pfgame;
 }
-
-
 
 clist_cstring_t* game_ptrf_get_names( const cmap_ptrf_game_t *cmap )
 {

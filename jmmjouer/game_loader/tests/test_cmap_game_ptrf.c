@@ -96,11 +96,11 @@ static void get_ptrf_from_name()
     game_ptrf_insert( cmap, pair_in1.game_name, pair_in1.pfgame);
     game_ptrf_insert( cmap, pair_in2.game_name, pair_in2.pfgame);
 
-    ptr_game_local_t ptrf1;
+    ptr_game_t ptrf1;
     ptrf1 = game_ptrf_get_from_name(cmap, "second");
     assert_ptr_equal( &test1, ptrf1 );
 
-    ptr_game_local_t ptrf2;
+    ptr_game_t ptrf2;
     ptrf2 = game_ptrf_get_from_name(cmap, "first");
     assert_ptr_equal( NULL, ptrf2 );
 

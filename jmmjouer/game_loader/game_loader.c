@@ -16,12 +16,10 @@
 #include "game_loader.h"
 #include "cmap_ptrf_game.h"
 
-#include "plugin_manager.h" /* to get singleton instance */
-#include "jmmjouer/utils_file.h" /* contains algo generic */
+#include "jmmjouer/game_loader/plugin_manager.h" /* to get singleton instance */
+#include "jmmjouer/utils_file.h"                 /* contains algo generic */
 #include "clogger/clogger.h"
-/* if forward declare in header */
-
-/* Define games known at compilation in a separate file, always included */
+/* Define games known at compilation in a separate file, always included at compilation */
 #include "jmmjouer/games/default_games.h"
 
 #if defined(_WIN32)
@@ -42,10 +40,8 @@ struct game_loader_type {
 static int load_static_game(game_loader_t *gameldr);
 static int load_shared_game(game_loader_t *gameldr);
 int add_game(game_loader_t *gload, const char *name, ptr_game_t pf_game);
-bool  is_empty(const game_loader_t *gload);
 /* static unsigned int size() {return nb_element;} */
-
-/*static int load_game_dll( cmap_ptrf_game_t *map, const char *name); not used */
+bool  is_empty(const game_loader_t *gload);
 /* used as callback function by load_shared_game */
 static int load_game_dll_callback( clist_gen_t *clist, const char *name);
 /*********** end private functions *********/
@@ -101,7 +97,7 @@ int game_loader_get_names2(const game_loader_t *gload, clist_cstring *list_names
 
 ptr_game_t game_loader_get_ptr_game( const game_loader_t *gameldr, const char * name_game)
 {
-    ptr_game_local_t pfgame_local;
+    ptr_game_t pfgame_local;
     pfgame_local = game_ptrf_get_from_name( gameldr->map_game, name_game);
     return (ptr_game_t)pfgame_local;
 }

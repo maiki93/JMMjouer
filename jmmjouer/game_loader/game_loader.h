@@ -1,9 +1,7 @@
 #pragma once
 
 /* needed for ptr_game_t definition */
-#include "joueur/person.h"
-#include "joueur/victory.h"
-
+#include "jmmjouer/ptrf_game_typedef.h"
 #include "ccontainer/clist_cstring.h"
 
 /* not exported as shared library */
@@ -38,9 +36,6 @@
   Try to avoid to recopy the interface of plugin_manager
   */
 
-/* pointer to function type to run the game */
-/* if void possible, much less dependencies */
-typedef victory_t(*ptr_game_t)(person_t);
 
 /* to get a better API, to try "namespace" ERR_GAME_LOADER::GAME_LOADER_OK */
 enum {

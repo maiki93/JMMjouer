@@ -2,13 +2,11 @@
 
 #include <stddef.h> /* ask when use in game_loader_, load of dll ? */
 
-#include "joueur/victory.h"
-#include "joueur/person.h"
+#include "jmmjouer/ptrf_game_typedef.h"
 #include "ccontainer/clist_cstring.h"
 
 /* nothing to export from here ? */
 
-typedef victory_t(*ptr_game_local_t)(person_t);
 
 /* @brief C-style map to store a list of the game_name and their corresponding
     (pointer to ) function to run them. */
@@ -29,8 +27,8 @@ void game_ptrf_delete(cmap_ptrf_game_t *cmap);
 
 size_t game_ptrf_size(const cmap_ptrf_game_t *cmap);
 
-int game_ptrf_insert( cmap_ptrf_game_t *cmap, const char *name, ptr_game_local_t);
-ptr_game_local_t game_ptrf_get_from_name(const cmap_ptrf_game_t *cmap, const char *name);
+int game_ptrf_insert( cmap_ptrf_game_t *cmap, const char *name, ptr_game_t);
+ptr_game_t game_ptrf_get_from_name(const cmap_ptrf_game_t *cmap, const char *name);
 
 /* @brief Return the list of all game names in the map.
     It is a copy of the original data, the returned clist must be deallocated by the caller */

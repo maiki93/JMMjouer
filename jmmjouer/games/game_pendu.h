@@ -6,7 +6,8 @@
 
 #include "shared_EXPORTS.h"
 
+/* really need to export ? adress of function taken in default_games.c (maybe at runtime ?) */
 victory_t SHARED_EXPORT start_game_pendu(person_t person);
-/*victory_t start_game_pendu(person_t person);*/
+
 
 #endif
