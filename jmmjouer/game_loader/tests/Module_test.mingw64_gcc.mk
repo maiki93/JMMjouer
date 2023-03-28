@@ -37,9 +37,9 @@ test_plugin_manager: $(MODDIR_GL_TESTS)/test_plugin_manager.o libclogger.a
 	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
 # need for game_X,  so need for utils
-test_game_loader: $(MODDIR_GL_TESTS)/test_game_loader.o jmmjouer/utils.o jmmjouer/utils_file.o joueur/victory.o libgame_loader.a libccontainer.a libclogger.a
+test_game_loader: $(MODDIR_GL_TESTS)/test_game_loader.o jmmjouer/utils.o jmmjouer/utils_file.o joueur/victory.o libgame_loader libccontainer libclogger libgame_pendu.dll
 	@echo "Building test_game_loader @ :    $@"  # target name
-	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
+	$(CC) $(STD_TESTS) $(CFLAGS) -o $@  $(MODDIR_GL_TESTS)/test_game_loader.o jmmjouer/utils.o jmmjouer/utils_file.o joueur/victory.o -L. -l$(IMPORT_LIB_CLOGGER) -l$(IMPORT_LIB_CCONTAINER) -l$(IMPORT_LIB_GAME_LOADER) -lgame_pendu_dll -L $(LIB_CMOCKA) -lcmocka
 
 clean ::
 	@echo "Clean test unit game_loader: $(MODDIR_GL_TESTS)"

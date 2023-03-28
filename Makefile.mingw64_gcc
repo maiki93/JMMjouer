@@ -20,7 +20,7 @@ LFLAGS = --warn-common -shared -z defs --no-allow-shlib-undefined -lc
 #MODULES := tests tests/test_mock
 # clogger call by an explicit make, no use of module
 # game_loader moved into jmmjouer
-MODULES := ccontainer joueur record # game_loader #tests
+MODULES := ccontainer joueur record jmmjouer src_plugin executables #tests
 
 # see advices (and much more than compilation options) https://matt.sh/howto-c
 # compiler option, activate many warning( here seeems common to gcc and clang)
@@ -78,11 +78,23 @@ $(info $$LFLAGS is $(LFLAGS) )
 $(info $$MAKECMDGOALS is $(MAKECMDGOALS) )
 $(info $$EXE is $(EXE) )
 
-# libclogger apart
-LIB_STATIC = libccontainer libclogger libjoueur #libgame_loader
+# JMMjouer compile if all static
+# LIB_STATIC = libccontainer libclogger libgame_loader libjoueur librecord
+# try all dynamic, compile also !
+#LIB_DYNAMIC = libccontainer libclogger libjoueur librecord
+#LIB_STATIC = libgame_loader
+
+# else multiple definition... in many cases (librecord and libccontainer)
+# may work if linkage with -lrecord (link directly to library)
+# or use  -Wl,-allow-multiple-definition
+#LIB_STATIC = libccontainer libclogger libgame_loader libjoueur
 # libjouer : linked with -shared -Bstatic against libclogger and libccontainer
 # librecord need only libjoueur ! (good, bad ?) cannot really works ?
-LIB_DYNAMIC = libgame_loader librecord
+#LIB_DYNAMIC = librecord
+
+# from previous multiple definition, both as shared : working !! ?? why ???
+LIB_STATIC = libclogger libgame_loader libjoueur
+LIB_DYNAMIC = librecord libccontainer
 
 # alternative to target as files
 #.PHONY : all clean unit_test
@@ -94,7 +106,8 @@ LIB_DYNAMIC = libgame_loader librecord
 # make all, generic way to use make produce executable JMMjouer
 #all: $(EXE)
 # necessary for vscode-makefile.tool ?
-all : JMMjouer
+#all : JMMjouer
+all : $(EXE) unit_test
 # unit_test
 
 ### FOR TU
@@ -125,10 +138,9 @@ unit_test::
 include $(patsubst %,%/Module.mingw64_gcc.mk,$(MODULES))
 
 # include core in jmmjouer, could be in MODULES
-include jmmjouer/Module.mingw64_gcc.mk
-
+#include jmmjouer/Module.mingw64_gcc.mk
 # only for plugins, could in MODULES
-include src_plugin/Module.mingw64_gcc.mk
+#include src_plugin/Module.mingw64_gcc.mk
 
 $(info == ROOT after include modules ==)
 $(info $$OBJS_ALL_STATIC is $(OBJS_ALL_STATIC) )

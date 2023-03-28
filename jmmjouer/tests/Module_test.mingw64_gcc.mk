@@ -19,9 +19,9 @@ unit_test:: $(EXE_JMMJOUER_TESTS)
 
 OBJS_NO_ARCADE := $(filter-out jmmjouer/arcade.o, $(OBJS_JMMJOUER))
 
-test_arcade: $(MODDIR_JMMJOUER_TESTS)/test_arcade.o $(OBJS_NO_ARCADE)  librecord libclogger libccontainer libgame_loader libjoueur
+test_arcade: $(MODDIR_JMMJOUER_TESTS)/test_arcade.o $(OBJS_NO_ARCADE)  librecord libclogger libccontainer libgame_loader libjoueur libgame_pendu.dll
 	@echo "Building test_arcade @ :    $@"  # target name
-	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $(MODDIR_JMMJOUER_TESTS)/test_arcade.o $(OBJS_NO_ARCADE) -L $(LIB_CMOCKA) -lcmocka -L. -l$(IMPORT_LIB_RECORD) -l$(IMPORT_LIB_CLOGGER) -l$(IMPORT_LIB_CCONTAINER) -l$(IMPORT_LIB_GAME_LOADER) -l$(IMPORT_LIB_JOUEUR)
+	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $(MODDIR_JMMJOUER_TESTS)/test_arcade.o $(OBJS_NO_ARCADE) -L $(LIB_CMOCKA) -lcmocka -L. -l$(IMPORT_LIB_RECORD) -l$(IMPORT_LIB_CLOGGER) -l$(IMPORT_LIB_CCONTAINER) -l$(IMPORT_LIB_GAME_LOADER) -l$(IMPORT_LIB_JOUEUR) -lgame_pendu_dll
 
 clean::
 	@echo "Clean jmmjouer unit tests in : $(MODDIR_JMMJOUER_TESTS)"

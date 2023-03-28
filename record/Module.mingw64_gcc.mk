@@ -38,7 +38,7 @@ librecord : librecord.dll
 endif
 
 # include module of tests
-include $(patsubst %,%/Module_test.mingw64_gcc.mk,$(MODDIR_RECORD)/tests))
+include $(patsubst %,%/Module_test.mingw64_gcc.mk,$(MODDIR_RECORD)/tests)
 
 clean ::
 	@echo "Clean module record"

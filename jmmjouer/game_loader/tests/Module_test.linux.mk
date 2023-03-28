@@ -38,7 +38,7 @@ test_plugin_manager: $(MODDIR_GL_TESTS)/test_plugin_manager.o libclogger
 # add libgame_pendu, otherwise does not compile with shared libgame_loader.so
 test_game_loader: $(MODDIR_GL_TESTS)/test_game_loader.o jmmjouer/utils.o jmmjouer/utils_file.o joueur/victory.o libgame_loader libccontainer libclogger libgame_pendu
 	@echo "Building test_game_loader @ :    $@"  # target name
-	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $(MODDIR_GL_TESTS)/test_game_loader.o jmmjouer/utils.o jmmjouer/utils_file.o joueur/victory.o -L . -lgame_loader -lccontainer -lclogger -lgame_pendu -L $(LIB_CMOCKA) -lcmocka
+	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $(MODDIR_GL_TESTS)/test_game_loader.o jmmjouer/utils.o jmmjouer/utils_file.o joueur/victory.o -L. -lgame_loader -lccontainer -lclogger -lgame_pendu -L $(LIB_CMOCKA) -lcmocka
 
 clean ::
 	@echo "Clean test unit game_loader: $(MODDIR_GL_TESTS)"

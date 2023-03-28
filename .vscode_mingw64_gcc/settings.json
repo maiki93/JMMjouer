@@ -22,7 +22,8 @@
         "cmap_game_victories.h": "c",
         "plugin_manager_fwd.h": "c",
         "strings.h": "c",
-        "clist_cstring.h": "c"
+        "clist_cstring.h": "c",
+        "Makefile.linux": "makefile"
     }, // default
 
     // https://earthly.dev/blog/vscode-make/
@@ -35,12 +36,11 @@
         {
             "name": "NO_LIB",
             "makeArgs": ["NO_LIB=1"]
-        },
+        },*/
         {
             "name": "Release",
             "makeArgs": ["RELEASE=1"]
         },
-        */
         {
             "name": "Print make version",
             "makeArgs": ["--version"]

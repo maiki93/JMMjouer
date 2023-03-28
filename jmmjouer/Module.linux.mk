@@ -2,7 +2,6 @@
 MODDIR_JMMJOUER := jmmjouer
 
 # Use explicit OBJS, more control
-# do not include main.o
 OBJS_JMMJOUER = $(MODDIR_JMMJOUER)/utils.o $(MODDIR_JMMJOUER)/utils_file.o \
 				$(MODDIR_JMMJOUER)/arcade.o
 
@@ -27,4 +26,4 @@ include $(MODDIR_JMMJOUER_TESTS)/Module_test.linux.mk
 clean::
 	@echo "Clean in jmmjouer core directory"
 	rm -f $(OBJS_JMMJOUER)
-	rm -f JMMjouer JMMjouer_nolib
+

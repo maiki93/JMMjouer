@@ -1,6 +1,6 @@
 
 MODDIR_GAME_LOADER := jmmjouer/game_loader
-MODULES_TESTS = $(MODDIR_GAME_LOADER)/tests
+#MODULES_TESTS = $(MODDIR_GAME_LOADER)/tests
 
 SRCS_GAME_LOADER := $(wildcard $(MODDIR_GAME_LOADER)/*.c)
 OBJS_GAME_LOADER = $(patsubst %.c, %.o, $(SRCS_GAME_LOADER))
@@ -39,16 +39,17 @@ $(info $$OBJS_GAME_LOADER is [$(OBJS_GAME_LOADER)] )
 
 # fine with dll, but include lots of dependencies (and repeat in others)
 # still better with games included here
-libgame_loader.dll : $(OBJS_GAME_LOADER) jmmjouer/utils_file.o jmmjouer/utils.o joueur/victory.o libjoueur libccontainer libclogger
+# last : do not compile because undefined ref to start_game_pendu in default_games
+libgame_loader.dll : $(OBJS_GAME_LOADER) $(OBJS_GAMES) jmmjouer/utils_file.o jmmjouer/utils.o joueur/victory.o libjoueur libccontainer libclogger
 	@echo "Create shared library -- game_loader"
 # like in liunx, libjoueur is not enought, missing clist_cstring modules
 # include libccontainer.lib => multiple definition clist_gen_X free_value...
 #	$(CC) -shared $(CFLAGS) -Wl,--export-all-symbols -o $@ $^ -Wl,--out-implib,libgame_loader_dll.a -L. -ljoueur_dll libccontainer.lib
 # fine with shared lib. to compare linux. same with libccontainer.dll. -ljoueur_dll, victory enough
 # last, need clogger. because --export-all-symbols ?
-	$(CC) -shared $(CFLAGS) -Wl,--export-all-symbols -o $@ $(OBJS_GAME_LOADER) jmmjouer/utils_file.o jmmjouer/utils.o joueur/victory.o -Wl,--out-implib,libgame_loader_dll.a -L. -l$(IMPORT_LIB_CCONTAINER) -l$(IMPORT_LIB_CLOGGER)
+	$(CC) -shared $(CFLAGS) -Wl,--export-all-symbols -o $@ $(OBJS_GAME_LOADER) $(OBJS_GAMES) jmmjouer/utils_file.o jmmjouer/utils.o joueur/victory.o -Wl,--out-implib,libgame_loader_dll.a -L. -l$(IMPORT_LIB_CCONTAINER) -l$(IMPORT_LIB_CLOGGER)
 
-libgame_loader.a : $(OBJS_GAME_LOADER)
+libgame_loader.a : $(OBJS_GAME_LOADER) $(OBJS_GAMES)
 	@echo "Create static library -- game_loader"
 	ar rcs $@ $^
 
