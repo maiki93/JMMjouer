@@ -63,11 +63,11 @@ test_cmap_game_ptrf: $(MODDIR_GL_TESTS)/test_cmap_game_ptrf.obj $(IMPORT_LIB_CCO
 # libjoueur does not allow to get libcontainer function ? but ok for clogger ?
 test_game_loader: $(MODDIR_GL_TESTS)/test_game_loader.obj $(MODDIR_GAME_LOADER)/cmap_ptrf_game.obj \
 				$(MODDIR_GAME_LOADER)/plugin_manager.obj $(MODDIR_JMMJOUER)/utils_file.obj  $(MODDIR_JMMJOUER)/utils.obj \
-				$(MODDIR_GAME_LOADER)/game_mastermind.obj \
-				$(IMPORT_LIB_CCONTAINER) $(IMPORT_LIB_JOUEUR) $(IMPORT_LIB_CLOGGER)
+				$(MODDIR_GAMES)/default_games.obj $(MODDIR_GAMES)/game_mastermind.obj \
+				$(IMPORT_LIB_CCONTAINER) $(IMPORT_LIB_JOUEUR) $(IMPORT_LIB_CLOGGER) game_pendu_dll.lib
 	@echo "Building test_game_loader @ :    $@"  # target name
 #	$(LINK) $(LFLAGS) /NOIMPLIB /NOEXP /LIBPATH:$(LIB_CMOCKA) cmocka.lib $?
-	$(LINK) $(LFLAGS) $? /LIBPATH:$(LIB_CMOCKA) cmocka.lib
+	$(LINK) $(LFLAGS) $?  /LIBPATH:$(LIB_CMOCKA) cmocka.lib
 
 clean ::
 	del $(MODDIR_GL_TESTS)\*.obj

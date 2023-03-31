@@ -41,17 +41,6 @@ CFLAGS = -Wall -Wextra -pedantic -Wno-variadic-macros -I .
 # gcc c89/90 : -ansi, -std=c90 or -std=iso9899:1990
 STD = -std=c90
 
-# standard gcc defines usually NDEBUG for release code (assert.h affected)
-# code uses internally a JMMJ_DEBUG, defined in preprocessor stage 
-# 	or declare directly here ? better will apply to all files without need to include a common header ?
-ifeq ($(debug),yes)          # separator mandatory between ifeq and '('
-# use specific code for the project, g3 to include MACRO definition as variables
-	CFLAGS += -g3 -O0 -DJMMJ_DEBUG
-else
-# kind of standard with gcc projects
-	CFLAGS += -DNDEBUG -O2
-endif
-
 # search for all *.c files and make *.o files
 # keep for example
 #SRCS := $(wildcard *.c)
@@ -65,6 +54,17 @@ ifeq ($(NO_LIB),0)
 	EXE:= JMMjouer
 else
 	EXE:= JMMjouer_nolib
+endif
+
+# standard gcc defines usually NDEBUG for release code (assert.h affected)
+# code uses internally a JMMJ_DEBUG, defined in preprocessor stage 
+# 	or declare directly here ? better will apply to all files without need to include a common header ?
+ifeq ($(debug),yes)          # separator mandatory between ifeq and '('
+# use specific code for the project, g3 to include MACRO definition as variables
+	CFLAGS += -g3 -O0 -DJMMJ_DEBUG
+else
+# kind of standard with gcc projects
+	CFLAGS += -DNDEBUG -O2
 endif
 
 # inspect variables

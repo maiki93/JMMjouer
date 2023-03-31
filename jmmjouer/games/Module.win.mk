@@ -3,6 +3,12 @@
 
 MODDIR_GAMES := jmmjouer\games
 
+# add default_games.h /.c here ? $(MODDIR_GAMES)/default_games.o
+# must be added to OBJS_GAME_LOADER in order to build fully the library
+OBJS_GAMES += $(MODDIR_GAMES)/game_mastermind.obj $(MODDIR_GAMES)/default_games.obj
+# added to all for no_lib
+OBJS_ALL_STATIC += $(OBJS_GAMES)
+
 $(MODDIR_GAMES)/game_pendu.obj : $(MODDIR_GAMES)/game_pendu.c
 	@echo "Build specific game_pendu in games : $@"
 	$(CC) $(STD) /DwithLIB /Dshared_EXPORTS $(CFLAGS) /c $< /Fo"$(dir $@)"
@@ -16,5 +22,6 @@ game_pendu.dll : $(MODDIR_GAMES)/game_pendu.obj $(MODDIR_JOUEUR)/victory.obj
 game_pendu_dll.lib : game_pendu.dll
 
 clean ::
+	@echo "Clean module games $(MODDIR_GAMES)"
 	del $(MODDIR_GAMES)\*.obj
-#	del game_pendu.dll, game_pendu_dll.lib, game_pendu.exp
+	del game_pendu.dll, game_pendu_dll.lib, game_pendu_dll.exp

@@ -19,7 +19,7 @@ $(OBJS_RECORD): %.obj: %.c
 
 # build dll, but no export so cannot finalize compile (and multiple def...)
 # in fact game loader could be in core, the plugin manager should be apart / reusable
-ADDITIONAL_DEP = $(MODDIR_JMMJOUER)/utils.obj $(MODDIR_JMMJOUER)/utils_file.obj
+ADDITIONAL_DEP = $(OBJS_GAMES) $(MODDIR_JMMJOUER)/utils.obj $(MODDIR_JMMJOUER)/utils_file.obj
 
 # try shared dll with msvc, missing some extern from clist_cstring, BUT LASO utils, utils_file
 #     same as Mingw 
@@ -31,7 +31,7 @@ libgame_loader.dll : $(OBJS_GAME_LOADER) $(ADDITIONAL_DEP) $(IMPORT_LIB_JOUEUR) 
 libgame_loader_dll.lib : libgame_loader.dll
 
 # Static library, compile without -Dshared_EXPORTS
-libgame_loader.lib : $(OBJS_GAME_LOADER)
+libgame_loader.lib : $(OBJS_GAME_LOADER) $(OBJS_GAMES)
 	@echo "Create static library -- game_loader"
 #	link.exe -lib $^ /OUT:libgame_loader.lib
 	$(LINK) /lib $(LFLAGS) $^ /OUT:libgame_loader.lib
@@ -51,6 +51,7 @@ IMPORT_LIB_GAME_LOADER = $(OBJS_GAME_LOADER) # $ADD_REP ?
 endif
 $(info IMPORT_LIB_GAME_LOADER: $(IMPORT_LIB_GAME_LOADER) )
 
+### TU
 include $(MODDIR_GAME_LOADER)\tests\Module_test.win.mk
 
 clean ::

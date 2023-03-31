@@ -1,4 +1,7 @@
-## similar Makefile for use with windows msvc tools
+## 
+# Similar Makefile for use with windows msvc tools
+#
+
 debug = yes
 RELEASE ?= 0
 ifeq ($(RELEASE),1)
@@ -9,17 +12,17 @@ endif
 CC = cl.exe
 # linker
 LINK = link.exe
-
 # ilk files generated, incremental link
 #   https://learn.microsoft.com/en-us/cpp/build/reference/incremental-link-incrementally?view=msvc-170
 # exp files, import/export libraries
 #   https://stackoverflow.com/questions/2727020/what-is-the-use-of-exp-and-what-is-the-difference-between-lib-and-dll
 # 	https://learn.microsoft.com/en-us/cpp/build/reference/working-with-import-libraries-and-export-files?view=msvc-170
 LFLAGS = /nologo
+# finally lib.exe is certainly called at the final stage, more option could choose what to export
 
 # List of subdirectories containing a Module.win.mk file
 # for windows, use all modules and no recursive (!= ming64 for clogger)
-MODULES := clogger ccontainer joueur record # game_loader tests
+MODULES := clogger ccontainer joueur record jmmjouer src_plugin executables # game_loader tests
 
 # Compile source, default name *obj on windows, adviced to keep it
 # /O1, /O2 optimisation , /Ox 'best' optimization'
@@ -97,7 +100,7 @@ $(info $$LIB_DYNAMIC is $(LIB_DYNAMIC) )
 # make all, generic way to use make produce executable JMMjouer
 all: $(EXE) unit_test
 
-
+### FOR TU, possible in windows ?
 
 # general rule for compiling c files when header file is available
 # msvc must extract directory path for option /Fo (output directory)
@@ -111,24 +114,15 @@ all: $(EXE) unit_test
 	@echo "^:   $^" # all dependencies
 	@echo "?:   $?" # all dependencies newer than target
 	@echo "dir from target: $(dir $@)"
-# apply export symbol in all, must use SHARED_LIB to be effective
-#	$(CC) $(STD) $(CFLAGS) /DwithLIB /Dshared_EXPORTS /c $< /Fo"$(dir $@)"
 	$(CC) $(STD) $(CFLAGS) $(SHARED_EXPORT) /c $< /Fo"$(dir $@)"
 
 # general rule, no header file associated (ex. main.c)
 %.obj: %.c
 	@echo "Build file generic rule without header in root:   $@"
-#	$(CC) $(STD) $(CFLAGS) /DwithLIB /Dshared_EXPORTS /c $< /Fo"$(dir $@)"
 	$(CC) $(STD) $(CFLAGS) $(SHARED_EXPORT) /c $< /Fo"$(dir $@)"
 
 # include the description for each module
 include $(patsubst %,%/Module.win.mk,$(MODULES))
-
-# include core in jmmjouer
-include jmmjouer/Module.win.mk
-
-# only for plugins
-include src_plugin/Module.win.mk
 
 # to try generic rule to build TU
 # not possible on windows, depends if linked to static or shared lib, really ?
@@ -144,35 +138,7 @@ $(info == ROOT after include modules ==)
 $(info $$OBJS_ALL_STATIC is $(OBJS_ALL_STATIC) )
 $(info $$OBJS_ALL_TESTS  is $(OBJS_ALL_TESTS) )
 
-#### games ####
-# pendu is a game provided in a shared library, known at link time (no plugin)
-# on windows we (usually) link the lib file. 
-# /LD ou /LDd (debug) to create shared library
-# cl.exe /LD game_morpion.c => produces game_morpion.dll (+lib and exp IF __declspec)
-#
-# may be important
-# link -dll game_morpion.obj => same (lib and exp ONLY IF __declspec is used, some fct or var exprted)
-#
-# finally lib.exe is certainly called at the final stage, could choose what to export
-
-# compile shared library to include at compile-time
-#game_pendu.dll : game_pendu.obj victory.obj
-#	$(LINK) $(LFLAGS) /DLL $^ /IMPLIB:game_pendu.lib /OUT:game_pendu.dll
-
-# compile shared library to include at run-time (game_morpion)
-# windows style, without lib generation for use as a run-time plugin
-#game_morpion.dll : game_morpion.obj victory.obj
-#	$(LINK) $(LFLAGS) /DLL /NOIMPLIB $^ /OUT:game_morpion.dll
-#	cp $@ .\plugins, do not mage to copy Copy-Item
-
 # call clean here and in subdirectories
 clean::
 	echo "Clean in root directory"
-#	del $(OBJS_EXE), main.obj
-# should be done before
-	del JMMjouer.exe, JMMjouer_nolib.exe
-	del game_morpion.obj, game_morpion.dll, \
-		game_morpion.ilk,game_morpion.exp, game_morpion.pdb
-	del game_pendu.obj, game_pendu.lib, game_pendu.dll, game_pendu.exp, \
-		game_pendu.ilk, game_pendu.pdb
 	del vc140.pdb

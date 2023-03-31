@@ -21,8 +21,8 @@ unit_test:: $(EXE_JMMJOUER_TESTS)
 OBJS_NO_ARCADE := $(filter-out jmmjouer/arcade.obj, $(OBJS_JMMJOUER))
 
 # game_pendu.obj not needed anymore to compile
-test_arcade: $(MODDIR_JMMJOUER_TESTS)/test_arcade.obj $(OBJS_NO_ARCADE) \
-		$(IMPORT_LIB_GAME_LOADER) $(IMPORT_LIB_RECORD) $(IMPORT_LIB_JOUEUR) $(IMPORT_LIB_CCONTAINER) $(IMPORT_LIB_CLOGGER)
+test_arcade: $(MODDIR_JMMJOUER_TESTS)/test_arcade.obj $(OBJS_NO_ARCADE) $(MODDIR_GAMES)/default_games.obj $(MODDIR_GAMES)/game_mastermind.obj \
+		$(IMPORT_LIB_GAME_LOADER) $(IMPORT_LIB_RECORD) $(IMPORT_LIB_JOUEUR) $(IMPORT_LIB_CCONTAINER) $(IMPORT_LIB_CLOGGER) game_pendu_dll.lib
 	@echo "Building test_arcade @ :    $@"  # target name
 #	$(LINK) $(LFLAGS) /NOIMPLIB /NOEXP /LIBPATH:$(LIB_CMOCKA) cmocka.lib $?
 	$(LINK) $(LFLAGS) $? /LIBPATH:$(LIB_CMOCKA) cmocka.lib

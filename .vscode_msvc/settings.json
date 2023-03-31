@@ -23,7 +23,10 @@
         "plugin_manager_fwd.h": "c",
         "strings.h": "c",
         "clist_cstring.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "Makefile.win": "makefile",
+        "Makefile.mingw64_gcc": "makefile",
+        "arcade_params.h": "c"
     }, // default
 
     // https://earthly.dev/blog/vscode-make/
@@ -31,6 +34,10 @@
         {
             "name": "Default",
             "makeArgs": []
+        },
+        {
+            "name": "Release",
+            "makeArgs": ["RELEASE=1"]
         },
         {
             "name": "Print make version",
