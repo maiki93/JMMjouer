@@ -18,6 +18,9 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
+/* or better in DoxyFile conf ...*/
+/** \cond  Doxygen_Suprress */
+
 #ifndef _GETOPT_H
 
 #ifndef __need_getopt
@@ -189,5 +192,7 @@ extern int getopt_long_only (int ___argc, char *const *___argv,
 
 /* Make sure we later can get all the definitions and declarations.  */
 #undef __need_getopt
+
+/** \endcond */ /* Doxygen_Supress */
 
 #endif /* getopt.h */

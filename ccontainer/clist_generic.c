@@ -1,52 +1,46 @@
 #include <string.h>
 #include <assert.h>
-/*#include <stdio.h> */ /* only for print, to delete later if use log only */
-/*#include <stdlib.h>*/
 
 #include "ccontainer/clist_generic.h"
 #include "clogger/clogger.h"
 
+/** @file
+    Implementation file
+*/
+
+/** Nodes of the list. 
+ * Structure kept in internal implementation
+ * \private
+ * \ingroup ccontainer_clist_gen_grp
+*/
 struct clist_node {
+    /** value_t contained in the node */
     value_t value;
+    /** pointer to the next clist_node */
     struct clist_node *next_node;
 };
 
+/** @brief Declaration of the list type.
+ * Contains the first node and the actual size of the list.
+ * \ingroup ccontainer_clist_gen_grp
+*/
 struct clist_type {
+    /** First node of the list */
     struct clist_node* first_node;
-    size_t len;  /* not necessary for list */
+    /** Number of actual elements stored in the list, it is not necessary for a list (vs vector)*/
+    size_t len;
     /* todo in specialization of clist_generic, when needed */
     /* pointer on current node for algorithm memorization.. or use internal only : thread-safe reading */
     /* pointer on last node for faster push_back */
 };
 
+/* **** static functions *****/
+/** \cond  Doxygen_Suprress */
 /* a priori all could be const node*, need cast or other technique to check */
 struct clist_node* get_node_last( struct clist_node *fnode );
 struct clist_node* get_next_node( const struct clist_node* current_node);
 struct clist_node* get_node_number( struct clist_node *fnode, size_t elem_nb);
-
-/** methods to create/delete value_t ***/
-/* declare const char* for usage, but cast used to allow the assignment.
-    make value_t.data const char* ? (usage make sense...TODO check) */
-value_t make_value(char *data, size_t len) {
-    value_t value;
-    value.data = data; /* (char*) if pass const char* */
-    value.len = len;
-    return value;
-}
-
-value_t copy_value(const char *data, size_t len) {
-    char *buf = (char*)malloc( len * sizeof(char) );
-    memcpy( buf, data, len);
-    return make_value(buf, len);
-}
-
-void free_value(value_t* value) {
-    if( value && value->data ) {
-        free(value->data);
-        value->data = NULL;
-        value->len = 0;
-    }
-}
+/** \endcond */
 
 /** Constructor/ destructor clist_gen */
 clist_gen_t* clist_gen_new() 
@@ -187,8 +181,8 @@ int clist_gen_find( const clist_gen_t *clist, value_t* value_out,
     return CLIST_NOTFOUND;
 }
 
+/** \cond Suppress_Doxygen */
 /***** Private functions implementation ****/
-/*** private, only dependent of node ? ***/
 struct clist_node* get_next_node(const struct clist_node* current_node) {
     assert( current_node );
     return current_node->next_node;
@@ -218,3 +212,4 @@ struct clist_node* get_node_number( struct clist_node *fnode, size_t elem_nb)
     }
     return curr;
 }
+/** \endcond */

@@ -4,33 +4,43 @@
 #include <assert.h>
 
 #include "irecord_private.h"
-/*#include "file_record_private.h"*/
 #include "clogger/clogger.h"
 
 #include "joueur/cmap_game_victories.h"
 
+/** To avoid warning from assert in release mode. */
 #define _unused(x) ((void)(x))
 
-/* complete declaration of file_record_t */
-/* moved into private header */
+/** Full definition of file_record_t in implementation 
+  \ingroup record_grp */
 typedef struct {
-    irecord_t record_base; /*compose with the structure, allow polymorphism*/
+    /** Compose with the base structure, allow polymorphism */
+    irecord_t record_base;
+    /** name of the text file */
     char *filename; /*like irecord, cannot be const for free / swap style still good*/
-    FILE *fp; /* really needed ? if want to keep the file opened between calls */
+    /** file pointer if we want to keep it open between calls */
+    FILE *fp; /* really needed ? used (windows ok ?) */
 } file_record_t;
 
-
+/** Maximum size of lines in text file. 
+ * \ingroup record_grp */
 enum  { MAX_LINE_SIZE = 50 };
 
 /* warning: useless storage class specifier in empty declaration */
+/** Maximum size of ... ? */
 /*static*/ enum { RECORD_MAX_LINE_SIZE = 50 };
 
-/** private implementation to override base class methods **/
+/** \name private implementation to override base class methods */
+/** \{ */
+/** Return a joueur_t from its name */
 joueur_t __get_joueur_from_name( void *this, const char* name);
-/* to make ovrride of this metod, public API */
+/** Return the number of loaded records in file.
+  To make override of this metod, in public API of irecord */
 size_t count_records(file_record_t *this);
+/** \} */
 
-/** private functions used only internally */
+/* *****************************************/
+/* private functions used only internally */
 static int open_file( file_record_t *this, bool mode_write );
 static void close_file( file_record_t *this );
 static bool search_record_joueur_by_name(file_record_t *this, char *line, const char* name);
