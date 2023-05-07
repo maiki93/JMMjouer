@@ -31,7 +31,7 @@ value_t value_str2 = {"second", 6};
 
 static void initialization_on_stack()
 {
-    // allocation on stack, call constructor
+    // allocation on stack, call only constructor
     clist_gen_t clist;
     clist_gen_init( &clist);
 

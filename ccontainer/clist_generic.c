@@ -80,7 +80,7 @@ void clist_gen_clear(clist_gen_t *clist, deleter_t deleter)
         free( curr_node );
         curr_node = NULL;
         
-        clist->len --;
+        clist->len--;
         curr_node = next_node; 
    } while (curr_node != NULL);
    /* all has been deleted, clist.first_node can be safetly nullified */
