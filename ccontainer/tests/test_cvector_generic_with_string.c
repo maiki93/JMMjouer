@@ -8,9 +8,9 @@
 #include "ccontainer/cvector_generic.h"
 
 /* test values with strings, do not include final \0 */
-static value_t value_str1 = {"first", 5}; /*  */
-static value_t value_str2 = {"second", 6};
-static value_t value_str3 = {.data="tree",.len=4}; /* available C90 */
+static ccontainer_value_t value_str1 = {"first", 5}; /*  */
+static ccontainer_value_t value_str2 = {"second", 6};
+static ccontainer_value_t value_str3 = {.data="tree",.len=4}; /* available C90 */
 
 static void initialization_on_stack()
 {
@@ -107,7 +107,7 @@ static void get_reference()
 {
     ccontainer_err err_code;
     cvector_gen_t cvect;
-    value_t* pvalue_out;
+    ccontainer_value_t* pvalue_out;
     
     // no memory allocation, no error_code
     cvector_gen_init( &cvect );
@@ -115,11 +115,11 @@ static void get_reference()
     cvector_gen_push_back( &cvect, &value_str1 );
     cvector_gen_push_back( &cvect, &value_str2 );
     // out of range
-    pvalue_out = cvector_gen_get_ref( &cvect, 5, &err_code);
+    pvalue_out = cvector_gen_get_at( &cvect, 5, &err_code);
     assert_null( pvalue_out);
     assert_int_equal( CCONTAINER_OUTOFRANGE, err_code);
     // access second elememt
-    pvalue_out = cvector_gen_get_ref( &cvect, 1, &err_code);
+    pvalue_out = cvector_gen_get_at( &cvect, 1, &err_code);
     assert_non_null( pvalue_out);
     assert_int_equal( CCONTAINER_OK, err_code);
     // assert the content is equal
@@ -128,11 +128,11 @@ static void get_reference()
     // assert it point to the correct place
     assert_ptr_equal( &(cvect.array[1]), pvalue_out);
 
-    // cannot do this, must use memory in value_t to modify it
+    // cannot do this, must use memory in ccontainer_value_t to modify it
     //pvalue_out->data = "THIRD";
     //pvalue_out->len = 5;
     // delete pvalue_out
-    // cvector_gen_replace( ) / cvector_gen_insert( index, value_t*)
+    // cvector_gen_replace( ) / cvector_gen_insert( index, ccontainer_value_t*)
 
     //pvalue_out2 = cvector_gen_get_const_ref( &cvect, 1, &err_code);
     // assert the content has been modified
@@ -154,32 +154,36 @@ static void get_copy()
 {
     ccontainer_err err_code;
     cvector_gen_t cvect;
-    value_t value_out = {.data=NULL,.len=0};
-    value_t value_out2 = {.data=NULL,.len=0};
 
+    ccontainer_value_t value_out = {.data=NULL,.len=0};
+    ccontainer_value_t value_out2 = {.data=NULL,.len=0};
+
+    ccontainer_value_t *pvalue_out, *pvalue_out2;
     // no memory allocation, no error_code
     cvector_gen_init( &cvect );
 
     cvector_gen_push_back( &cvect, &value_str1 );
     cvector_gen_push_back( &cvect, &value_str2 );
     // out of range
-    err_code = cvector_gen_get_copy( &cvect, 5, &value_out);
+    pvalue_out = cvector_gen_get_at( &cvect, 5, &err_code);
     assert_int_equal( CCONTAINER_OUTOFRANGE, err_code);
     // access second elememt
-    err_code = cvector_gen_get_copy( &cvect, 1, &value_out);
+    //err_code = cvector_gen_get_at( &cvect, 1, &value_out);
+    pvalue_out = cvector_gen_get_at( &cvect, 1, &err_code);
     assert_int_equal( CCONTAINER_OK, err_code);
     // assert the content is equal
-    assert_int_equal( 6, value_out.len );
-    assert_memory_equal( "second", value_out.data, 6 );
+    assert_int_equal( 6, pvalue_out->len );
+    assert_memory_equal( "second", pvalue_out->data, 6 );
     // delete the copy
     default_deleter_value( &value_out);
 
     // check source vector is not modified
-    err_code = cvector_gen_get_copy( &cvect, 1, &value_out2);
+    //err_code = cvector_gen_get_at( &cvect, 1, &value_out2 );
+    pvalue_out2 = cvector_gen_get_at( &cvect, 1, &err_code);
     assert_int_equal( CCONTAINER_OK, err_code);
     // assert the content is equal
-    assert_int_equal( 6, value_out2.len );
-    assert_memory_equal( "second", value_out2.data, 6 );
+    assert_int_equal( 6, pvalue_out2->len );
+    assert_memory_equal( "second", pvalue_out2->data, 6 );
     // do not forget to delete the copy
     default_deleter_value( &value_out2);
 
@@ -190,7 +194,7 @@ static void swap_2index()
 {
     ccontainer_err err_code;
     cvector_gen_t cvect;
-    value_t* pvalue_out;
+    ccontainer_value_t* pvalue_out;
 
     // no memory allocation, no error_code
     cvector_gen_init( &cvect );
@@ -201,15 +205,15 @@ static void swap_2index()
 
     cvector_gen_swap( &cvect, 0, 2);
 
-    pvalue_out = cvector_gen_get_ref( &cvect, 0, &err_code);
+    pvalue_out = cvector_gen_get_at( &cvect, 0, &err_code);
     assert_int_equal( 4, pvalue_out->len );
     assert_memory_equal( "tree", pvalue_out->data, pvalue_out->len );
 
-    pvalue_out = cvector_gen_get_ref( &cvect, 1, &err_code);
+    pvalue_out = cvector_gen_get_at( &cvect, 1, &err_code);
     assert_int_equal( 6, pvalue_out->len );
     assert_memory_equal( "second", pvalue_out->data, pvalue_out->len );
 
-    pvalue_out = cvector_gen_get_ref( &cvect, 2, &err_code);
+    pvalue_out = cvector_gen_get_at( &cvect, 2, &err_code);
     assert_int_equal( 5, pvalue_out->len );
     assert_memory_equal( "first", pvalue_out->data, pvalue_out->len );
 

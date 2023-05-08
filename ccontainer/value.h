@@ -14,7 +14,7 @@
 */
 
 /**
- * @defgroup ccontainer_value_grp value_t generic structure stored in ccontainer's
+ * @defgroup ccontainer_value_grp ccontainer_value_t generic structure stored in ccontainer's
  * @ingroup ccontainer_grp
  */
 
@@ -32,61 +32,78 @@ typedef struct {
     char *data;
     /** size of data pointed by data */
     size_t len; 
-} value_t;
+} ccontainer_value_t;
 
-/** Used in the destruction of value_t who required memory_allocation, 
- *  must be provide by user of the class  */
-typedef void (*deleter_value_t) (value_t* value);
+/** Function signature for the destruction of ccontainer_value_t whose required memory allocation. 
+ *  It may be provided by the user of the library to overwritte the default deleter ccontainer_value_delete 
+ * \param[in] value_in as source */
+typedef void (*deleter_value_t) (ccontainer_value_t* value);
 
-/** Used as a copy constructor of value_t.
- * value_t defines \ref default_deleter_value_t for shallow copy,
- * but user may provide a deep_copy constructor
- * \param[in] value as source
+/** Function signature for a deep copy of ccontainer_value_t whose required memory allocation.
+ * The \ref default_deleter_value_t makes a shallow copy, but user may provide a deep copy constructor
+ * \param[in] value_in as source
  * \return a copy of the source
  */
-typedef value_t(*duplicater_value_t) (const value_t * value);
+typedef ccontainer_value_t(*duplicater_value_t) (const ccontainer_value_t * value_in);
 
-/** Return a value_t from data input.
-    value_t takes ownership of the data which should not be modified after this call.
+/** Return a ccontainer_value_t from data input.
+    ccontainer_value_t takes ownership of the data which should not be modified after this call.
     \param[in] data : pointer to the data to serialize
     \param[in] len : size of the data
-    \return a value_t which keep ownership of the data    
+    \return a ccontainer_value_t which keep ownership of the data    
 */
-SHARED_EXPORT value_t make_value(char *data, size_t len);
+SHARED_EXPORT ccontainer_value_t ccontainer_make_value(char *data_in, size_t len);
 
-/** Share value_t from value_src with value_dest.
-    value_dest points to the same interal data of value_src, free be called with care
+/** Share ccontainer_value_t from value_src with value_dest.
+    value_dest points to the same interal data of value_src, free must be called with care
     No check performed on initial value_dest, its data may cause memory leak.
-    \param[in] value_dest : pointer to the destination value_t
-    \param[in] value_src : pointer to the source value_t */
-SHARED_EXPORT void copy_value(value_t *value_dest, const value_t *value_src);
+    \param[in] value_dest : pointer to the destination ccontainer_value_t
+    \param[in] value_src : pointer to the source ccontainer_value_t */
+SHARED_EXPORT void ccontainer_copy_value(ccontainer_value_t *value_dest, const ccontainer_value_t *value_src);
 
-/** Transfert data from one value_t to an other.
+/** Transfert data from one ccontainer_value_t to an other.
     value_dest takes ownership of the internal data stored in value_src, 
-    Free should not be called on value_src after the call !
+    Free should not be called on value_src after the call
     No check performed on initial value_dest, its data may cause memory leak.
     \post value_src.data = NULL && len == 0
-    \param[in] value_dest : pointer to the destination value_t
-    return value_t : value with stolen data of the source */
-SHARED_EXPORT value_t move_value(value_t *value_src);
+    \param[in] value_dest : pointer to the destination ccontainer_value_t
+    \return ccontainer_value_t : value with stolen data of the source */
+SHARED_EXPORT ccontainer_value_t ccontainer_move_value(ccontainer_value_t *value_src);
 
-/** Free memory on a value_t.
- * \deprecated default_deleter_value is equivalent
+/** Reset ccontainer_value_t.
+  No check are done if previous memory is allocated.
+  It is mainly a shortcut and more applicable to :
+  ccontainer_value_t value = {.data = NULL,.len = 0}
+  Use ccontainer_delete_value to free dynamically allocated memory
+  \post value_in_out.data = NULL && len == 0
+  \param[in] value_in_out : pointer to the ccontainer_value_t to reset
+*/
+SHARED_EXPORT void ccontainer_reset_value(ccontainer_value_t *value_in_out);
+
+/** Reset by deleting allocated memory by value_in.data.
  * \post value_in.data = NULL && len = 0
- * \param[in] value_in : pointer to the destination value_t */
-SHARED_EXPORT void free_value(value_t *value_in);
+ * \param[in] value_in_out : pointer to the ccontainer_value_t
+*/
+SHARED_EXPORT void ccontainer_delete_value(ccontainer_value_t *value_in_out);
+
+/** Free memory on a ccontainer_value_t.
+ * delete_value : destructor ??
+ * \deprecated default_deleter_value is equivalent
+ * \post value is not usuable, can only call value_in = NULL if passed from a pointer
+ * \param[in] value_in : pointer to the ccontainer_value_t de deallocate */
+SHARED_EXPORT void ccontainer_free_value(ccontainer_value_t *value);
 
 /** \todo Use only one function : default_free_value / default_copy_value
  *      default_deleter_value
  */
 
-/** Create a value_t copy of the input data.
+/** Create a ccontainer_value_t copy of the input data.
  * Default implementation makes a bytes-to-bytes copy of the array data of length len.
  * If value_in contains pointers to heap allocated memory, the copy will point to the same memory.
    \param[in] value_in source
-   \return a new value_t
+   \return a new ccontainer_value_t
 */
-SHARED_EXPORT value_t default_duplicater_value(const value_t* value_in);
+SHARED_EXPORT ccontainer_value_t default_duplicater_value(const ccontainer_value_t* value_in);
 
 /* why not copy_value(value_t *) ? more explicit ! (use with cast of arguments maybe ?)*/
 
@@ -96,7 +113,7 @@ SHARED_EXPORT value_t default_duplicater_value(const value_t* value_in);
  *      may specify a specific deleter to overidde this behaviour
  * \post value.len == 0 && value.data == NULL
 */
-SHARED_EXPORT void default_deleter_value(value_t* value);
+SHARED_EXPORT void default_deleter_value(ccontainer_value_t* value);
 
 #ifdef __cplusplus
 }

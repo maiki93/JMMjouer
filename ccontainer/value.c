@@ -1,43 +1,56 @@
 
 #include "ccontainer/value.h"
 #include "string.h"
+#include "assert.h"
 
-/** methods to create/delete value_t ***/
-/* declare const char* for usage, but cast used to allow the assignment.
-    make value_t.data const char* ? (usage make sense...TODO check) */
-value_t make_value(char *data, size_t len) {
-    value_t value;
+/* methods to create/delete ccontainer_value_t */
+ccontainer_value_t ccontainer_make_value(char *data, size_t len) {
+    ccontainer_value_t value;
+    assert( data != NULL );
     value.data = data; /* (char*) if pass const char* */
     value.len = len;
     return value;
 }
 
-void copy_value(value_t *value_dest, const value_t *value_src)
+void ccontainer_copy_value(ccontainer_value_t *value_dest, const ccontainer_value_t *value_src)
 {
-    memcpy(value_dest, value_src, sizeof(value_t));
+    memcpy(value_dest, value_src, sizeof(ccontainer_value_t));
 }
 
-value_t move_value(value_t *value_src)
+ccontainer_value_t ccontainer_move_value(ccontainer_value_t *value_src)
 {
-    value_t value_out;
-    memcpy(&value_out, value_src, sizeof(value_t));
+    ccontainer_value_t value_out;
+    memcpy(&value_out, value_src, sizeof(ccontainer_value_t));
     /* invalidate the source */
     value_src->data = NULL;
     value_src->len = 0;
     return value_out;
 }
 
-void free_value(value_t *value_in)
+void ccontainer_reset_value(ccontainer_value_t *value_in_out)
 {
-    if( value_in->data)
-        free(value_in->data);
-    value_in->data = NULL;
-    value_in->len = 0;
+    value_in_out->data = NULL;
+    value_in_out->len = 0;
+}
+
+void ccontainer_delete_value(ccontainer_value_t *value_in_out)
+{
+    if( value_in_out && value_in_out->data)
+        free(value_in_out->data);
+    value_in_out->data = NULL;
+    value_in_out->len = 0;
+}
+
+/* delete_value : destructor */
+void ccontainer_free_value(ccontainer_value_t *value_in)
+{
+    ccontainer_delete_value( value_in );
+    free( value_in ); 
 }
 
 
-value_t default_duplicater_value(const value_t* value_in) {
-    value_t value_out;
+ccontainer_value_t default_duplicater_value(const ccontainer_value_t* value_in) {
+    ccontainer_value_t value_out;
     char *buf = (char*)malloc( value_in->len * sizeof(char) );
     /* testing allocation error, need (some) error_code */
     memcpy( buf, value_in->data, value_in->len);
@@ -47,10 +60,14 @@ value_t default_duplicater_value(const value_t* value_in) {
     return value_out;
 }
 
-void default_deleter_value(value_t* value) {
+
+void default_deleter_value(ccontainer_value_t* value) {
+    ccontainer_delete_value( value );
+    /*
     if( value && value->data ) {
         free(value->data);
         value->data = NULL;
         value->len = 0;
     }
+    */
 }

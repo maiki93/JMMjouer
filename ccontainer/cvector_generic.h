@@ -9,9 +9,9 @@
 /** \file
  * Generic implementation of a C-vector container with dynamic size (re-)allocation.
  * 
- * Try to Follow functionalities and interfaces similar to a std::vector with \ref value_t elements.
+ * Try to Follow functionalities and interfaces similar to a std::vector with \ref ccontainer_value_t elements.
  * 
- * value_t may contain pointer to dynamically allocated memory, 
+ * ccontainer_value_t may contain pointer to dynamically allocated memory, 
  * 
  * Declare complete structure in header first, 
  *  it would allow better performance ? construction on stack(more carray in fact) ? for tests.
@@ -19,15 +19,15 @@
 */
 
 /**
- * \defgroup ccontainer_cvector_gen_grp Dynamic vector with generic value_t
+ * \defgroup ccontainer_cvector_gen_grp dynamic array with generic elements
  * \ingroup ccontainer_grp
 */
 
 /** @{ \ingroup ccontainer_cvector_gen_grp */
 
-/** Internal structure : array of generic value_t */
+/** Internal structure : array of generic ccontainer_value_t */
 typedef struct {
-    value_t *array;
+    ccontainer_value_t *array;
     size_t capacity;
     size_t len;
     deleter_value_t ptrf_deleter;
@@ -88,7 +88,7 @@ SHARED_EXPORT void cvector_gen_free(cvector_gen_t *cvect);
 /** \@{ 
  * \name Specific destructor and copy constructor for specific implementation
 */
-/** Apply user defined destructor to value_t.
+/** Apply user defined destructor to ccontainer_value_t.
  * Replace the default implementation \ref default_deleter_value()
  * \param[in] cvect pointer to a cvector_gen_t instance
  * \param[in] function with signature void(value_t *value)
@@ -110,23 +110,24 @@ SHARED_EXPORT void cvector_gen_clear(cvector_gen_t *cvect);
 /** Make a copy of the input value at the end of the vector.
  * Vector grows dynamically if necessary by increasing the capacity.
  * \param[in] cvect pointer to a cvector_gen_t instance
- * \param[in] value_in input value_t to insert
+ * \param[in] value_in input ccontainer_value_t to insert
 */
-SHARED_EXPORT ccontainer_err cvector_gen_push_back(cvector_gen_t *cvect, const value_t *value_in);
+SHARED_EXPORT ccontainer_err cvector_gen_push_back(cvector_gen_t *cvect, const ccontainer_value_t *value_in);
 /* copy of the input is more explicit ? but pointer to struct copy (16bytes)*/
-/* SHARED_EXPORT ccontainer_err cvector_gen_push_back(cvector_gen_t *cvect, value_t value_in); */
+/* SHARED_EXPORT ccontainer_err cvector_gen_push_back(cvector_gen_t *cvect, ccontainer_value_t value_in); */
 
-/** Retrive value_t at position given by indice.
+/** Retrive ccontainer_value_t at position given by indice.
  * Should return if error or keep return value and erro_code as a output parameter
+ * More flexible if pass value_out as pointer, alllow allocation on heap or stack ? only intermediate...(except string)
  * \param[in] cvect pointer to a cvector_gen_t instance
  * \param[in] index position of the elemnt to retrieve [0,len-1]
  * \param[in] err_code error_code status returned by function
- * \return pointer associated to the value_t element in the vector
+ * \return pointer associated to the ccontainer_value_t element in the vector
 */
-SHARED_EXPORT value_t* cvector_gen_get_ref(cvector_gen_t *cvect, size_t index, ccontainer_err* err_code);
+SHARED_EXPORT ccontainer_value_t* cvector_gen_get_at(const cvector_gen_t *cvect, size_t index, ccontainer_err* err_code);
 /* SHARED_EXPORT const value_t* cvector_gen_get_const_ref(cvector_gen_t *cvect, size_t index, ccontainer_err* err_code); */
 /* const value_t* , cannot modify the content */
-SHARED_EXPORT ccontainer_err cvector_gen_get_copy(cvector_gen_t *cvect, size_t index, value_t* value_out);
+/* SHARED_EXPORT ccontainer_err cvector_gen_get_copy(cvector_gen_t *cvect, size_t index, value_t* value_out); */
 /*
 SHARED_EXPORT CCONTAINER_ERR cvector_gen_get_ref(cvector_gen_t *cvect, size_t indice, value_t** value_out);
 SHARED_EXPORT CCONTAINER_ERR cvector_gen_get_copy(cvector_gen_t *cvect, size_t indice, value_t** value_out);
@@ -139,8 +140,8 @@ SHARED_EXPORT CCONTAINER_ERR cvector_gen_get_copy(cvector_gen_t *cvect, size_t i
 */
 SHARED_EXPORT void cvector_gen_swap(cvector_gen_t *cvect, size_t index1, size_t index2);
 
-SHARED_EXPORT size_t cvector_gen_size(cvector_gen_t *cvect);
-SHARED_EXPORT size_t cvector_gen_capacity(cvector_gen_t *cvect);
+SHARED_EXPORT size_t cvector_gen_size(const cvector_gen_t *cvect);
+SHARED_EXPORT size_t cvector_gen_capacity(const cvector_gen_t *cvect);
 SHARED_EXPORT ccontainer_err cvector_gen_set_capacity(cvector_gen_t *cvect, size_t new_size);
 
 #ifdef __cplusplus
