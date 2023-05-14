@@ -17,7 +17,7 @@ void cvector_gen_init( cvector_gen_t* cvect )
     cvect->capacity = 0;
     cvect->len = 0;
     /* default copy and destructor */
-    cvect->ptrf_deleter = default_deleter_value;
+    cvect->ptrf_deleter = ccontainer_delete_value;
     cvect->ptrf_duplicater = default_duplicater_value;
 }
 
@@ -33,7 +33,7 @@ ccontainer_err cvector_gen_init_with_capacity( cvector_gen_t* cvect, size_t init
     cvect->capacity = init_capacity;
     cvect->len = 0;
     /* default copy and destructor */
-    cvect->ptrf_deleter = default_deleter_value;
+    cvect->ptrf_deleter = ccontainer_delete_value;
     cvect->ptrf_duplicater = default_duplicater_value;
     return CCONTAINER_OK;
 }
@@ -42,14 +42,12 @@ void cvector_gen_delete( cvector_gen_t* cvect )
 {
     if( !cvect )
         return;
-
     /* free memory allocated by all valid ccontainer_value_t (size) */
     if( cvect->len > 0 )
         cvector_gen_clear(cvect);
     /* free memory of the array of ccontainer_value_t (capacity) */
     if( cvect->array )
         free(cvect->array);
-
     /* not necessary, will be invalidated by free but safer if retest */
     cvect->array = NULL;
     cvect->capacity = 0;
@@ -113,21 +111,12 @@ ccontainer_err cvector_gen_set_capacity(cvector_gen_t *cvect, size_t new_capacit
     /* copy previous content, copy byte-to-byte respect values and/or pointer */
     if( cvect->array ) {
         for(i = 0; i< cvect->len; i++)
-            /*tmp[i] = (*cvect->ptrf_duplicater)( cvect->array + i );*/
             tmp[i] = ccontainer_move_value( cvect->array + i );
+        /* deallocate previous array */
+        free( cvect->array );
     }
 
-    /* free previous value_t in array properly */
-    /* cvector_gen_delete( cvect );  // will delete the string associated */
-    /* with move no need of deleting */
-    /*
-    for(i = 0; i< cvect->len; i++ ) {
-        free_value( cvect->array + i );
-    }*/
-    if( cvect->array )
-        free( cvect->array );
-
-    /* reset new attributes of cvect, len does not change */
+    /* reset new attributes of cvect with the new capacity, len does not change */
     cvect->array = tmp;
     cvect->len = memo_len;
     cvect->capacity = new_capacity;
@@ -143,8 +132,8 @@ ccontainer_err cvector_gen_push_back(cvector_gen_t *cvect, const ccontainer_valu
     }
 
     assert( cvect->capacity >= cvect->len);
-    /* copy byte to byte value_in at the last position of the array */
-    /*cvect->array[cvect->len] = (*cvect->ptrf_duplicater)(value_in);*/
+    /* copy byte to byte value_in at the last position of the array 
+        ownership is transfered to the vector, move possible */
     ccontainer_copy_value( cvect->array + cvect->len, value_in);
     cvect->len++;
 
@@ -160,8 +149,7 @@ ccontainer_value_t* cvector_gen_get_at(const cvector_gen_t *cvect, size_t index,
         return NULL;
     }
     *err_code = CCONTAINER_OK;
-    /*return &(cvect->array[index]); */ /* <=> array + index */
-    return cvect->array + index;
+    return cvect->array + index; /* <=> &(cvect->array[index]) */
 }
 /* to delete
 ccontainer_err cvector_gen_get_copy(cvector_gen_t *cvect, size_t index, value_t* value_out)

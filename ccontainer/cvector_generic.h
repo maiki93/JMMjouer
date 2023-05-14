@@ -25,14 +25,16 @@
 
 /** @{ \ingroup ccontainer_cvector_gen_grp */
 
-/** Internal structure : array of generic ccontainer_value_t */
+/** Internal structure : an array of generic ccontainer_value_t. */
 typedef struct {
     ccontainer_value_t *array;
     size_t capacity;
     size_t len;
-    deleter_value_t ptrf_deleter;
-    duplicater_value_t ptrf_duplicater;
+    /* to suppress in generic ? or not too bad here */
+    deleter_value_t ptrf_deleter;  /* only for delete / free / remove */
+    duplicater_value_t ptrf_duplicater; /* only for copy_constructor */
 } cvector_gen_t;
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,7 +42,7 @@ extern "C" {
 
 /** \name Constructor/Destructor */
 /** @{ */
-/** Memory Allocation. 
+/** Memory Allocation of a cvector on heap. 
  * Caller must check that the return pointer is not NULL
 */
 SHARED_EXPORT cvector_gen_t* cvector_gen_new();
@@ -107,8 +109,10 @@ SHARED_EXPORT void cvector_gen_set_duplicater( cvector_gen_t *cvect, duplicater_
   \param[in] cvect pointer to a cvector_gen_t instance */
 SHARED_EXPORT void cvector_gen_clear(cvector_gen_t *cvect);
 
-/** Make a copy of the input value at the end of the vector.
- * Vector grows dynamically if necessary by increasing the capacity.
+/** Transfer the input ccontainer_value_t at the end of the vector.
+ * Vector grows dynamically if necessary by increasing its capacity.
+ * After the call value_in is not responsible anymore of the memory allocated, must not be freed.
+ * Maybe better to force a move (in implementation) and make it clearer in interface.
  * \param[in] cvect pointer to a cvector_gen_t instance
  * \param[in] value_in input ccontainer_value_t to insert
 */

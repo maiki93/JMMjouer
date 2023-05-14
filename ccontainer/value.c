@@ -1,15 +1,38 @@
 
 #include "ccontainer/value.h"
+/*#include "ccontainer/error_code.h"*/
 #include "string.h"
 #include "assert.h"
 
 /* methods to create/delete ccontainer_value_t */
+/*
 ccontainer_value_t ccontainer_make_value(char *data, size_t len) {
     ccontainer_value_t value;
     assert( data != NULL );
-    value.data = data; /* (char*) if pass const char* */
+    value.data = data; // (char*) if pass const char*
     value.len = len;
     return value;
+}
+*/
+ccontainer_value_t ccontainer_make_value(char *data, size_t len, ccontainer_err *err_code) 
+{
+    ccontainer_value_t value_out;
+    char *tmp_string;
+
+    assert( data != NULL );
+    
+    tmp_string = (char *)malloc( len );
+    if( !tmp_string ) {
+        *err_code = CCONTAINER_ALLOCERR;
+        ccontainer_reset_value(&value_out); /* to assur data pointer is NULL */
+        return value_out;
+    }
+    memcpy(tmp_string, data, len);
+
+    value_out.data = tmp_string; /* (char*) if pass const char* */
+    value_out.len = len;
+    *err_code = CCONTAINER_OK;
+    return value_out;
 }
 
 void ccontainer_copy_value(ccontainer_value_t *value_dest, const ccontainer_value_t *value_src)
@@ -60,14 +83,7 @@ ccontainer_value_t default_duplicater_value(const ccontainer_value_t* value_in) 
     return value_out;
 }
 
-
+/*
 void default_deleter_value(ccontainer_value_t* value) {
     ccontainer_delete_value( value );
-    /*
-    if( value && value->data ) {
-        free(value->data);
-        value->data = NULL;
-        value->len = 0;
-    }
-    */
-}
+}*/

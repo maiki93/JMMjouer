@@ -1,7 +1,5 @@
 
 MODDIR_CCONTAINER := ccontainer
-# default, overwritten if present in LIB_STATIC
-#IMPORT_LIB_CCONTAINER = libccontainer_dll.lib
 
 SRCS_CCONTAINER := $(wildcard $(MODDIR_CCONTAINER)/*.c)
 OBJS_CCONTAINER := $(patsubst %.c, %.o, $(SRCS_CCONTAINER))

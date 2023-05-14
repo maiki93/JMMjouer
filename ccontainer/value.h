@@ -1,16 +1,17 @@
 #pragma once
 
+#include "ccontainer/error_code.h"
+#include "stdlib.h" /* size_t */
+
 #include "shared_EXPORTS.h"
-#include "stdlib.h"
 
 /* Do not know where best place to define defgroup ccontainer, 
     a page of doxygen documentation maybe */
 /** @defgroup ccontainer_grp generic C-style containers */
 
-/** @file 
+/** @file
  * Basic building structure to be inserted in all ccontainer's.
  * Storing an array of char with its length is generic enought to store any structure.
- *
 */
 
 /**
@@ -28,9 +29,9 @@ extern "C" {
     Can store any serializable type or data structure
     \ingroup ccontainer_value_grp */
 typedef struct {
-    /** pointer to a serializable structure */
+    /** pointer to serialized data */
     char *data;
-    /** size of data pointed by data */
+    /** size of the data array */
     size_t len; 
 } ccontainer_value_t;
 
@@ -52,7 +53,7 @@ typedef ccontainer_value_t(*duplicater_value_t) (const ccontainer_value_t * valu
     \param[in] len : size of the data
     \return a ccontainer_value_t which keep ownership of the data    
 */
-SHARED_EXPORT ccontainer_value_t ccontainer_make_value(char *data_in, size_t len);
+SHARED_EXPORT ccontainer_value_t ccontainer_make_value(char *data_in, size_t len, ccontainer_err *err_code);
 
 /** Share ccontainer_value_t from value_src with value_dest.
     value_dest points to the same interal data of value_src, free must be called with care
@@ -113,7 +114,7 @@ SHARED_EXPORT ccontainer_value_t default_duplicater_value(const ccontainer_value
  *      may specify a specific deleter to overidde this behaviour
  * \post value.len == 0 && value.data == NULL
 */
-SHARED_EXPORT void default_deleter_value(ccontainer_value_t* value);
+/* SHARED_EXPORT void default_deleter_value(ccontainer_value_t* value); */
 
 #ifdef __cplusplus
 }

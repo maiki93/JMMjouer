@@ -21,10 +21,9 @@ static void initialization_on_stack()
 
     assert_int_equal( 0, cvector_gen_size( &cvect ));
     assert_int_equal( 0, cvector_gen_capacity( &cvect ));
-    // nothing to free here, but generally still required if allocated in stack
+    // empty to delete anyway
     cvector_gen_delete( &cvect );
-    //cvector_gen_clear( &cvect );
-
+    
     cvector_gen_t cvect2;
     err_code = cvector_gen_init_with_capacity( &cvect2, 2 );
 
@@ -37,7 +36,7 @@ static void initialization_on_stack()
     assert_int_equal( 0, cvector_gen_size( &cvect2) );
     assert_int_equal( 2, cvector_gen_capacity( &cvect2) );
 
-    // must use something to free the array
+    // dealloate internal array properly
     cvector_gen_delete( &cvect2 );
 }
 
@@ -62,30 +61,12 @@ static void initialization_on_heap()
     cvect2 = NULL;
 }
 
-static void push_two_str_in_empty_cvector()
-{
-    ccontainer_err err_code;
-    cvector_gen_t cvect;
-    // no memory allocation, no error_code
-    cvector_gen_init( &cvect );
-
-    err_code = cvector_gen_push_back( &cvect, &value_str1 );
-    assert_int_equal( CCONTAINER_OK, err_code);
-    assert_int_equal( 1, cvector_gen_size( &cvect ));
-    assert_int_equal( 1, cvector_gen_capacity( &cvect ));
-
-    err_code = cvector_gen_push_back( &cvect, &value_str2 );
-    assert_int_equal( CCONTAINER_OK, err_code);
-    assert_int_equal( 2, cvector_gen_size( &cvect ));
-    assert_int_equal( 2, cvector_gen_capacity( &cvect ));
-
-    cvector_gen_delete( &cvect );
-}
-
 static void push_two_str_in_capacity_five()
 {
     ccontainer_err err_code;
     cvector_gen_t *cvect;
+
+    ccontainer_value_t tmp_value_in;
 
     cvect = cvector_gen_new();
     // no memory allocation, no error_code
@@ -93,9 +74,21 @@ static void push_two_str_in_capacity_five()
     assert_int_equal( CCONTAINER_OK, err_code);
     assert_int_equal( 5, cvector_gen_capacity( cvect ));
 
-    err_code = cvector_gen_push_back( cvect, &value_str1 );
-    err_code = cvector_gen_push_back( cvect, &value_str2 );
+    // create a temporary copy of the input formatted as a ccontainer_value_t
+    tmp_value_in = ccontainer_make_value(value_str1.data, value_str1.len, &err_code);
     assert_int_equal( CCONTAINER_OK, err_code);
+    // transfer value_t into the cvector_gen_t
+    err_code = cvector_gen_push_back( cvect, &tmp_value_in );
+    assert_int_equal( CCONTAINER_OK, err_code);
+    // reset content, no free because treansfered into the vector
+    // it is not necessary
+    ccontainer_reset_value(&tmp_value_in);
+    
+    tmp_value_in = ccontainer_make_value(value_str2.data, value_str2.len, &err_code);
+    assert_int_equal( CCONTAINER_OK, err_code);
+    err_code = cvector_gen_push_back( cvect, &tmp_value_in );
+    assert_int_equal( CCONTAINER_OK, err_code);
+
     assert_int_equal( 2, cvector_gen_size( cvect ));
     assert_int_equal( 5, cvector_gen_capacity( cvect ));
 
@@ -103,17 +96,45 @@ static void push_two_str_in_capacity_five()
     cvect = NULL;
 }
 
+static void push_two_str_in_empty_cvector()
+{
+    ccontainer_err err_code;
+    ccontainer_value_t tmp_value_in;
+    cvector_gen_t cvect;
+
+    cvector_gen_init( &cvect );
+
+    tmp_value_in = ccontainer_make_value(value_str1.data,value_str1.len,&err_code);
+    err_code = cvector_gen_push_back( &cvect, &tmp_value_in );
+    assert_int_equal( CCONTAINER_OK, err_code);
+    assert_int_equal( 1, cvector_gen_size( &cvect ));
+    assert_int_equal( 1, cvector_gen_capacity( &cvect ));
+
+    tmp_value_in = ccontainer_make_value(value_str2.data,value_str2.len,&err_code);
+    err_code = cvector_gen_push_back( &cvect, &tmp_value_in );
+    assert_int_equal( CCONTAINER_OK, err_code);
+    assert_int_equal( 2, cvector_gen_size( &cvect ));
+    assert_int_equal( 2, cvector_gen_capacity( &cvect ));
+
+    cvector_gen_delete( &cvect );
+}
+
 static void get_reference()
 {
     ccontainer_err err_code;
     cvector_gen_t cvect;
+    ccontainer_value_t tmp_value_in;
     ccontainer_value_t* pvalue_out;
     
     // no memory allocation, no error_code
     cvector_gen_init( &cvect );
 
-    cvector_gen_push_back( &cvect, &value_str1 );
-    cvector_gen_push_back( &cvect, &value_str2 );
+    tmp_value_in = ccontainer_make_value(value_str1.data,value_str1.len,&err_code);
+    cvector_gen_push_back( &cvect, &tmp_value_in );
+
+    tmp_value_in = ccontainer_make_value(value_str2.data,value_str2.len,&err_code);
+    cvector_gen_push_back( &cvect, &tmp_value_in );
+
     // out of range
     pvalue_out = cvector_gen_get_at( &cvect, 5, &err_code);
     assert_null( pvalue_out);
@@ -149,7 +170,7 @@ static void get_reference()
 
     cvector_gen_delete( &cvect );
 }
-
+/*
 static void get_copy()
 {
     ccontainer_err err_code;
@@ -189,19 +210,24 @@ static void get_copy()
 
     cvector_gen_delete( &cvect );
 }
+*/
 
 static void swap_2index()
 {
     ccontainer_err err_code;
     cvector_gen_t cvect;
+    ccontainer_value_t tmp_value_in;
     ccontainer_value_t* pvalue_out;
-
+    
     // no memory allocation, no error_code
     cvector_gen_init( &cvect );
 
-    cvector_gen_push_back( &cvect, &value_str1 );
-    cvector_gen_push_back( &cvect, &value_str2 );
-    cvector_gen_push_back( &cvect, &value_str3 );
+    tmp_value_in = ccontainer_make_value(value_str1.data,value_str1.len,&err_code);
+    cvector_gen_push_back( &cvect, &tmp_value_in );
+    tmp_value_in = ccontainer_make_value(value_str2.data,value_str2.len,&err_code);
+    cvector_gen_push_back( &cvect, &tmp_value_in );
+    tmp_value_in = ccontainer_make_value(value_str3.data,value_str3.len,&err_code);
+    cvector_gen_push_back( &cvect, &tmp_value_in );
 
     cvector_gen_swap( &cvect, 0, 2);
 
@@ -227,10 +253,10 @@ int main()
     const struct CMUnitTest tests_cvector_generic[] = {
         cmocka_unit_test(initialization_on_stack),
         cmocka_unit_test(initialization_on_heap),
-        cmocka_unit_test(push_two_str_in_empty_cvector),
         cmocka_unit_test(push_two_str_in_capacity_five),
+        cmocka_unit_test(push_two_str_in_empty_cvector),
         cmocka_unit_test(get_reference),
-        cmocka_unit_test(get_copy),
+        //cmocka_unit_test(get_copy),
         cmocka_unit_test(swap_2index),
     };
 

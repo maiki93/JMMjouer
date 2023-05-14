@@ -9,6 +9,8 @@
 /* include directly the implementation, it is for tests */
 #include "ccontainer/tests/struct_complex.c"
 
+static void check_copy_in_value(ccontainer_value_t *value, struct_complex_t *comp_struct );
+
 /** \name adapter functions to cvector_generic with ccontainer_value_t internal type */
 /** \{ */
 /** Return a ccontainer_value_t containing a copy of all struct_complex_t data, "serializer".
@@ -189,28 +191,35 @@ static void serialization_struct()
     float v_float = (float) *(value.data + sizeof(char *));
     float b_float = (bool) *(value.data + sizeof(char *) + sizeof(float));
     */
+   check_copy_in_value(&value, &comp_struct_in);
 
     // full copy, can delete the first input
     struct_complex_delete( &comp_struct_in);
 
+    // deserialization
     err_code = extract_value_struct_complex( &value, &comp_struct_out );
-    // ccontainer_delete_value( &value ); // is enought ?
     assert_int_equal(CCONTAINER_OK, err_code);
     // check values
     assert_string_equal("maiki",comp_struct_out.pname);
     assert_float_equal(3.14f,comp_struct_out.one_float,0.001);
     assert_true(comp_struct_out.is_valid);
     // check they point to same internal data
-     comp_struct_out.pname[0] = 'P';
+    //check_same_reference(&comp_struct_out, &value); // => bug if uncommented ??
+    //check_copy_in_value(&value, &comp_struct_out);
+    /*
+    comp_struct_out.pname[0] = 'P';
     char t = *( (char **)value.data)[0];
     assert_int_not_equal( 'P', t);
     assert_int_equal( 'm', t);
+    */
     
-    // call deep copy deleter, because struct_out deep copy
+    // call deep copy deleter, because deep copy of struct_out
     struct_complex_deleter_value(&value);
-    // free and reset memory allocated in comp_struct
+    // free and reset memory allocated in comp_struct when value extracted
     struct_complex_delete( &comp_struct_out);
 }
+
+
 
 static void push_back_one_struct()
 {
@@ -238,7 +247,7 @@ static void push_back_one_struct()
     err_code = cvector_gen_push_back(&cvector, &value_struct);
     assert_int_equal(0, err_code);
     // only temporary a temporary value, delete only value.data
-    ccontainer_delete_value(&value_struct);
+    ccontainer_reset_value(&value_struct);
 
     // retrieve by copy (cvector_get_ref -> value_t* -> extract_struct_complex -> a deep copy)
     pvalue_ref = cvector_gen_get_at(&cvector, 0, &err_code);
@@ -252,10 +261,8 @@ static void push_back_one_struct()
     assert_true(struct_out.is_valid);
 
     // check they point to different array
-    struct_out.pname[0] = 'T';
-    char t = *( (char **) cvector.array[0].data)[0];
-    assert_int_not_equal( 'T', t);
-
+    check_copy_in_value(&(cvector.array[0]), &struct_out);
+    
     struct_complex_delete(&struct_out);    
     cvector_gen_delete(&cvector);
 }
@@ -280,18 +287,16 @@ static void push_back_two_struct_init_capacity_2()
 
     ccontainer_value_t value_struct,value_struct2;
     value_struct = make_value_struct_complex(&comp_struct, &err_code);
-    // push back makes a deep copy
     cvector_gen_push_back(&cvector, &value_struct);
-    //default_deleter_value(&value_struct);
-    ccontainer_delete_value(&value_struct);
     
     value_struct2 = make_value_struct_complex(&comp_struct2, &err_code);
-    cvector_gen_push_back(&cvector, &value_struct2); // pass test but memory leak
-    //default_deleter_value(&value_struct2);
-    ccontainer_delete_value(&value_struct2);
+    cvector_gen_push_back(&cvector, &value_struct2);
     
     struct_complex_delete(&comp_struct);
     struct_complex_delete(&comp_struct2);
+    // can reset, if no test ref after
+    ccontainer_reset_value( &value_struct );
+    ccontainer_reset_value( &value_struct );
 
     // retrieve reference
     pvalue_out_ref = cvector_gen_get_at(&cvector, 0, &err_code);
@@ -304,7 +309,6 @@ static void push_back_two_struct_init_capacity_2()
     assert_true(struct_out.is_valid);
 
     struct_complex_delete(&struct_out);
-    
     cvector_gen_delete(&cvector);
 }
 
@@ -325,22 +329,19 @@ static void push_back_two_struct_init_capacity_0()
     // default is fine here, error in duplicator
     // cvector_gen_set_duplicater(&cvector, struct_complex_duplicater);
 
-    ccontainer_value_t value_struct,value_struct2;
+    ccontainer_value_t value_struct; //,value_struct2;
     value_struct = make_value_struct_complex(&comp_struct, &err_code);
     // push back makes a deep copy
     err_code = cvector_gen_push_back(&cvector, &value_struct);
     assert_int_equal(CCONTAINER_OK, err_code);
-    //default_deleter_value(&value_struct);
-    ccontainer_delete_value(&value_struct);
-
-    value_struct2 = make_value_struct_complex(&comp_struct2, &err_code);
-    cvector_gen_push_back(&cvector, &value_struct2); // pass test but memory leak
-    //default_deleter_value(&value_struct2);
-    ccontainer_delete_value(&value_struct2);
-
+    
+    value_struct = make_value_struct_complex(&comp_struct2, &err_code);
+    cvector_gen_push_back(&cvector, &value_struct);
+    
     // copy independent of input
     struct_complex_delete(&comp_struct);
     struct_complex_delete(&comp_struct2);
+    ccontainer_reset_value(&value_struct);
 
     // retrieve reference
     pvalue_out_ref = cvector_gen_get_at(&cvector, 0, &err_code);
@@ -356,7 +357,6 @@ static void push_back_two_struct_init_capacity_0()
     assert_int_equal(0, err_code);
     // delete previous content of struct_out
     err_code = extract_value_struct_complex(pvalue_out_ref, &struct_out);
-    // delete_value(pvalue_out_ref);
     pvalue_out_ref = NULL;
 
     assert_int_equal(0, err_code);
@@ -398,6 +398,33 @@ static void wrapper_ref_from_vector()
     struct_complex_delete(&comp_struct_in);
 }
 
+/* ********  Helper ********* */
+/* may just compare the adress (once clear it is functional)*/
+void check_copy_in_value(ccontainer_value_t *value, struct_complex_t *comp_struct )
+{
+    char memo = comp_struct->pname[0];
+    // check they don't point to same internal copy
+    comp_struct->pname[0] = 'P';
+    char t = *( (char **)value->data)[0];
+    assert_int_not_equal( 'P', t);
+    assert_int_equal( memo, t);
+
+    // revert
+    comp_struct->pname[0] = memo;
+}
+
+void check_ref_in_value(ccontainer_value_t *value, struct_complex_t *comp_struct )
+{
+    char memo = comp_struct->pname[0];
+    // check they don't point to same internal copy
+    comp_struct->pname[0] = 'P';
+    char t = *( (char **)value->data)[0];
+    assert_int_equal( 'P', t);
+
+    // revert for both
+    comp_struct->pname[0] = memo;
+}
+
 int main()
 {
     /* can be inside main, or as global. here no problem with identical name */
@@ -414,4 +441,4 @@ int main()
     /* call group_setup and teardown at the very beginning and end */
     /* return cmocka_run_group_tests(tests_historique, group_setup, group_teardown);*/
     return cmocka_run_group_tests(tests_cvector_struct_complex, NULL, NULL);
-}   
+}

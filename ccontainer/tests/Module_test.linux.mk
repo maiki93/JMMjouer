@@ -21,7 +21,15 @@ test_clist_cstring: $(MODDIR_CCONTAINER_TESTS)/test_clist_cstring.o libccontaine
 	@echo "Building test_clist_cstring @ :    $@"  # target name
 	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $(MODDIR_CCONTAINER_TESTS)/test_clist_cstring.o -L . -lccontainer -lclogger -L $(LIB_CMOCKA) -lcmocka
 
+test_cvector_generic_with_string : $(MODDIR_CCONTAINER_TESTS)/test_cvector_generic_with_string.o $(MODDIR_CCONTAINER)/cvector_generic.o $(MODDIR_CCONTAINER)/value.o
+	@echo "Building test_cvector_generic_with_string @ :    $@"  # target name
+	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
+
+test_cvector_struct_complex : $(MODDIR_CCONTAINER_TESTS)/test_cvector_struct_complex.o $(MODDIR_CCONTAINER)/cvector_generic.o $(MODDIR_CCONTAINER)/value.o
+	@echo "Building test_cvector_struct_complex @ :    $@"
+	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
+
 clean ::
 	@echo "clean unit_test ccontainer"
 	rm -f $(OBJS_CCONTAINER_TESTS)
-	rm -f test_clist_generic test_clist_cstring
+	rm -f test_clist_generic test_clist_cstring test_cvector_generic_with_string test_cvector_struct_complex
