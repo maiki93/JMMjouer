@@ -26,7 +26,7 @@ extern "C" {
 #endif
 
 /** Generic structure which will be inserted in the ccontainer's. 
-    Can store any serializable type or data structure
+    Can store any serializable type or complex data structure with pointers on heap memory
     \ingroup ccontainer_value_grp */
 typedef struct {
     /** pointer to serialized data */
@@ -45,7 +45,8 @@ typedef void (*deleter_value_t) (ccontainer_value_t* value);
  * \param[in] value_in as source
  * \return a copy of the source
  */
-typedef ccontainer_value_t(*duplicater_value_t) (const ccontainer_value_t * value_in);
+typedef ccontainer_value_t(*duplicater_value_t) (const ccontainer_value_t * value_in, ccontainer_err *err_code);
+
 
 /** Return a ccontainer_value_t from data input.
     ccontainer_value_t takes ownership of the data which should not be modified after this call.
@@ -55,17 +56,16 @@ typedef ccontainer_value_t(*duplicater_value_t) (const ccontainer_value_t * valu
 */
 SHARED_EXPORT ccontainer_value_t ccontainer_make_value(char *data_in, size_t len, ccontainer_err *err_code);
 
-/** Share ccontainer_value_t from value_src with value_dest.
-    value_dest points to the same interal data of value_src, free must be called with care
-    No check performed on initial value_dest, its data may cause memory leak.
-    \param[in] value_dest : pointer to the destination ccontainer_value_t
+/** Return a deep copy of value_src.
+    Make a new heap allocation for data and copy the content of value_src.
+    \pre value_src must be valid ( not null and value.data not null )
     \param[in] value_src : pointer to the source ccontainer_value_t */
-SHARED_EXPORT void ccontainer_copy_value(ccontainer_value_t *value_dest, const ccontainer_value_t *value_src);
+SHARED_EXPORT ccontainer_value_t ccontainer_copy_value(const ccontainer_value_t *value_src, ccontainer_err *err_code);
 
 /** Transfert data from one ccontainer_value_t to an other.
-    value_dest takes ownership of the internal data stored in value_src, 
-    Free should not be called on value_src after the call
-    No check performed on initial value_dest, its data may cause memory leak.
+    Returned value_t takes ownership of the internal data stored in value_src,
+    free should not be called on value_src after the call.
+    \pre value_src must be valid ( not null and value.data not null )
     \post value_src.data = NULL && len == 0
     \param[in] value_dest : pointer to the destination ccontainer_value_t
     \return ccontainer_value_t : value with stolen data of the source */
@@ -93,28 +93,6 @@ SHARED_EXPORT void ccontainer_delete_value(ccontainer_value_t *value_in_out);
  * \post value is not usuable, can only call value_in = NULL if passed from a pointer
  * \param[in] value_in : pointer to the ccontainer_value_t de deallocate */
 SHARED_EXPORT void ccontainer_free_value(ccontainer_value_t *value);
-
-/** \todo Use only one function : default_free_value / default_copy_value
- *      default_deleter_value
- */
-
-/** Create a ccontainer_value_t copy of the input data.
- * Default implementation makes a bytes-to-bytes copy of the array data of length len.
- * If value_in contains pointers to heap allocated memory, the copy will point to the same memory.
-   \param[in] value_in source
-   \return a new ccontainer_value_t
-*/
-SHARED_EXPORT ccontainer_value_t default_duplicater_value(const ccontainer_value_t* value_in);
-
-/* why not copy_value(value_t *) ? more explicit ! (use with cast of arguments maybe ?)*/
-
-/** Deallocate memory of the internal data array.
- * Follow signature of deleter_t function pointer and used as default implementation.
- * \note value->data is deallocated and cannot be re-used (for optimization cvector_gen size/capacity)
- *      may specify a specific deleter to overidde this behaviour
- * \post value.len == 0 && value.data == NULL
-*/
-/* SHARED_EXPORT void default_deleter_value(ccontainer_value_t* value); */
 
 #ifdef __cplusplus
 }

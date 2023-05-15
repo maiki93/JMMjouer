@@ -8,7 +8,7 @@
 #include "ccontainer/cvector_generic.h"
 
 /* test values with strings, do not include final \0 */
-static ccontainer_value_t value_str1 = {"first", 5}; /*  */
+static ccontainer_value_t value_str1 = {"first", 5};
 static ccontainer_value_t value_str2 = {"second", 6};
 static ccontainer_value_t value_str3 = {.data="tree",.len=4}; /* available C90 */
 
@@ -16,32 +16,31 @@ static void initialization_on_stack()
 {
     ccontainer_err err_code;
     cvector_gen_t cvect;
-    // no memory allocation, no error_code
+    // no memory allocation, no error_code, default destructor and copy
     cvector_gen_init( &cvect );
 
     assert_int_equal( 0, cvector_gen_size( &cvect ));
     assert_int_equal( 0, cvector_gen_capacity( &cvect ));
-    // empty to delete anyway
+    // empty but need to delete anyway
     cvector_gen_delete( &cvect );
     
     cvector_gen_t cvect2;
     err_code = cvector_gen_init_with_capacity( &cvect2, 2 );
-
+    assert_int_equal( CCONTAINER_OK, err_code);
     assert_int_equal( 0, cvector_gen_size( &cvect2 ));
     assert_int_equal( 2, cvector_gen_capacity( &cvect2 ));
-    assert_int_equal( CCONTAINER_OK, err_code);
 
     // clear do not change the capacity
     cvector_gen_clear( &cvect2 );
     assert_int_equal( 0, cvector_gen_size( &cvect2) );
     assert_int_equal( 2, cvector_gen_capacity( &cvect2) );
-
     // dealloate internal array properly
     cvector_gen_delete( &cvect2 );
 }
 
 static void initialization_on_heap()
 {
+    ccontainer_err err_code;
     cvector_gen_t *cvect = cvector_gen_new();
     cvector_gen_init( cvect );
 
@@ -52,8 +51,8 @@ static void initialization_on_heap()
     cvect = NULL;
     ///////////////////
     cvector_gen_t *cvect2 = cvector_gen_new();
-    cvector_gen_init_with_capacity( cvect2, 2 );
-
+    err_code = cvector_gen_init_with_capacity( cvect2, 2 );
+    assert_int_equal( CCONTAINER_OK, err_code);
     assert_int_equal( 0, cvector_gen_size( cvect2 ));
     assert_int_equal( 2, cvector_gen_capacity( cvect2 ));
     
@@ -69,23 +68,19 @@ static void push_two_str_in_capacity_five()
     ccontainer_value_t tmp_value_in;
 
     cvect = cvector_gen_new();
-    // no memory allocation, no error_code
     err_code = cvector_gen_init_with_capacity( cvect, 5 );
-    assert_int_equal( CCONTAINER_OK, err_code);
-    assert_int_equal( 5, cvector_gen_capacity( cvect ));
-
-    // create a temporary copy of the input formatted as a ccontainer_value_t
+    
+    // create a copy of the input in a ccontainer_value_t format
     tmp_value_in = ccontainer_make_value(value_str1.data, value_str1.len, &err_code);
     assert_int_equal( CCONTAINER_OK, err_code);
     // transfer value_t into the cvector_gen_t
     err_code = cvector_gen_push_back( cvect, &tmp_value_in );
     assert_int_equal( CCONTAINER_OK, err_code);
-    // reset content, no free because treansfered into the vector
-    // it is not necessary
-    ccontainer_reset_value(&tmp_value_in);
+    // content of tmp_value has been moved
+    assert_null( tmp_value_in.data );
+    assert_int_equal(0, tmp_value_in.len);
     
     tmp_value_in = ccontainer_make_value(value_str2.data, value_str2.len, &err_code);
-    assert_int_equal( CCONTAINER_OK, err_code);
     err_code = cvector_gen_push_back( cvect, &tmp_value_in );
     assert_int_equal( CCONTAINER_OK, err_code);
 
@@ -104,13 +99,13 @@ static void push_two_str_in_empty_cvector()
 
     cvector_gen_init( &cvect );
 
-    tmp_value_in = ccontainer_make_value(value_str1.data,value_str1.len,&err_code);
+    tmp_value_in = ccontainer_make_value( value_str1.data, value_str1.len, &err_code);
     err_code = cvector_gen_push_back( &cvect, &tmp_value_in );
     assert_int_equal( CCONTAINER_OK, err_code);
     assert_int_equal( 1, cvector_gen_size( &cvect ));
     assert_int_equal( 1, cvector_gen_capacity( &cvect ));
 
-    tmp_value_in = ccontainer_make_value(value_str2.data,value_str2.len,&err_code);
+    tmp_value_in = ccontainer_make_value( value_str2.data, value_str2.len, &err_code);
     err_code = cvector_gen_push_back( &cvect, &tmp_value_in );
     assert_int_equal( CCONTAINER_OK, err_code);
     assert_int_equal( 2, cvector_gen_size( &cvect ));
@@ -126,13 +121,11 @@ static void get_reference()
     ccontainer_value_t tmp_value_in;
     ccontainer_value_t* pvalue_out;
     
-    // no memory allocation, no error_code
     cvector_gen_init( &cvect );
 
-    tmp_value_in = ccontainer_make_value(value_str1.data,value_str1.len,&err_code);
+    tmp_value_in = ccontainer_make_value( value_str1.data, value_str1.len, &err_code);
     cvector_gen_push_back( &cvect, &tmp_value_in );
-
-    tmp_value_in = ccontainer_make_value(value_str2.data,value_str2.len,&err_code);
+    tmp_value_in = ccontainer_make_value( value_str2.data, value_str2.len, &err_code);
     cvector_gen_push_back( &cvect, &tmp_value_in );
 
     // out of range
@@ -146,7 +139,7 @@ static void get_reference()
     // assert the content is equal
     assert_int_equal( 6, pvalue_out->len );
     assert_memory_equal( "second", pvalue_out->data, 6 );
-    // assert it point to the correct place
+    // assert it points to the same memory
     assert_ptr_equal( &(cvect.array[1]), pvalue_out);
 
     // cannot do this, must use memory in ccontainer_value_t to modify it
@@ -169,6 +162,31 @@ static void get_reference()
     //value_out3 = cvect.ptrf_duplicater( cvector_gen_get_ref( &cvect, 1, &err_code) );
 
     cvector_gen_delete( &cvect );
+}
+
+static void copy_constructor()
+{
+    ccontainer_err err_code;
+    cvector_gen_t cvect, cvect_copy;
+    ccontainer_value_t tmp_value_in;
+    ccontainer_value_t* pvalue_out;
+    
+    cvector_gen_init( &cvect );
+
+    tmp_value_in = ccontainer_make_value( value_str1.data, value_str1.len, &err_code);
+    cvector_gen_push_back( &cvect, &tmp_value_in );
+    tmp_value_in = ccontainer_make_value( value_str2.data, value_str2.len, &err_code);
+    cvector_gen_push_back( &cvect, &tmp_value_in );
+
+    cvect_copy = cvector_gen_copy( &cvect, &err_code);
+    assert_int_equal(CCONTAINER_OK, err_code);
+
+    cvector_gen_delete( &cvect );
+
+    assert_int_equal( 2, cvect_copy.len );
+    assert_int_equal( 2, cvect_copy.capacity );
+
+    cvector_gen_delete( &cvect_copy );
 }
 /*
 static void get_copy()
@@ -256,6 +274,7 @@ int main()
         cmocka_unit_test(push_two_str_in_capacity_five),
         cmocka_unit_test(push_two_str_in_empty_cvector),
         cmocka_unit_test(get_reference),
+        cmocka_unit_test(copy_constructor),
         //cmocka_unit_test(get_copy),
         cmocka_unit_test(swap_2index),
     };

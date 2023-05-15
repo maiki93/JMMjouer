@@ -18,12 +18,12 @@ void cvector_gen_init( cvector_gen_t* cvect )
     cvect->len = 0;
     /* default copy and destructor */
     cvect->ptrf_deleter = ccontainer_delete_value;
-    cvect->ptrf_duplicater = default_duplicater_value;
+    cvect->ptrf_duplicater = ccontainer_copy_value;
 }
 
 ccontainer_err cvector_gen_init_with_capacity( cvector_gen_t* cvect, size_t init_capacity)
 {
-    /* swap idiom for memroy allocation */
+    /* memory allocation of array of ccontainer_value_t */
     ccontainer_value_t *tab = calloc( init_capacity, sizeof(ccontainer_value_t) );
     if( tab == NULL )
         return CCONTAINER_ALLOCERR;
@@ -34,8 +34,37 @@ ccontainer_err cvector_gen_init_with_capacity( cvector_gen_t* cvect, size_t init
     cvect->len = 0;
     /* default copy and destructor */
     cvect->ptrf_deleter = ccontainer_delete_value;
-    cvect->ptrf_duplicater = default_duplicater_value;
+    cvect->ptrf_duplicater = ccontainer_copy_value;
     return CCONTAINER_OK;
+}
+
+cvector_gen_t cvector_gen_copy(const cvector_gen_t* cvect_src, ccontainer_err *err_code)
+{
+    ccontainer_value_t tmp_value;
+    ccontainer_value_t *ptmp_value;
+    cvector_gen_t cvect_out;
+    size_t i;
+    assert( cvect_src );
+    cvector_gen_init_with_capacity( &cvect_out, cvect_src->len );
+    
+    cvect_out.ptrf_deleter = cvect_src->ptrf_deleter;
+    cvect_out.ptrf_duplicater = cvect_src->ptrf_duplicater;
+
+    /* size to set manually or should call push back */
+    cvect_out.len = cvect_src->len;
+    /* deep_copy of all elements (up to len) */
+    for( i = 0; i < cvect_src->len; i++) {
+        cvect_out.array[i] = (*cvect_out.ptrf_duplicater)( cvect_src->array + i, err_code);
+        if( *err_code != CCONTAINER_OK ) {
+            return cvect_out;
+        }
+    }
+    
+    assert( cvect_out.len == cvect_src->len );
+    assert( cvect_out.len <= cvect_src->capacity );
+
+    *err_code = CCONTAINER_OK;
+    return cvect_out;
 }
 
 void cvector_gen_delete( cvector_gen_t* cvect )
@@ -123,7 +152,7 @@ ccontainer_err cvector_gen_set_capacity(cvector_gen_t *cvect, size_t new_capacit
     return CCONTAINER_OK;
 }
 
-ccontainer_err cvector_gen_push_back(cvector_gen_t *cvect, const ccontainer_value_t *value_in)
+ccontainer_err cvector_gen_push_back(cvector_gen_t *cvect, ccontainer_value_t *value_in)
 {
     ccontainer_err code_err;
 
@@ -132,9 +161,9 @@ ccontainer_err cvector_gen_push_back(cvector_gen_t *cvect, const ccontainer_valu
     }
 
     assert( cvect->capacity >= cvect->len);
-    /* copy byte to byte value_in at the last position of the array 
-        ownership is transfered to the vector, move possible */
-    ccontainer_copy_value( cvect->array + cvect->len, value_in);
+
+    /* ownership is transfered to the vector */
+    cvect->array[ cvect->len ] = ccontainer_move_value(value_in);
     cvect->len++;
 
     /* all attributes of cvect have been reset */
@@ -151,31 +180,7 @@ ccontainer_value_t* cvector_gen_get_at(const cvector_gen_t *cvect, size_t index,
     *err_code = CCONTAINER_OK;
     return cvect->array + index; /* <=> &(cvect->array[index]) */
 }
-/* to delete
-ccontainer_err cvector_gen_get_copy(cvector_gen_t *cvect, size_t index, value_t* value_out)
-{
-    value_t value_tmp;
-    // check range
-    if( index >= cvect->len) {
-        return CCONTAINER_OUTOFRANGE;
-    }
-    // delete previous value_out if already allocated
-    if( value_out && value_out->data) {
-        assert(value_out->len != 0); // if data len should != 0 
-        // cvect->ptrf_deleter( value_out );
-        free_value(value_out);
-    }
 
-    // make full duplication
-    //value_tmp = (*cvect->ptrf_duplicater)( cvect->array + index );
-    //copy_value(value_out,&value_tmp);
-    
-    // copy_value(value_out, cvect->array + index); 
-    // *value_out = (*cvect->ptrf_duplicater)( cvect->array + index );
-
-    return CCONTAINER_OK;
-}
-*/
 /* Methods for algorithms */
 void cvector_gen_swap(cvector_gen_t *cvect, size_t index1, size_t index2)
 {
@@ -197,4 +202,3 @@ void delete_elements( cvector_gen_t *cvect, size_t index_begin, size_t index_las
     }
 }
 
-/* static copy_elements( cvector_gen_t *cvect, index_begin, index_end, shift ) */
