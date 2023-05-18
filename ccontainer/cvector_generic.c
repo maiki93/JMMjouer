@@ -40,13 +40,11 @@ ccontainer_err cvector_gen_init_with_capacity( cvector_gen_t* cvect, size_t init
 
 cvector_gen_t cvector_gen_copy(const cvector_gen_t* cvect_src, ccontainer_err *err_code)
 {
-    ccontainer_value_t tmp_value;
-    ccontainer_value_t *ptmp_value;
     cvector_gen_t cvect_out;
     size_t i;
     assert( cvect_src );
+
     cvector_gen_init_with_capacity( &cvect_out, cvect_src->len );
-    
     cvect_out.ptrf_deleter = cvect_src->ptrf_deleter;
     cvect_out.ptrf_duplicater = cvect_src->ptrf_duplicater;
 

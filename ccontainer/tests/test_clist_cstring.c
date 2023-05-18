@@ -8,7 +8,6 @@
 #include <stdio.h> /*only for printf, may be commented */
 #include <string.h>
 
-/*#include "../clist_cstring.h"*/
 #include "ccontainer/clist_cstring.h"
 
 /* string insertion */
@@ -37,7 +36,7 @@ static int teardown_heap(void **state)
 {
     (void) state;
     /* call destructor clist_clear & deallocate */
-    clist_cstring_delete( lcstring_heap );
+    clist_cstring_free( lcstring_heap );
     /* cannot access clist anymore */
     /*assert_null( lcstring_heap->clist);*/
     lcstring_heap = NULL; /* to protect later use */
@@ -55,8 +54,8 @@ static void initialization_on_stack()
     assert_int_equal( 0, clist_cstring_size( &list_cstr) );
     
     // deallocation on stack, call destructor
-    clist_cstring_clear( &list_cstr );
-    /*assert_int_equal( 0, clist_cstring_size( &list_cstr) );*/
+    clist_cstring_delete( &list_cstr );
+    assert_null( list_cstr.clist );
 }
 
 static void initialization_on_heap()
@@ -68,66 +67,63 @@ static void initialization_on_heap()
     clist_cstring_init( list_cstr );
     assert_non_null( list_cstr->clist );
     assert_int_equal( 0, clist_cstring_size(list_cstr) );
-    /* no acces, private */
-    /* assert_null ( list_cstr->clist->first_node ); */
-
+    
     /* call destructor clist_clear & deallocate */
-    clist_cstring_delete( list_cstr ); 
-    /* cannot access member of list_cstr now */
-    /* assert_null( list_cstr->clist); */
+    clist_cstring_free( list_cstr ); 
     list_cstr = NULL; /* to protect later use */
-    assert_null( list_cstr );
 }
 
 /* insert one string by copy and retrieve one string */
 static void push_back_two_strings_get_copy()
 {
-    // allocation on stack, call constructor
     clist_cstring_t list_cstr;
     char *string_out = NULL;
-    int retour;
+    ccontainer_err err_code;
 
     clist_cstring_init( &list_cstr);
-    retour = clist_cstring_push_back(&list_cstr, string1);
-    assert_int_equal( CLIST_OK, retour );
+    err_code = clist_cstring_push_back(&list_cstr, string1);
+    assert_int_equal( CCONTAINER_OK, err_code );
     assert_int_equal( 1, clist_cstring_size(&list_cstr) );
 
-    retour = clist_cstring_get_copy( &list_cstr, 0, &string_out );
-    assert_int_equal( CLIST_OK, retour);
+    string_out = clist_cstring_get_copy_at( &list_cstr, 0, &err_code );
+    assert_int_equal(  CCONTAINER_OK, err_code);
     assert_string_equal( "first", string_out);
     
     // deallocation on stack, call destructor
-    clist_cstring_clear( &list_cstr );
-    /* cannot access anymore */
-    /*assert_int_equal( 0, clist_cstring_size( &list_cstr) );*/
-
-    // local allocated memory 
+    clist_cstring_delete( &list_cstr );
+    // local copy with its allocated memory 
     free(string_out);
     string_out = NULL;
 }
 
 static void push_back_two_strings_get_ref()
 {
-    int retour;
+    ccontainer_err err_code;
     char * string_out = NULL;
+    // allocation done in setup
     // push one
     clist_cstring_push_back(lcstring_heap, string1);
 
-    retour = clist_cstring_get_ref( lcstring_heap, 0, &string_out);
-    assert_int_equal( CLIST_OK, retour);
+    string_out = clist_cstring_get_ref_at( lcstring_heap, 0, &err_code);
+    assert_int_equal(  CCONTAINER_OK, err_code );
     assert_memory_equal( "first", string_out, 5);
     assert_int_equal(5, strlen(string_out));
+    // only a ref
+    string_out = NULL;
 
     // only one, return not found
-    retour = clist_cstring_get_ref( lcstring_heap, 1, &string_out);
-    assert_int_equal( CLIST_OUTOFRANGE, retour);
+    string_out = clist_cstring_get_ref_at( lcstring_heap, 1, &err_code);
+    assert_int_equal( CCONTAINER_OUTOFRANGE, err_code);
 
     // push a second
     clist_cstring_push_back(lcstring_heap, string2);
-    retour = clist_cstring_get_ref( lcstring_heap, 1, &string_out);
-    assert_int_equal( CLIST_OK, retour);
+    string_out = clist_cstring_get_ref_at( lcstring_heap, 1, &err_code);
+    assert_int_equal( CCONTAINER_OK, err_code);
     assert_memory_equal( "second", string_out, 6);
     assert_int_equal(6, strlen(string_out));
+    // only a ref
+    string_out = NULL;
+    //deallocation lcstring_heap done in teardown
 }
 
 static void get_array()
@@ -141,7 +137,7 @@ static void get_array()
     clist_cstring_push_back(lcstring_heap, "third");
 
     retour = clist_cstring_get_array( lcstring_heap, &p_array, &array_len );
-    assert_int_equal( CLIST_OK, retour);
+    assert_int_equal( CCONTAINER_OK, retour);
     assert_int_equal( 3, array_len);
 
     assert_string_equal("first", p_array[0]);
@@ -159,7 +155,7 @@ static void get_array_error_empty()
     int retour;
 
     retour = clist_cstring_get_array( lcstring_heap, &p_array, &array_len );
-    assert_int_equal( CLIST_EMPTY, retour);
+    assert_int_equal( CCONTAINER_EMPTY, retour);
     assert_int_equal( 0, array_len);
 }
 

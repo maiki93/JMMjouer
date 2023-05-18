@@ -2,7 +2,6 @@
 #include <assert.h>
 
 #include "ccontainer/clist_generic.h"
-#include "clogger/clogger.h"
 
 /** @file
     Implementation file
@@ -14,8 +13,8 @@
  * \ingroup ccontainer_clist_gen_grp
 */
 struct clist_node {
-    /** value_t contained in the node */
-    value_t value;
+    /** ccontainer_value_t contained in the node */
+    ccontainer_value_t value;
     /** pointer to the next clist_node */
     struct clist_node *next_node;
 };
@@ -29,9 +28,6 @@ struct clist_type {
     struct clist_node* first_node;
     /** Number of actual elements stored in the list, it is not necessary for a list (vs vector)*/
     size_t len;
-    /* todo in specialization of clist_generic, when needed */
-    /* pointer on current node for algorithm memorization.. or use internal only : thread-safe reading */
-    /* pointer on last node for faster push_back */
 };
 
 /* **** static functions *****/
@@ -54,20 +50,15 @@ void clist_gen_init(clist_gen_t* clist)
     clist->len = 0;
 }
 
-void clist_gen_del(clist_gen_t* clist, deleter_t deleter) {
-    clist_gen_clear(clist, deleter);
-    free( clist );
-}
-
 /* need intermediate with clist_node , propagate deleter (of value) */
 /* it is a method of nodes only in fact */
-void clist_gen_clear(clist_gen_t *clist, deleter_t deleter) 
+void clist_gen_delete(clist_gen_t *clist, deleter_value_t ptrf_deleter) 
 {
     struct clist_node* next_node;
     struct clist_node* curr_node = clist->first_node;
 
-   if(curr_node == NULL) {
-        CLOG_DEBUG("First node is NULL, nothing to delete, size: %d\n",clist->len);
+   if( !curr_node ) {
+        assert( clist->len == 0);
         return;
    }
 
@@ -75,7 +66,7 @@ void clist_gen_clear(clist_gen_t *clist, deleter_t deleter)
         /* store next node before deleting the current one */
         next_node = get_next_node(curr_node);
         /* delete the current one */
-        deleter(&curr_node->value);
+        (*ptrf_deleter)(&curr_node->value);
         curr_node->next_node = NULL;
         free( curr_node );
         curr_node = NULL;
@@ -88,6 +79,12 @@ void clist_gen_clear(clist_gen_t *clist, deleter_t deleter)
    assert( clist->len == 0);
 }
 
+void clist_gen_free(clist_gen_t* clist, deleter_value_t ptrf_deleter) 
+{
+    clist_gen_delete(clist, ptrf_deleter);
+    free( clist );
+}
+
 /*** Public API implementation ****/
 size_t clist_gen_size(const clist_gen_t *clist)
 {
@@ -95,37 +92,39 @@ size_t clist_gen_size(const clist_gen_t *clist)
 }
 
 /* push_front */
-int clist_gen_push_front(clist_gen_t *clist, value_t value_in)
+ccontainer_err clist_gen_push_front(clist_gen_t *clist, ccontainer_value_t *value_in)
 {
     /* store value of the first node */
     struct clist_node *first_node_copy = clist->first_node;
 
     /* creation and copy of value_in into a new node */
     struct clist_node *p_new_node = (struct clist_node*) malloc( sizeof(struct clist_node));
-    p_new_node->value = copy_value( value_in.data, value_in.len );
+    if( !p_new_node )
+        return CCONTAINER_ALLOCERR;
+    p_new_node->value = ccontainer_move_value( value_in );
     
     /* reassign first node to the new one, ok if NULL */
     p_new_node->next_node = first_node_copy;
     /* clist point to the new one */
     clist->first_node = p_new_node;
     clist->len++;
-    return CLIST_OK;
+    return CCONTAINER_OK;
 }
 
 /** arument by pointer, avoid a copy 
- * push_back */
-int clist_gen_push_back(clist_gen_t *clist, const value_t *value_in)
+ * push_back , const not ? but use of move */
+ccontainer_err clist_gen_push_back(clist_gen_t *clist, ccontainer_value_t *value_in)
 {
     struct clist_node *new_node;
     /* return a copy, may create the strange behaviour */
     struct clist_node *last_node = get_node_last(clist->first_node);
     /* create a  new node */
     new_node = (struct clist_node*) malloc( sizeof(struct clist_node));
-    new_node->next_node = NULL;
     if( !new_node )
-        return CLIST_ALLOC_ERR;
-    
-    new_node->value = copy_value( value_in->data, value_in->len );
+        return CCONTAINER_ALLOCERR;
+
+    new_node->value = ccontainer_move_value( value_in );
+    new_node->next_node = NULL;
     /* specific for first one, 
         would need the adress of the pointer (and *node = new_node) to avoid the if ? */
    if( last_node == NULL)
@@ -134,51 +133,51 @@ int clist_gen_push_back(clist_gen_t *clist, const value_t *value_in)
         last_node->next_node = new_node;
 
     clist->len++;
-    return CLIST_OK;
+    return CCONTAINER_OK;
 }
 
 /* get by number, not very "list", otherwise need to give access to clist_node interface in API
     not the point on this interface to get by number ? really needed ? */
-int clist_gen_get_value_ref( const clist_gen_t *clist, size_t elem_nb, value_t **value_out)
+ccontainer_value_t* clist_gen_get_at( const clist_gen_t *clist, size_t index, ccontainer_err *err_code)
 {
     struct clist_node *node;
-    if( elem_nb >= clist->len )
-        return CLIST_OUTOFRANGE;
-    node = get_node_number( clist->first_node, elem_nb );
-    *value_out = &(node->value);
-    return CLIST_OK;
+    if( index >= clist->len ) {
+        *err_code = CCONTAINER_OUTOFRANGE;
+        return NULL;
+    }
+    node = get_node_number( clist->first_node, index );
+    *err_code = CCONTAINER_OK;
+    return &(node->value);
 }
 
-int clist_gen_get_value_copy( const clist_gen_t *clist, size_t elem_nb, value_t *value_out)
+ccontainer_value_t* clist_gen_find( const clist_gen_t *clist, 
+                    const char* buffer, size_t buffer_len, ccontainer_err *err_code)
 {
-    struct clist_node *node;
-    if( elem_nb >= clist->len )
-        return CLIST_OUTOFRANGE;
-    node = get_node_number( clist->first_node, elem_nb );
-    *value_out = copy_value( node->value.data, node->value.len );
-    return CLIST_OK;
-}
+    ccontainer_value_t value_out;
 
-/* cannot return ERR positif and size_t */
-int clist_gen_find( const clist_gen_t *clist, value_t* value_out, 
-                    const char* buffer, size_t buffer_len)
-{
     struct clist_node *curr_node = clist->first_node;
+
+    ccontainer_reset_value(&value_out);
+    
     if( clist->first_node == NULL) {
-        return CLIST_EMPTY;
+        *err_code = CCONTAINER_EMPTY;
+        return NULL;
     }
     /* loop over nodes */
     do {
         /* comparison criteria */
         if( memcmp( curr_node->value.data, buffer, buffer_len) == 0 ) {
-            *value_out = copy_value( curr_node->value.data, curr_node->value.len );
-            return CLIST_OK;
+            /*value_out = ccontainer_copy_value( &(curr_node->value), err_code );*/
+            *err_code = CCONTAINER_OK;
+            return &(curr_node->value);
         }
         /* update node */
         curr_node = get_next_node( curr_node );
     } while ( curr_node != NULL );
 
-    return CLIST_NOTFOUND;
+
+    *err_code = CCONTAINER_NOT_FOUND;
+    return NULL;
 }
 
 /** \cond Suppress_Doxygen */

@@ -7,7 +7,7 @@
 
 #include "ccontainer/cvector_generic.h"
 
-/* test values with strings, do not include final \0 */
+/* test values with simple strings, do not include final \0 */
 static ccontainer_value_t value_str1 = {"first", 5};
 static ccontainer_value_t value_str2 = {"second", 6};
 static ccontainer_value_t value_str3 = {.data="tree",.len=4}; /* available C90 */
@@ -169,7 +169,6 @@ static void copy_constructor()
     ccontainer_err err_code;
     cvector_gen_t cvect, cvect_copy;
     ccontainer_value_t tmp_value_in;
-    ccontainer_value_t* pvalue_out;
     
     cvector_gen_init( &cvect );
 
@@ -188,47 +187,6 @@ static void copy_constructor()
 
     cvector_gen_delete( &cvect_copy );
 }
-/*
-static void get_copy()
-{
-    ccontainer_err err_code;
-    cvector_gen_t cvect;
-
-    ccontainer_value_t value_out = {.data=NULL,.len=0};
-    ccontainer_value_t value_out2 = {.data=NULL,.len=0};
-
-    ccontainer_value_t *pvalue_out, *pvalue_out2;
-    // no memory allocation, no error_code
-    cvector_gen_init( &cvect );
-
-    cvector_gen_push_back( &cvect, &value_str1 );
-    cvector_gen_push_back( &cvect, &value_str2 );
-    // out of range
-    pvalue_out = cvector_gen_get_at( &cvect, 5, &err_code);
-    assert_int_equal( CCONTAINER_OUTOFRANGE, err_code);
-    // access second elememt
-    //err_code = cvector_gen_get_at( &cvect, 1, &value_out);
-    pvalue_out = cvector_gen_get_at( &cvect, 1, &err_code);
-    assert_int_equal( CCONTAINER_OK, err_code);
-    // assert the content is equal
-    assert_int_equal( 6, pvalue_out->len );
-    assert_memory_equal( "second", pvalue_out->data, 6 );
-    // delete the copy
-    default_deleter_value( &value_out);
-
-    // check source vector is not modified
-    //err_code = cvector_gen_get_at( &cvect, 1, &value_out2 );
-    pvalue_out2 = cvector_gen_get_at( &cvect, 1, &err_code);
-    assert_int_equal( CCONTAINER_OK, err_code);
-    // assert the content is equal
-    assert_int_equal( 6, pvalue_out2->len );
-    assert_memory_equal( "second", pvalue_out2->data, 6 );
-    // do not forget to delete the copy
-    default_deleter_value( &value_out2);
-
-    cvector_gen_delete( &cvect );
-}
-*/
 
 static void swap_2index()
 {
@@ -264,7 +222,6 @@ static void swap_2index()
     cvector_gen_delete( &cvect);
 }
 
-
 int main()
 {
     /* can be inside main, or as global. here no problem with identical name */
@@ -275,7 +232,6 @@ int main()
         cmocka_unit_test(push_two_str_in_empty_cvector),
         cmocka_unit_test(get_reference),
         cmocka_unit_test(copy_constructor),
-        //cmocka_unit_test(get_copy),
         cmocka_unit_test(swap_2index),
     };
 

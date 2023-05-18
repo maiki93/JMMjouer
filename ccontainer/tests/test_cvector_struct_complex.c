@@ -379,12 +379,12 @@ static void copy_constructor()
     ccontainer_err err_code;
     struct_complex_t comp_struct, comp_struct2;
     struct_complex_init( &comp_struct, "maiki", 3.14f, true);
-    //struct_complex_init( &comp_struct2, "toto", 2.31f, false);
+    struct_complex_init( &comp_struct2, "toto", 2.31f, false);
 
     cvector_gen_t cvector;
     cvector_gen_t cvector_copy;
-    //cvector_gen_init(&cvector);
-    err_code = cvector_gen_init_with_capacity(&cvector,1);
+    
+    err_code = cvector_gen_init_with_capacity(&cvector,5);
     cvector_gen_set_deleter(&cvector, struct_complex_deleter_value);
     cvector_gen_set_duplicater(&cvector, struct_complex_duplicater_value);
     
@@ -393,20 +393,20 @@ static void copy_constructor()
     err_code = cvector_gen_push_back(&cvector, &value_struct);
     assert_int_equal(CCONTAINER_OK, err_code);
     
-    //value_struct = make_value_struct_complex(&comp_struct2, &err_code);
-    //cvector_gen_push_back(&cvector, &value_struct);
+    value_struct = make_value_struct_complex(&comp_struct2, &err_code);
+    err_code = cvector_gen_push_back(&cvector, &value_struct);
 
     // copy independent of input, can delete
     struct_complex_delete(&comp_struct);
-    //struct_complex_delete(&comp_struct2);
+    struct_complex_delete(&comp_struct2);
 
     cvector_copy = cvector_gen_copy( &cvector, &err_code);
     assert_int_equal(CCONTAINER_OK, err_code);
 
     cvector_gen_delete( &cvector );
 
-    assert_int_equal( 1, cvector_copy.len );
-    assert_int_equal( 1, cvector_copy.capacity );
+    assert_int_equal( 2, cvector_copy.len );
+    assert_int_equal( 2, cvector_copy.capacity );
 
     cvector_gen_delete( &cvector_copy );
 }
