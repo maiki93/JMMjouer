@@ -9,11 +9,11 @@
 /** Error code for the library.
  * \ingroup ccontainer_grp
 */
-typedef enum CCONTAINER_ERROR { /* suggested E_CCONTAINER */
+typedef enum CCONTAINER_ENUM_ERROR { /* suggested E_CCONTAINER */
     CCONTAINER_OK = 0,
     CCONTAINER_OUTOFRANGE = 1,
     CCONTAINER_ALLOCERR = 2,
     CCONTAINER_NOT_FOUND = 3,
     CCONTAINER_EMPTY = 4,
-    CCONTAINER_ERR_END = 5
-} ccontainer_err;
+    CCONTAINER_END = 5
+} ccontainer_err_t;

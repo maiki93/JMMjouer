@@ -92,7 +92,7 @@ size_t clist_gen_size(const clist_gen_t *clist)
 }
 
 /* push_front */
-ccontainer_err clist_gen_push_front(clist_gen_t *clist, ccontainer_value_t *value_in)
+ccontainer_err_t clist_gen_push_front(clist_gen_t *clist, ccontainer_value_t *value_in)
 {
     /* store value of the first node */
     struct clist_node *first_node_copy = clist->first_node;
@@ -111,7 +111,7 @@ ccontainer_err clist_gen_push_front(clist_gen_t *clist, ccontainer_value_t *valu
     return CCONTAINER_OK;
 }
 
-ccontainer_err clist_gen_push_back(clist_gen_t *clist, ccontainer_value_t *value_in)
+ccontainer_err_t clist_gen_push_back(clist_gen_t *clist, ccontainer_value_t *value_in)
 {
     struct clist_node *new_node;
     /* pointer to last node, a reference */
@@ -136,7 +136,7 @@ ccontainer_err clist_gen_push_back(clist_gen_t *clist, ccontainer_value_t *value
 
 /* get by number, not very "list", otherwise need to give access to clist_node interface in API
     not the point on this interface to get by number ? really needed ? */
-ccontainer_value_t* clist_gen_get_at( const clist_gen_t *clist, size_t index, ccontainer_err *err_code)
+ccontainer_value_t* clist_gen_get_at( const clist_gen_t *clist, size_t index, ccontainer_err_t *err_code)
 {
     struct clist_node *node;
     if( index >= clist->len ) {
@@ -149,7 +149,7 @@ ccontainer_value_t* clist_gen_get_at( const clist_gen_t *clist, size_t index, cc
 }
 
 ccontainer_value_t* clist_gen_find( const clist_gen_t *clist, 
-                    const char* buffer, size_t buffer_len, ccontainer_err *err_code)
+                    const char* buffer, size_t buffer_len, ccontainer_err_t *err_code)
 {
     ccontainer_value_t value_out;
 

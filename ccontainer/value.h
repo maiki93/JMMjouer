@@ -45,7 +45,7 @@ typedef void (*deleter_value_t) (ccontainer_value_t* value);
  * \param[in] value_in as source
  * \return a copy of the source
  */
-typedef ccontainer_value_t(*duplicater_value_t) (const ccontainer_value_t * value_in, ccontainer_err *err_code);
+typedef ccontainer_value_t(*duplicater_value_t) (const ccontainer_value_t * value_in, ccontainer_err_t *err_code);
 
 
 /** Return a ccontainer_value_t from data input.
@@ -54,13 +54,13 @@ typedef ccontainer_value_t(*duplicater_value_t) (const ccontainer_value_t * valu
     \param[in] len : size of the data
     \return a ccontainer_value_t which keep ownership of the data    
 */
-SHARED_EXPORT ccontainer_value_t ccontainer_make_value(char *data_in, size_t len, ccontainer_err *err_code);
+SHARED_EXPORT ccontainer_value_t ccontainer_make_value(char *data_in, size_t len, ccontainer_err_t *err_code);
 
 /** Return a deep copy of value_src.
     Make a new heap allocation for data and copy the content of value_src.
     \pre value_src must be valid ( not null and value.data not null )
     \param[in] value_src : pointer to the source ccontainer_value_t */
-SHARED_EXPORT ccontainer_value_t ccontainer_copy_value(const ccontainer_value_t *value_src, ccontainer_err *err_code);
+SHARED_EXPORT ccontainer_value_t ccontainer_copy_value(const ccontainer_value_t *value_src, ccontainer_err_t *err_code);
 
 /** Transfert data from one ccontainer_value_t to an other.
     Returned value_t takes ownership of the internal data stored in value_src,

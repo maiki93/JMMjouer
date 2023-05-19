@@ -67,7 +67,7 @@ SHARED_EXPORT size_t clist_cstring_size(clist_cstring_t *clist_str);
    The null terminaison caracter is present in value_t::data  to allow the retrieval by reference 
    \param[inout] clist_str pointer to an instance of clist_cstring_t 
    \param[in] to_insert a string in C, must be null terminated */
-SHARED_EXPORT ccontainer_err clist_cstring_push_back(clist_cstring_t *clist_str, const char *to_insert);
+SHARED_EXPORT ccontainer_err_t clist_cstring_push_back(clist_cstring_t *clist_str, const char *to_insert);
 
 /** Get a copy of nb-th element.
   Copy allocated on heap, must be freed by caller.
@@ -75,14 +75,14 @@ SHARED_EXPORT ccontainer_err clist_cstring_push_back(clist_cstring_t *clist_str,
   \param[in] index of the collection to retrieve
   \param[out] err_code ccontainer error code
   \return  pointer to a copy string with terminason caracter, NULL on error */
-SHARED_EXPORT char* clist_cstring_get_copy_at( clist_cstring_t *list, size_t index, ccontainer_err *err_code);
+SHARED_EXPORT char* clist_cstring_get_copy_at( clist_cstring_t *list, size_t index, ccontainer_err_t *err_code);
 
 /** Get a reference to one element of the list.
     May be very tricky to modify the original throught the reference (size problems) !!
     \param[in] index of the collection to retrive
     \param[out] err_code ccontainer error code
     \return  pointer to a string in the clist, NULL on error */
-SHARED_EXPORT char* clist_cstring_get_ref_at( clist_cstring_t *clist_str, size_t index, ccontainer_err *err_code);
+SHARED_EXPORT char* clist_cstring_get_ref_at( clist_cstring_t *clist_str, size_t index, ccontainer_err_t *err_code);
 
 /** Return a array of string, deep copies of the internal elements.
     \param[in] clist_str pointer to a clist_string_t instance

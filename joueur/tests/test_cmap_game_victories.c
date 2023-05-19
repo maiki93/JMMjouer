@@ -19,7 +19,7 @@ struct pair_game_victory_t pair_out; /* fetch */
 
 static void pair_victory_to_value()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     ccontainer_value_t value_out;
 
     value_out = make_value_pair_victory( &pair_in1, &err_code );
@@ -32,7 +32,7 @@ static void pair_victory_to_value()
 
 static void value_to_pair_victory()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     ccontainer_value_t value_out;
 
     value_out = make_value_pair_victory( &pair_in1, &err_code );
@@ -65,7 +65,7 @@ static void construction_cmap()
 
 static void insert_new_victory()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     cmap_game_victories_t map_victory;
     game_victories_init( &map_victory );
     

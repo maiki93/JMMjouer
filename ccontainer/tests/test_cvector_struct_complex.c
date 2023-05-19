@@ -21,7 +21,7 @@ static void check_copy_in_value(ccontainer_value_t *value, struct_complex_t *com
   Depending on this choice, different copy / destructor pointer funtion must be set to cvector.
   \param[in] complex_struct source
   \param[out] ccontainer_value_t containing its own copy of all data of complex_struct */
-ccontainer_value_t make_value_struct_complex(const struct_complex_t * complex_struct, ccontainer_err *err_code)
+ccontainer_value_t make_value_struct_complex(const struct_complex_t * complex_struct, ccontainer_err_t *err_code)
 {
     ccontainer_value_t value_out;
     char *tmp_string;
@@ -65,7 +65,7 @@ ccontainer_value_t make_value_struct_complex(const struct_complex_t * complex_st
   \param[in] value_in : pointer to the source ccontainer_value_t
   \param[out] struct_out : pointer to the destination struct_complex_t 
   \return ccontainer error_code */
-ccontainer_err extract_value_struct_complex(const ccontainer_value_t* value_in, struct_complex_t *struct_out)
+ccontainer_err_t extract_value_struct_complex(const ccontainer_value_t* value_in, struct_complex_t *struct_out)
 {
     // free memory of struct_out if already allocated
     if( struct_out && struct_out->pname ) {
@@ -109,7 +109,7 @@ void struct_complex_deleter_value(ccontainer_value_t* value_in)
 /* Default duplicater is correct, copy byte-to-byte pname allocated on heap does not change.
  This implementation certainly incorrect.
  Would be necessary for a deep_copy_constructor(&ccontainer_gen_t, duplicater_t) */
-ccontainer_value_t struct_complex_duplicater_value(const ccontainer_value_t* value_in, ccontainer_err *err_code)
+ccontainer_value_t struct_complex_duplicater_value(const ccontainer_value_t* value_in, ccontainer_err_t *err_code)
 {
     ccontainer_value_t value_out;
     size_t len_str;
@@ -170,7 +170,7 @@ static void serialization_struct()
     struct_complex_t comp_struct_in;
     struct_complex_t comp_struct_out = {.pname=NULL,.one_float=0.f,.is_valid=false};
     ccontainer_value_t value;
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     struct_complex_init( &comp_struct_in, "maiki", 3.14f, true);
 
     value = make_value_struct_complex( &comp_struct_in, &err_code );
@@ -206,7 +206,7 @@ static void serialization_struct()
 
 static void deleter_and_duplicater_struct()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     ccontainer_value_t value_struct, value_struct_copy;
     
     struct_complex_t comp_struct;
@@ -235,7 +235,7 @@ static void deleter_and_duplicater_struct()
 
 static void push_back_one_struct()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     struct_complex_t struct_out = {.pname = NULL,.one_float=0.,.is_valid=false};
 
     struct_complex_t comp_struct;
@@ -284,7 +284,7 @@ static void push_back_two_struct_init_capacity_2()
     ccontainer_value_t *pvalue_out_ref;
     struct_complex_t struct_out = {.pname = NULL,.one_float=0.,.is_valid=false};
 
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     struct_complex_t comp_struct, comp_struct2;
     struct_complex_init( &comp_struct, "maiki", 3.14f, true);
     struct_complex_init( &comp_struct2, "toto", 2.31f, false);
@@ -327,7 +327,7 @@ static void push_back_two_struct_init_capacity_0()
     ccontainer_value_t *pvalue_out_ref;
     struct_complex_t struct_out = {.pname = NULL,.one_float=0.,.is_valid=false};
 
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     struct_complex_t comp_struct, comp_struct2;
     struct_complex_init( &comp_struct, "maiki", 3.14f, true);
     struct_complex_init( &comp_struct2, "toto", 2.31f, false);
@@ -376,7 +376,7 @@ static void push_back_two_struct_init_capacity_0()
 
 static void copy_constructor()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     struct_complex_t comp_struct, comp_struct2;
     struct_complex_init( &comp_struct, "maiki", 3.14f, true);
     struct_complex_init( &comp_struct2, "toto", 2.31f, false);
@@ -415,7 +415,7 @@ static void copy_constructor()
 /*
 static void wrapper_ref_from_vector()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     struct_complex_t comp_struct_in;
     struct_complex_init( &comp_struct_in, "maiki", 3.14f, true);
 

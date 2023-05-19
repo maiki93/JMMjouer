@@ -13,8 +13,8 @@
     Storage : similar to a map<nameGame, ptr_game_t>
 */
 
-#include "game_loader.h"
-#include "cmap_ptrf_game.h"
+#include "jmmjouer/game_loader/game_loader.h"
+#include "jmmjouer/game_loader/cmap_game_ptrf.h"
 
 #include "jmmjouer/game_loader/plugin_manager.h" /* to get singleton instance */
 #include "jmmjouer/utils_file.h"                 /* contains algo generic */
@@ -30,7 +30,7 @@
 
 /* full definition, a bit overkill this class with one data member but clear design and extendable */
 struct game_loader_type {
-    cmap_ptrf_game_t *map_game;
+    cmap_game_ptrf_t *map_game;
 };
 
 /*********** private functions *********/
@@ -59,11 +59,11 @@ void game_loader_init( game_loader_t *gameldr)
     game_ptrf_init( gameldr->map_game );
 }
     
-void game_loader_delete( game_loader_t *gameldr)
+void game_loader_free( game_loader_t *gameldr)
 {
     CLOG_DEBUG("Clear game_loader %d\n", 1);
-    game_ptrf_delete( gameldr->map_game );
-    gameldr->map_game = NULL;
+    game_ptrf_free( gameldr->map_game );
+    /*gameldr->map_game = NULL;*/
     free( gameldr );
 }
 
@@ -97,8 +97,9 @@ int game_loader_get_names2(const game_loader_t *gload, clist_cstring *list_names
 
 ptr_game_t game_loader_get_ptr_game( const game_loader_t *gameldr, const char * name_game)
 {
+    ccontainer_err_t err_code;
     ptr_game_t pfgame_local;
-    pfgame_local = game_ptrf_get_from_name( gameldr->map_game, name_game);
+    pfgame_local = game_ptrf_get_from_name( gameldr->map_game, name_game, &err_code);
     return (ptr_game_t)pfgame_local;
 }
 
@@ -142,7 +143,7 @@ int load_game_dll_callback( clist_gen_t *clist_base, const char *filename )
     int retour;
     plugin_mgr_t *plg_manager;
     /* down cast , must be sure */
-    cmap_ptrf_game_t *map = (cmap_ptrf_game_t *)clist_base;
+    cmap_game_ptrf_t *map = (cmap_game_ptrf_t *)clist_base;
     assert( map );
 
     plg_manager = plugin_manager_get_instance();
@@ -163,7 +164,7 @@ int load_game_dll_callback( clist_gen_t *clist_base, const char *filename )
 }
 
 /* could pass plugin_manager as parameter / or own it / or call getInstance() */
-int load_game_dll( cmap_ptrf_game_t *map, const char *filename )
+int load_game_dll( cmap_game_ptrf_t *map, const char *filename )
 {
     ptr_game_t pf_game = NULL;
     int retour;

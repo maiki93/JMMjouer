@@ -28,20 +28,20 @@ extern "C" {
  * The returned structure can be inserted in any ccontainer of the library.
  * \param[in] text_to_insert well-formed string with a null terminal character
  * \return ccontainer_value_t containing a copy of the input */
-ccontainer_value_t make_value_cstring( const char* text_to_insert, ccontainer_err *err_code);
+ccontainer_value_t make_value_cstring( const char* text_to_insert, ccontainer_err_t *err_code);
 
 /** Return an heap allocated cstring from a ccontainer_value_t.
    It creates a copy which must be freed by the caller.
    \param[inout]  value_in 
    \return a well formed string with the terminason character. */
-char* extract_value_cstring( const ccontainer_value_t *value_in, ccontainer_err *err_code);
+char* extract_value_cstring( const ccontainer_value_t *value_in, ccontainer_err_t *err_code);
 
 /** Specific destructor for ccontainer_value_t representation value_cstring data.
    Method to provide to ccontainer for safe deallocation of memory : delete/free/remove...
    \param[inout] pointer to ccontainer_value_t to deallocate */
 void deleter_value_cstring( ccontainer_value_t *value );
 
-ccontainer_value_t duplicater_value_cstring( const ccontainer_value_t *value_src, ccontainer_err *err_code);
+ccontainer_value_t duplicater_value_cstring( const ccontainer_value_t *value_src, ccontainer_err_t *err_code);
 
 /** @} */ /** public API */
 

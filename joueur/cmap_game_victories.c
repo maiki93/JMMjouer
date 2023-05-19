@@ -5,7 +5,7 @@
 #include "cmap_game_victories.h"
 
 /* ** Serialization / Deserialization / Default copy and deleter from value_t ***/
-ccontainer_value_t make_value_pair_victory( const struct pair_game_victory_t *pair_victory_in, ccontainer_err *err_code)
+ccontainer_value_t make_value_pair_victory( const struct pair_game_victory_t *pair_victory_in, ccontainer_err_t *err_code)
 {
     ccontainer_value_t value_out;
     char *p_buffer;
@@ -35,7 +35,7 @@ ccontainer_value_t make_value_pair_victory( const struct pair_game_victory_t *pa
     return value_out;
 }
 
-ccontainer_err extract_value_pair_victory(const ccontainer_value_t *value, struct pair_game_victory_t *pair_victory_out)
+ccontainer_err_t extract_value_pair_victory(const ccontainer_value_t *value, struct pair_game_victory_t *pair_victory_out)
 {
     assert( pair_victory_out );
     /* equivalent, here p += 20 working !! */
@@ -81,9 +81,9 @@ size_t game_victories_size(cmap_game_victories_t *cmap)
     return clist_gen_size( cmap->clist );
 }
 
-ccontainer_err game_victories_insert( cmap_game_victories_t *cmap, struct pair_game_victory_t pair)
+ccontainer_err_t game_victories_insert( cmap_game_victories_t *cmap, struct pair_game_victory_t pair)
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     /* a temporary value_t to be moved into clist_gen_t */
     ccontainer_value_t value_clist = make_value_pair_victory( &pair, &err_code );
     err_code = clist_gen_push_back( cmap->clist, &value_clist );
@@ -94,7 +94,7 @@ struct pair_game_victory_t game_victories_get_copy( cmap_game_victories_t *cmap,
 {
     struct pair_game_victory_t pair;
     ccontainer_value_t *pvalue_clist;
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     
     pvalue_clist = clist_gen_find( cmap->clist, name, strlen(name), &err_code );
     if( err_code != CCONTAINER_OK )

@@ -64,17 +64,17 @@ SHARED_EXPORT size_t clist_gen_size(const clist_gen_t *clist);
  * \param[in] clist pointer to a clist_gen_t
  * \param[in] value ccontainer_value_t to be copied into the list
  */
-SHARED_EXPORT ccontainer_err clist_gen_push_front(clist_gen_t *clist, ccontainer_value_t *value);
+SHARED_EXPORT ccontainer_err_t clist_gen_push_front(clist_gen_t *clist, ccontainer_value_t *value);
 
 /** @brief Make a copy of the input value at the end of the list 
  * \param[in] clist pointer to a clist_gen_t
 */
-SHARED_EXPORT ccontainer_err clist_gen_push_back(clist_gen_t *clist, ccontainer_value_t *value_in);
+SHARED_EXPORT ccontainer_err_t clist_gen_push_back(clist_gen_t *clist, ccontainer_value_t *value_in);
 
 /** Interface and usage not very convenient ** if want to modify only, not safe as well 
    but no copy needed 
    \param[in] clist pointer to a clist_gen_t */
-SHARED_EXPORT ccontainer_value_t* clist_gen_get_at( const clist_gen_t *clist, size_t index, ccontainer_err *err_code);
+SHARED_EXPORT ccontainer_value_t* clist_gen_get_at( const clist_gen_t *clist, size_t index, ccontainer_err_t *err_code);
 /** Get a copy of the content , better adapted for use ? 
      \param[in] clist pointer to a clist_gen_t */
 /* SHARED_EXPORT int clist_gen_get_value_copy( const clist_gen_t *clist, size_t elem_nb, ccontainer_value_t *value_out); */
@@ -87,7 +87,7 @@ SHARED_EXPORT ccontainer_value_t* clist_gen_get_at( const clist_gen_t *clist, si
    \param[out] value_out pointer to an internally allocated ccontainer_value_t
    \return ERROR code */
 SHARED_EXPORT ccontainer_value_t* clist_gen_find( const clist_gen_t* clist, 
-                                    const char* buffer, size_t buffer_len, ccontainer_err *err_code);
+                                    const char* buffer, size_t buffer_len, ccontainer_err_t *err_code);
 
 #ifdef __cplusplus
 }

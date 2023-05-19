@@ -78,7 +78,7 @@ static void push_back_two_strings_get_copy()
 {
     clist_cstring_t list_cstr;
     char *string_out = NULL;
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
 
     clist_cstring_init( &list_cstr);
     err_code = clist_cstring_push_back(&list_cstr, string1);
@@ -98,7 +98,7 @@ static void push_back_two_strings_get_copy()
 
 static void push_back_two_strings_get_ref()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     char * string_out = NULL;
     // allocation done in setup
     // push one

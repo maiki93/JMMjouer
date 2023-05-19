@@ -21,7 +21,7 @@ void cvector_gen_init( cvector_gen_t* cvect )
     cvect->ptrf_duplicater = ccontainer_copy_value;
 }
 
-ccontainer_err cvector_gen_init_with_capacity( cvector_gen_t* cvect, size_t init_capacity)
+ccontainer_err_t cvector_gen_init_with_capacity( cvector_gen_t* cvect, size_t init_capacity)
 {
     /* memory allocation of array of ccontainer_value_t */
     ccontainer_value_t *tab = calloc( init_capacity, sizeof(ccontainer_value_t) );
@@ -38,7 +38,7 @@ ccontainer_err cvector_gen_init_with_capacity( cvector_gen_t* cvect, size_t init
     return CCONTAINER_OK;
 }
 
-cvector_gen_t cvector_gen_copy(const cvector_gen_t* cvect_src, ccontainer_err *err_code)
+cvector_gen_t cvector_gen_copy(const cvector_gen_t* cvect_src, ccontainer_err_t *err_code)
 {
     cvector_gen_t cvect_out;
     size_t i;
@@ -120,7 +120,7 @@ size_t cvector_gen_capacity(const cvector_gen_t *cvect)
     return cvect->capacity;
 }
 
-ccontainer_err cvector_gen_set_capacity(cvector_gen_t *cvect, size_t new_capacity)
+ccontainer_err_t cvector_gen_set_capacity(cvector_gen_t *cvect, size_t new_capacity)
 {
     ccontainer_value_t *tmp;
     size_t i, memo_len = cvect->len;
@@ -150,9 +150,9 @@ ccontainer_err cvector_gen_set_capacity(cvector_gen_t *cvect, size_t new_capacit
     return CCONTAINER_OK;
 }
 
-ccontainer_err cvector_gen_push_back(cvector_gen_t *cvect, ccontainer_value_t *value_in)
+ccontainer_err_t cvector_gen_push_back(cvector_gen_t *cvect, ccontainer_value_t *value_in)
 {
-    ccontainer_err code_err;
+    ccontainer_err_t code_err;
 
     if( (code_err = cvector_gen_set_capacity( cvect, cvect->len+1 )) != CCONTAINER_OK ) {
         return code_err;
@@ -168,7 +168,7 @@ ccontainer_err cvector_gen_push_back(cvector_gen_t *cvect, ccontainer_value_t *v
     return CCONTAINER_OK;
 }
 
-ccontainer_value_t* cvector_gen_get_at(const cvector_gen_t *cvect, size_t index, ccontainer_err* err_code)
+ccontainer_value_t* cvector_gen_get_at(const cvector_gen_t *cvect, size_t index, ccontainer_err_t* err_code)
 {
     /* size_t always positive */
     if( index >= cvect->len) {

@@ -50,10 +50,10 @@ size_t clist_cstring_size(clist_cstring_t *clist_str)
     return clist_gen_size( clist_str->clist );
 }
 
-ccontainer_err clist_cstring_push_back(clist_cstring_t *clist_str, const char *to_insert)
+ccontainer_err_t clist_cstring_push_back(clist_cstring_t *clist_str, const char *to_insert)
 {
     ccontainer_value_t tmp_value_in;
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     assert( clist_str );
     assert( to_insert );
 
@@ -64,7 +64,7 @@ ccontainer_err clist_cstring_push_back(clist_cstring_t *clist_str, const char *t
     return clist_gen_push_back( clist_str->clist, &tmp_value_in );
 }
 
-char* clist_cstring_get_copy_at( clist_cstring_t *list, size_t index, ccontainer_err *err_code )
+char* clist_cstring_get_copy_at( clist_cstring_t *list, size_t index, ccontainer_err_t *err_code )
 {
     char* string_out;
     ccontainer_value_t* pvalue_out;
@@ -78,7 +78,7 @@ char* clist_cstring_get_copy_at( clist_cstring_t *list, size_t index, ccontainer
     return string_out;
 }
 
-char* clist_cstring_get_ref_at( clist_cstring_t *clist_str, size_t index, ccontainer_err *err_code)
+char* clist_cstring_get_ref_at( clist_cstring_t *clist_str, size_t index, ccontainer_err_t *err_code)
 {
     ccontainer_value_t *pvalue;
     char *string_out;
@@ -98,7 +98,7 @@ int clist_cstring_get_array( clist_cstring_t *list, char ***array_out, size_t *a
 {
     /*ccontainer_value_t value_out;*/
     ccontainer_value_t* pvalue_out; /* temporary value */
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     char **array = NULL; /* use local only */
     size_t lgen_len, indice;
     

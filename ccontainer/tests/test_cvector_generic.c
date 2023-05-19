@@ -14,7 +14,7 @@ static ccontainer_value_t value_str3 = {.data="tree",.len=4}; /* available C90 *
 
 static void initialization_on_stack()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     cvector_gen_t cvect;
     // no memory allocation, no error_code, default destructor and copy
     cvector_gen_init( &cvect );
@@ -40,7 +40,7 @@ static void initialization_on_stack()
 
 static void initialization_on_heap()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     cvector_gen_t *cvect = cvector_gen_new();
     cvector_gen_init( cvect );
 
@@ -62,7 +62,7 @@ static void initialization_on_heap()
 
 static void push_two_str_in_capacity_five()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     cvector_gen_t *cvect;
 
     ccontainer_value_t tmp_value_in;
@@ -93,7 +93,7 @@ static void push_two_str_in_capacity_five()
 
 static void push_two_str_in_empty_cvector()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     ccontainer_value_t tmp_value_in;
     cvector_gen_t cvect;
 
@@ -116,7 +116,7 @@ static void push_two_str_in_empty_cvector()
 
 static void get_reference()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     cvector_gen_t cvect;
     ccontainer_value_t tmp_value_in;
     ccontainer_value_t* pvalue_out;
@@ -166,7 +166,7 @@ static void get_reference()
 
 static void copy_constructor()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     cvector_gen_t cvect, cvect_copy;
     ccontainer_value_t tmp_value_in;
     
@@ -190,7 +190,7 @@ static void copy_constructor()
 
 static void swap_2index()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     cvector_gen_t cvect;
     ccontainer_value_t tmp_value_in;
     ccontainer_value_t* pvalue_out;

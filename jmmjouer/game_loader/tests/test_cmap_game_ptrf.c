@@ -8,7 +8,8 @@
 /* variant from cmap, include header */
 /* #include "../cmap_ptrf_game.h" */
 /* No ! main test is make_value / extract_value, others are only recopy */
-#include "jmmjouer/game_loader/cmap_ptrf_game.c"
+#include "jmmjouer/game_loader/cmap_game_ptrf.c"
+/*#include "jmmjouer/game_loader/cmap_game_ptrf.h"*/
 
 /* function to pointer test, explicit correct argument */
 static victory_t test1(person_t person) {
@@ -21,95 +22,107 @@ static victory_t test1(person_t person) {
     return vict_out;
 }
 
-struct pair_ptr_game pair_in1 = {"first",
+struct pair_game_ptrf pair_in1 = {"first",
                                  NULL};
 
-struct pair_ptr_game pair_in2 = {"second",
+struct pair_game_ptrf pair_in2 = {"second",
                                  &test1};
 
 static void pair_game_to_value()
 {
-    value_t value_out;
-
-    value_out = make_value_ptr_game( &pair_in2 );
+    ccontainer_err_t err_code;
+    ccontainer_value_t value_out;
+    // copy all data into value_t (serailization string + ptr_game)
+    value_out = make_value_game_ptrf( &pair_in2, &err_code );
+    assert_int_equal(CCONTAINER_OK, err_code);
     assert_string_equal("second", value_out.data);
-    // free memory before calling again
-    // or delete inside ?? unitialized not clear...
-    free_value( &value_out );
+    // default deleter, no pointer inside value_t
+    ccontainer_delete_value( &value_out );
 
-    value_out = make_value_ptr_game( &pair_in1 );
+    value_out = make_value_game_ptrf( &pair_in1, &err_code );
     assert_string_equal("first", value_out.data);
-    free_value( &value_out );
+    ccontainer_delete_value( &value_out );
 }
 
 static void value_to_pair_game()
 {
-    value_t value_out;
+    ccontainer_err_t err_code;
+    ccontainer_value_t value_out;
     // allocated inside call
-    value_out = make_value_ptr_game( &pair_in2 );
+    value_out = make_value_game_ptrf( &pair_in2, &err_code );
 
     // allocated inside function, caller repsonsible deallocation
-    struct pair_ptr_game pair_out = extract_value_ptr_game( &value_out );
-
+    struct pair_game_ptrf pair_out = extract_value_pair_game_ptrf( &value_out, &err_code );
+    assert_int_equal(CCONTAINER_OK, err_code);
     assert_string_equal("second", pair_out.game_name);
     assert_ptr_equal( &test1, pair_out.pfgame);
 
-    assert_int_equal(1,1);
-    // delete
-    delete_pair_ptr_game( &pair_out );
-    free_value( &value_out );
-    
+    // delete pair
+    delete_pair_game_ptrf( &pair_out );
+    // delete copy in value_t
+    ccontainer_delete_value( &value_out );
 }
 
 static void initialization_on_heap()
 {
-    cmap_ptrf_game_t *cmap;
+    cmap_game_ptrf_t *cmap;
     cmap = game_ptrf_new();
 
     game_ptrf_init( cmap );
     assert( cmap->clist != NULL);
+    assert( game_ptrf_size( cmap ) == 0);
 
-    game_ptrf_delete( cmap );
+    game_ptrf_free( cmap );
     cmap = NULL;
 }
 
-static void insert_new_pair_game()
+static void insert_two_pair()
 {
-    int retour;
-    cmap_ptrf_game_t *cmap;
+    ccontainer_err_t err_code;
+    cmap_game_ptrf_t *cmap;
+
     cmap = game_ptrf_new();
     game_ptrf_init( cmap );
 
-    retour = game_ptrf_insert( cmap, pair_in1.game_name, pair_in1.pfgame);
-    assert_int_equal(retour, CLIST_OK);
+    err_code = game_ptrf_insert( cmap, pair_in1.game_name, pair_in1.pfgame);
+    assert_int_equal(err_code, CCONTAINER_OK);
     assert_int_equal(1, game_ptrf_size(cmap));
 
-    game_ptrf_delete( cmap );
+    err_code = game_ptrf_insert( cmap, pair_in2.game_name, pair_in2.pfgame);
+    assert_int_equal(err_code, CCONTAINER_OK);
+    assert_int_equal(2, game_ptrf_size(cmap));
+
+    game_ptrf_free( cmap );
 }
 
 static void get_ptrf_from_name()
 {
-    cmap_ptrf_game_t *cmap;
+    ccontainer_err_t err_code;
+    cmap_game_ptrf_t *cmap;
+
     cmap = game_ptrf_new();
     game_ptrf_init( cmap );
 
-    game_ptrf_insert( cmap, pair_in1.game_name, pair_in1.pfgame);
-    game_ptrf_insert( cmap, pair_in2.game_name, pair_in2.pfgame);
+    err_code = game_ptrf_insert( cmap, pair_in1.game_name, pair_in1.pfgame);
+    err_code = game_ptrf_insert( cmap, pair_in2.game_name, pair_in2.pfgame);
+    assert_int_equal(CCONTAINER_OK, err_code);
 
     ptr_game_t ptrf1;
-    ptrf1 = game_ptrf_get_from_name(cmap, "second");
+    ptrf1 = game_ptrf_get_from_name(cmap, "second", &err_code);
+    assert_int_equal(CCONTAINER_OK, err_code);
     assert_ptr_equal( &test1, ptrf1 );
 
     ptr_game_t ptrf2;
-    ptrf2 = game_ptrf_get_from_name(cmap, "first");
+    ptrf2 = game_ptrf_get_from_name(cmap, "first", &err_code);
     assert_ptr_equal( NULL, ptrf2 );
 
-    game_ptrf_delete( cmap );
+    game_ptrf_free( cmap );
 }
 
 static void get_clist_cstring_game_name()
 {
-    cmap_ptrf_game_t *cmap;
+    ccontainer_err_t err_code;
+    cmap_game_ptrf_t *cmap;
     clist_cstring_t *names;
     char *name_game_out; 
 
@@ -121,15 +134,16 @@ static void get_clist_cstring_game_name()
     names = game_ptrf_get_names( cmap );
     
     assert_int_equal( 2, clist_cstring_size( names ));
-    clist_cstring_get_ref( names, 0, &name_game_out );
+    name_game_out = clist_cstring_get_ref_at( names, 0, &err_code );
     assert_string_equal("first", name_game_out);
-    clist_cstring_get_ref( names, 1, &name_game_out );
+    name_game_out = clist_cstring_get_ref_at( names, 1, &err_code );
     assert_string_equal("second", name_game_out);
-    clist_cstring_delete( names );
-    game_ptrf_delete( cmap );
+    clist_cstring_free( names );
+    game_ptrf_free( cmap );
 }
 
 /* return array, set deprecated */
+/*
 static void get_array_game_name()
 {
     cmap_ptrf_game_t *cmap;
@@ -144,7 +158,7 @@ static void get_array_game_name()
     game_ptrf_insert( cmap, pair_in2.game_name, pair_in2.pfgame);
 
     retour = game_ptrf_get_array_name( cmap, &names, &names_len);
-    assert_int_equal( CLIST_OK, retour );
+    assert_int_equal( CCONTAINER_OK, retour );
     assert_int_equal( 2, names_len );
     assert_string_equal( "first", names[0]);
     assert_string_equal( "second", names[1]);
@@ -156,6 +170,7 @@ static void get_array_game_name()
     }
     free(names);
 }
+*/
 
 int main()
 {
@@ -164,10 +179,10 @@ int main()
         cmocka_unit_test(pair_game_to_value),
         cmocka_unit_test(value_to_pair_game),
         cmocka_unit_test(initialization_on_heap),
-        cmocka_unit_test(insert_new_pair_game),
+        cmocka_unit_test(insert_two_pair),
         cmocka_unit_test(get_ptrf_from_name),
         cmocka_unit_test(get_clist_cstring_game_name),
-        cmocka_unit_test(get_array_game_name),
+        //cmocka_unit_test(get_array_game_name),
         /*
         cmocka_unit_test(find_not_existing_entry),
         */

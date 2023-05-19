@@ -2,7 +2,7 @@
 #include "string.h"
 #include "assert.h"
 
-ccontainer_value_t make_value_cstring( const char* text_to_insert, ccontainer_err *err_code)
+ccontainer_value_t make_value_cstring( const char* text_to_insert, ccontainer_err_t *err_code)
 {
     ccontainer_value_t value_out;
     char *tmp_buffer;
@@ -27,7 +27,7 @@ ccontainer_value_t make_value_cstring( const char* text_to_insert, ccontainer_er
     return value_out;
 }
 
-char* extract_value_cstring( const ccontainer_value_t *value_in, ccontainer_err *err_code)
+char* extract_value_cstring( const ccontainer_value_t *value_in, ccontainer_err_t *err_code)
 {
     char *string_out;
     /* ccontainer_value_t::data and len include the terminaison caracter */
@@ -49,7 +49,7 @@ void deleter_value_cstring( ccontainer_value_t *value)
     value->len = 0;
 }
 
-ccontainer_value_t duplicater_value_cstring( const ccontainer_value_t *value_src, ccontainer_err *err_code)
+ccontainer_value_t duplicater_value_cstring( const ccontainer_value_t *value_src, ccontainer_err_t *err_code)
 {
     ccontainer_value_t value_out;
     char* tmp_buffer;

@@ -56,7 +56,7 @@ static void initialization_on_heap()
 
 static void add_one_str_as_value()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     ccontainer_value_t tmp_value_in;
     clist_gen_t clist;
     clist_gen_init( &clist );
@@ -80,7 +80,7 @@ static void add_one_str_as_value()
 
 static void add_two_str_as_value()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     ccontainer_value_t tmp_value_in;
     clist_gen_t clist;
     clist_gen_init( &clist );
@@ -104,7 +104,7 @@ static void add_two_str_as_value()
 
 static void add_last_two_str_as_value()
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     ccontainer_value_t tmp_value_in;
     clist_gen_t *clist = clist_gen_new();
     clist_gen_init( clist );
@@ -126,7 +126,7 @@ static void add_last_two_str_as_value()
 
 static void get_element_by_index() 
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     ccontainer_value_t tmp_value_in;
     clist_gen_t clist;
     ccontainer_value_t* pvalue_out; /* value by ref */
@@ -158,7 +158,7 @@ static void get_element_by_index()
 
 static void find_element_by_comparison() 
 {
-    ccontainer_err err_code;
+    ccontainer_err_t err_code;
     ccontainer_value_t tmp_value_in;
     clist_gen_t clist;
     ccontainer_value_t value_str_local, value_str_local2; 

@@ -20,7 +20,7 @@ static int setup(void **state) {
 /* clear data and delete the instance */
 static int teardown(void **state) {
     (void) state;
-    game_loader_delete( gload );
+    game_loader_free( gload );
     gload = NULL;
     return 0;
 }
@@ -93,8 +93,9 @@ static void get_array_2_names(void **state) {
     free(name);
 }
 
-static void get_clist_cstring_2_names() {
-
+static void get_clist_cstring_2_names() 
+{
+    ccontainer_err_t err_code;
     clist_cstring_t *clist;
     char *name_game_out;
     
@@ -108,13 +109,13 @@ static void get_clist_cstring_2_names() {
     assert_int_equal( 2, game_ptrf_size(gload->map_game));  // compare to size of game_loader array directly
     assert_int_equal( 2, clist_cstring_size( clist) );
 
-    clist_cstring_get_ref( clist, 0, &name_game_out );
+    name_game_out = clist_cstring_get_ref_at( clist, 0, &err_code );
     assert_int_equal( 4, strlen(name_game_out));
     assert_string_equal( "toto", name_game_out );
-    clist_cstring_get_ref( clist, 1, &name_game_out );
+    name_game_out = clist_cstring_get_ref_at( clist, 1, &err_code );
     assert_string_equal( "titi2", name_game_out );
 
-    clist_cstring_delete( clist );
+    clist_cstring_free( clist );
 }
 
 
@@ -138,6 +139,7 @@ static void get_ptr_games_from_name()
     */
     assert_int_equal( 0x10, pfgame1 );
     assert_int_equal( 0x20, pfgame2 );
+
 }
 
 /* static void get_ptr_games_from_indices() {
