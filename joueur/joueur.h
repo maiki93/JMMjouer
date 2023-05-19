@@ -30,7 +30,8 @@ SHARED_EXPORT int joueur_init(joueur_t *joueur, const char * name, bool is_dalto
  * person_t is invalid and map empty */
 SHARED_EXPORT int joueur_default_init(joueur_t *joueur);
 /** Destructor, clear the map */
-SHARED_EXPORT void joueur_clear(joueur_t *joueur);
+SHARED_EXPORT void joueur_delete(joueur_t *joueur);
+
 /** Print info to console, much better to do later for generalization */
 SHARED_EXPORT void joueur_info(joueur_t *joueur);
 

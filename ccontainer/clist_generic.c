@@ -111,12 +111,10 @@ ccontainer_err clist_gen_push_front(clist_gen_t *clist, ccontainer_value_t *valu
     return CCONTAINER_OK;
 }
 
-/** arument by pointer, avoid a copy 
- * push_back , const not ? but use of move */
 ccontainer_err clist_gen_push_back(clist_gen_t *clist, ccontainer_value_t *value_in)
 {
     struct clist_node *new_node;
-    /* return a copy, may create the strange behaviour */
+    /* pointer to last node, a reference */
     struct clist_node *last_node = get_node_last(clist->first_node);
     /* create a  new node */
     new_node = (struct clist_node*) malloc( sizeof(struct clist_node));
@@ -174,7 +172,6 @@ ccontainer_value_t* clist_gen_find( const clist_gen_t *clist,
         /* update node */
         curr_node = get_next_node( curr_node );
     } while ( curr_node != NULL );
-
 
     *err_code = CCONTAINER_NOT_FOUND;
     return NULL;

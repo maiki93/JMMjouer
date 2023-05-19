@@ -29,7 +29,7 @@ int joueur_default_init(joueur_t *joueur)
     return PERSON_OK;   
 }
 
-void joueur_clear(joueur_t *joueur)
+void joueur_delete(joueur_t *joueur)
 {
     assert( joueur );
     /* to write */
@@ -38,7 +38,7 @@ void joueur_clear(joueur_t *joueur)
         printf("Joueur %s, TODO must clear the map", joueur->person.nom);
     } 
     /* to do all the time indeeded */
-    game_victories_clear( &(joueur->map_victories) );       
+    game_victories_delete( &(joueur->map_victories) );       
 }
 
 void joueur_info(joueur_t *joueur)

@@ -28,24 +28,36 @@ struct pair_game_victory_t {
  * \ingroup entities_grp
 */
 typedef struct {
-    /* clist_gen_t clist; no access generic type in h  ? musst use pointer ? to check ..*/
     /** pointer a clist_gen_t */
     clist_gen_t *clist;
 } cmap_game_victories_t;
 
-/* internal usage only, dependent value_t and victory_t only 
-    shared export not needed if internal module ?? */
-/** \name transfert function between \ref pair_game_victory_t and \ref value_t for ccontainer 
- * \{ */
-/** Return a value_t from a pair_game_victory_t */
-/*SHARED_EXPORT*/ value_t make_value_victory( struct pair_game_victory_t victory );
-/** Extract a pair_game_victory_t from a generic value_t */
-/*SHARED_EXPORT*/ struct pair_game_victory_t extract_value_victory( const value_t* value);
-/** \} */
 
-/* to see in this case...
+/** \name Adapter functions to ccontainer for \ref pair_game_victory_t. 
+ * \{ */
+/** Return a ccontainer_value_t from a pair_game_victory_t.
+ * Create a copy of all data in pair, for insertion into the cmap
+ * \param[in] pointer to a pair
+ * \param[out] pointer to a ccontainer error code
+ * \return ccontainer_value_t with a copy of the data in pair
+ */
+ccontainer_value_t make_value_pair_victory( const struct pair_game_victory_t *pair_victory_in, ccontainer_err *err_code);
+
+/** Extract a pair_game_victory_t from a generic value_t 
+ *  Create a copy of the data in value_in into pair_victory_out
+ * \pre pair_out must point to a valid adress (memory already allocated on stack or on heap before the call)
+ * \note no memory allocation, err_code useless. may change api.
+ * \param[in] pointer to a value_t as source
+ * \param[out] pointer to a pair_victory_t, memory must be allocated before the call
+ * \return error_code from ccontainer library. */
+ccontainer_err extract_value_pair_victory( const ccontainer_value_t* value_in, struct pair_game_victory_t *pair_victory_out);
+
+/* All allocation on heap : do not need specific deleter or duplicater
 void deleter(value_t* value)
 */
+
+/** \} */ /* end of adapter section */
+
 
 /** \name Constructor / Destructor 
  * \{ */
@@ -54,9 +66,9 @@ SHARED_EXPORT cmap_game_victories_t* game_victories_new();
 /** Constructor */
 SHARED_EXPORT void game_victories_init(cmap_game_victories_t *cmap);
 /** Clear all contents */
-SHARED_EXPORT void game_victories_clear(cmap_game_victories_t *cmap);
-/** Free memory */
 SHARED_EXPORT void game_victories_delete(cmap_game_victories_t *cmap);
+/** Free memory */
+SHARED_EXPORT void game_victories_free(cmap_game_victories_t *cmap);
 /** \} */
 
 /** \name public API */
@@ -64,7 +76,7 @@ SHARED_EXPORT void game_victories_delete(cmap_game_victories_t *cmap);
 /** Return the size of the map */
 SHARED_EXPORT size_t game_victories_size(cmap_game_victories_t *cmap);
 /** Insert a pair_game_victory_t into the map. */
-SHARED_EXPORT int game_victories_insert( cmap_game_victories_t *cmap, struct pair_game_victory_t victory);
+SHARED_EXPORT ccontainer_err game_victories_insert( cmap_game_victories_t *cmap, struct pair_game_victory_t victory);
 /** Retrieve the pair_game_victory_t value with the provided key */
 SHARED_EXPORT struct pair_game_victory_t game_victories_get_copy( cmap_game_victories_t *cmap, const char *name);
 /** \} */

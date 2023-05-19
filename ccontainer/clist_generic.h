@@ -79,11 +79,10 @@ SHARED_EXPORT ccontainer_value_t* clist_gen_get_at( const clist_gen_t *clist, si
      \param[in] clist pointer to a clist_gen_t */
 /* SHARED_EXPORT int clist_gen_get_value_copy( const clist_gen_t *clist, size_t elem_nb, ccontainer_value_t *value_out); */
 
-/** @brief Retrieve a COPY of the first element where the buffer match the internal ccontainer_value_t::data.
-
-   \todo equivalent with reference. improve interface with usage. works for string, need a comp function indeed.
+/** Retrieve a reference of the first value_t matching the criteria.
    Most important function  for reuse and specialization, very generic at this level 
    It checks the first n bytes given in buffer (later comp function ?)
+   \todo works for string, need a comp function indeed.
    \param[in] clist pointer to a clist_gen_t
    \param[out] value_out pointer to an internally allocated ccontainer_value_t
    \return ERROR code */

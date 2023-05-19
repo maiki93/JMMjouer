@@ -4,46 +4,49 @@
 
 #include "cmap_game_victories.h"
 
-/*** Serialization / Deserialization / Copy ? with value_t **********/
-value_t make_value_victory( struct pair_game_victory_t pair )
+/* ** Serialization / Deserialization / Default copy and deleter from value_t ***/
+ccontainer_value_t make_value_pair_victory( const struct pair_game_victory_t *pair_victory_in, ccontainer_err *err_code)
 {
-    value_t value;
-    char buffer[sizeof(struct pair_game_victory_t)];
+    ccontainer_value_t value_out;
+    char *p_buffer;
+    assert( pair_victory_in );
+    assert( strlen(pair_victory_in->game_name) < 20 );
+
+    ccontainer_reset_value(&value_out);
     /* pointer to follow the serialization */
-    char *p_buffer = buffer;
-    /* maybe return value to use */    
-    memcpy( p_buffer, pair.game_name, 20);
-    p_buffer += 20;
-    memcpy( p_buffer, &pair.victories, sizeof(victory_t) );
-    
-    value.data = (char*)malloc( sizeof(struct pair_game_victory_t) );
-    memcpy( value.data, buffer, sizeof(struct pair_game_victory_t));
-
-    /* again a copy, dr_memeroy */
-    /* not possible buffer ? */
-    
-    value.len = sizeof(struct pair_game_victory_t);
-    return value;
-}
-
-struct pair_game_victory_t extract_value_victory(const value_t *value)
-{
-    struct pair_game_victory_t pair;
-    char *p = value->data;
-    
-    memcpy( pair.game_name, value->data, 20);
-    p += 20;
-    memcpy( &pair.victories, p, sizeof(victory_t) );
-    return pair;
-}
-/* again the same function, should use a default */
-static void deleter_pair_game_victory( value_t *value)
-{
-    if( value ) {
-        free(value->data);
-        value->data = NULL;
+    p_buffer = (char *) malloc( sizeof(struct pair_game_victory_t));
+    if( !p_buffer ) {
+        *err_code = CCONTAINER_ALLOCERR;
+        return value_out;
     }
-    value->len = 0;
+    
+    /* serialize name (fixed=20) + victory (fixed=3*8) */ 
+    /*memcpy( p_buffer, &(pair_victory_in->game_name), 20);*/
+    /* p_buffer += 20; */ /* it not equivalent !! */
+    /*memcpy( p_buffer + 20, &(pair_victory_in->victories), sizeof(victory_t) );*/
+
+    /* no pointer in pair structure, can copy byte-to-byte */
+    memcpy( p_buffer, pair_victory_in, sizeof(struct pair_game_victory_t));
+    
+    /* swap and return */
+    *err_code = CCONTAINER_OK;
+    value_out.data = p_buffer;
+    value_out.len = sizeof(struct pair_game_victory_t);
+    return value_out;
+}
+
+ccontainer_err extract_value_pair_victory(const ccontainer_value_t *value, struct pair_game_victory_t *pair_victory_out)
+{
+    assert( pair_victory_out );
+    /* equivalent, here p += 20 working !! */
+    /*
+    memcpy( pair_victory_out->game_name, value->data, 20);
+    p += 20;
+    memcpy( &(pair_victory_out->victories), p, sizeof(victory_t) );
+    */
+    memcpy( pair_victory_out, value->data, sizeof(struct pair_game_victory_t));
+    
+    return CCONTAINER_OK;
 }
 
 /*** Implementation Constructor/Destructor *****/
@@ -58,29 +61,17 @@ void game_victories_init(cmap_game_victories_t *cmap)
     clist_gen_init( cmap->clist );
 }
 
-void game_victories_clear(cmap_game_victories_t *cmap)
+void game_victories_delete(cmap_game_victories_t *cmap)
 {
     assert( cmap->clist != NULL);
-    /* to test if not null ? */
-    clist_gen_clear( cmap->clist, deleter_pair_game_victory);
-    /* post condition before continuing */
-    assert( cmap->clist != NULL);
-    assert( clist_gen_size( cmap->clist) == 0);
-    /* in clist_cstring: free clist
-        here try to keep valid but empty cmap 
-        not possible because clist is a pointer !! 
-        on stack no other possibility to delelte (need object ! )*/
-    free(cmap->clist);
+    /* it is a pointer to clist_gen_t */
+    clist_gen_free( cmap->clist, ccontainer_delete_value );
     cmap->clist = NULL;
 }
 
-void game_victories_delete(cmap_game_victories_t *cmap)
+void game_victories_free(cmap_game_victories_t *cmap)
 {
-    if( ! cmap->clist ) {
-        /*clist_gen_del( cmap->clist, deleter_pair);*/
-        game_victories_clear( cmap );
-    }
-    /* to de done only is declred on heap */
+    game_victories_delete( cmap );
     free(cmap);
 }
 
@@ -90,39 +81,29 @@ size_t game_victories_size(cmap_game_victories_t *cmap)
     return clist_gen_size( cmap->clist );
 }
 
-int game_victories_insert( cmap_game_victories_t *cmap, struct pair_game_victory_t pair)
+ccontainer_err game_victories_insert( cmap_game_victories_t *cmap, struct pair_game_victory_t pair)
 {
-    int retour;
-
-    value_t value_clist = make_value_victory( pair );
-    retour = clist_gen_push_back( cmap->clist, &value_clist );
-    /* free_value if access */
-    /*
-    free(value_clist.data);
-    value_clist.data = NULL;
-    value_clist.len = 0;
-    */
-   free_value( &value_clist );
-   return retour;
+    ccontainer_err err_code;
+    /* a temporary value_t to be moved into clist_gen_t */
+    ccontainer_value_t value_clist = make_value_pair_victory( &pair, &err_code );
+    err_code = clist_gen_push_back( cmap->clist, &value_clist );
+   return err_code;
 }
 
 struct pair_game_victory_t game_victories_get_copy( cmap_game_victories_t *cmap, const char *name)
 {
-    int retour;
     struct pair_game_victory_t pair;
-    value_t value_clist;
+    ccontainer_value_t *pvalue_clist;
+    ccontainer_err err_code;
     
-    retour = clist_gen_find( cmap->clist, &value_clist, name, strlen(name) );
-    if( retour != CLIST_OK )
+    pvalue_clist = clist_gen_find( cmap->clist, name, strlen(name), &err_code );
+    if( err_code != CCONTAINER_OK )
     {
         strcpy( pair.game_name, "invalid");
         return pair;
     }
-    /* create victory from value_clist */
-    pair = extract_value_victory( &value_clist );
-    /* deallocate local copy */
-    free(value_clist.data);
-
+    /* create pair_victory from value_clist */
+    err_code = extract_value_pair_victory( pvalue_clist, &pair );
     return pair;
 }
 

@@ -5,7 +5,6 @@
 
 #include "shared_EXPORTS.h"
 
-/* by default all *h files included in doxygen, or just use at least one command block ? */
 /** @file
  * Definition of a person : name and characteristics (daltonien).
  * 
@@ -30,7 +29,7 @@ enum { MAX_SIZE_NOM_PERSON = 20 };    /* or enum considerered as constant expres
 /** Invalid person. */
 #define PERSON_INVALID -1
 /** @} */
-/* #define PERSON_ADMIN 1 */ /* with administration rights */
+/* #define PERSON_ADMIN 1 */ /* with administration rights, use mask ? */
 
 /** Description of a general person with name and specific profile.
   Full declaration of the structure in header, gives public access in C.
@@ -42,15 +41,9 @@ typedef struct {
     /** profile, for use of colors in the game console */
     bool is_daltonien;
     /*bool is_admin;*/ /* default false, got info from record */
-    /* to be in param game
-    bool serie_3_game;  true : indicate if the player participe to a serie of all games, maximum one of each game)
-                        false : ask to make again a game */
-    /* simpler to include the list of victories inside,
-     maybe too linked... copy etc... make only one joueur_with_victory ? */
-    /*cmap_game_victories_t map_victories;*/
 } person_t;
 
-/** @name Constructor */
+/** @name Constructor / Destructor */
 /** @{ */
 /** Default constructor. 
     Set name:"invalid" and is_daltonien:false */

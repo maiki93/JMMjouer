@@ -61,8 +61,7 @@ static void joueur_not_found()
     joueur = record_find_joueur_from_name( (irecord_t*)file, "titi");
     assert_string_equal( joueur.person.nom, "invalid");
 
-    /* joueur_delete(); */ /* needed if contains pointer to allocated memory */
-    joueur_clear( &joueur );
+    joueur_delete( &joueur );
     file_record_delete( file );
     free( file );
 }
@@ -81,7 +80,7 @@ static void joueur_valid_daltonien_no_game()
     // kevin has no games recorded
     assert_int_equal( 0, game_victories_size( & joueur.map_victories) );
 
-    joueur_clear( &joueur );
+    joueur_delete( &joueur );
     file_record_delete( file );
     free( file );
 }
@@ -121,7 +120,7 @@ static void joueur_with_historic()
     pair_out = game_victories_get_copy( &(joueur.map_victories), "toto" );
     assert_string_equal( "invalid", pair_out.game_name);
 
-    joueur_clear( &joueur );
+    joueur_delete( &joueur );
     file_record_delete( file );
     free( file );
 }
@@ -144,10 +143,9 @@ static void default_init_joueur_with_historic()
     size_t nb_games = game_victories_size( & joueur.map_victories );
     assert_int_equal(3, nb_games);
 
-    joueur_clear( &joueur );
+    joueur_delete( &joueur );
     file_record_delete( file );
     free( file );
-
 }
 
 static void count_functional_style_test()
