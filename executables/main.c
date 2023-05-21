@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
     file_record_delete( record );
     record = NULL;
     
-    game_loader_delete( game_loader );
+    game_loader_free( game_loader );
     game_loader = NULL;
 
     /* unload games and deallocation of memory on heap */

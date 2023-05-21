@@ -104,7 +104,7 @@ int for_files_with_extension( const char* directory, const char* extension,
            if( retour ) {
                 CLOG_ERR("Error in calling pointer function %d", retour);
            }
-        } 
+        }
     }
     closedir(d);
     /* deallocation local variable*/

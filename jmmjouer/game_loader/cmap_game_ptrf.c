@@ -217,7 +217,7 @@ int game_ptrf_get_array_name( const cmap_game_ptrf_t *cmap, char ***array_out, s
     /* iterative copy of ccontainer_value_t::data into array of cstring */
     for( indice = 0; indice < lgen_len; indice++) {
         if( (pvalue_out = clist_gen_get_at( cmap->clist, indice, &err_code)) 
-                    != NULL ) {
+                    == NULL ) {
             return err_code;
         }
         /* transform ccontainer_value_t into pair */

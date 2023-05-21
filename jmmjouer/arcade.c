@@ -67,7 +67,9 @@ int arcade_run(arcade_params_t *params)
     /* for game choice */
     clist_cstring_t *clist_game_name = NULL;
     char *name_game_out = NULL;
+    ccontainer_err_t err_code;
     int game_indice = -1;
+
 
     bool play_anonymous = params->play_anonymous;
     bool exit_loop = false;
@@ -103,7 +105,7 @@ int arcade_run(arcade_params_t *params)
         if( game_indice >= 0) {
             CLOG_DEBUG("game_indice: %d\n",game_indice);
             /* ok not convenient if not in return */
-            clist_cstring_get_ref( clist_game_name, game_indice, &name_game_out );
+            name_game_out = clist_cstring_get_ref_at( clist_game_name, game_indice, &err_code );
             printf("game name: %s\n", name_game_out );
             CLOG_DEBUG("game name: %s\n", name_game_out );
         }
@@ -125,7 +127,7 @@ int arcade_run(arcade_params_t *params)
             assert( game_indice >= 0);
             assert( game_indice < (int)  clist_cstring_size(clist_game_name));
             /* get the game and run it */
-            clist_cstring_get_ref( clist_game_name, game_indice, &name_game_out );
+            name_game_out = clist_cstring_get_ref_at( clist_game_name, game_indice, &err_code );
             run_game(&joueur, name_game_out);
 
             /* store result in record */
@@ -136,7 +138,7 @@ int arcade_run(arcade_params_t *params)
     /** 3. exit game **/
     clist_cstring_delete( clist_game_name );
     clist_game_name = NULL;
-    joueur_clear( &joueur );
+    joueur_delete( &joueur );
     return 0;
 }
 
@@ -218,7 +220,7 @@ static joueur_t identification_joueur()
             if( new_joueur_confirmation) {
                 /* delete previous invalid joueur 
                     or need to set argument of new joueur setName, dalto... */
-                joueur_clear(&joueur);
+                joueur_delete(&joueur);
                 printf("NEW JOUEUR INIT\n");
                 CLOG_DEBUG("clear previous joueur and init a new one with name %s\n", try_name);
                 joueur_init(&joueur, try_name, false);
@@ -262,6 +264,7 @@ static int print_game_menu(clist_cstring_t *clist_game_name)
 {
     int i, choice_game, nb_game;
     char *name_out = NULL;
+    ccontainer_err_t err_code;
     bool valid_entry = false;
     /* allow to deal more easily with integer inside the function */
     nb_game = (int) clist_cstring_size( clist_game_name);
@@ -269,7 +272,7 @@ static int print_game_menu(clist_cstring_t *clist_game_name)
 
     printf("---------------\nListe des jeux ------\n");
     for( i = 0; i < nb_game; i++) {
-        clist_cstring_get_ref( clist_game_name, i, &name_out);
+        name_out = clist_cstring_get_ref_at( clist_game_name, i, &err_code);
         printf("%d. %s\n", i, name_out);
     }
     printf("%d. Un jeu au hasard\n", i++);

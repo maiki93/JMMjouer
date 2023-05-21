@@ -49,7 +49,7 @@ static void identification()
     //assert_string_equal(joueur.person.nom, "mic");
     assert_int_equal(1,1);
 
-    joueur_clear( &joueur );
+    joueur_delete( &joueur );
 }
 
 int main()

@@ -33,7 +33,7 @@ size_t game_ptrf_size(const cmap_game_ptrf_t *cmap);
 ccontainer_err_t game_ptrf_insert( cmap_game_ptrf_t *cmap, const char *name, ptr_game_t);
 ptr_game_t game_ptrf_get_from_name(const cmap_game_ptrf_t *cmap, const char *name, ccontainer_err_t *err_code);
 
-/* @brief Return the list of all game names in the map.
+/** Return the list of all game names in the map.
     It is a copy of the original data, the returned clist must be deallocated by the caller */
 clist_cstring_t* game_ptrf_get_names( const cmap_game_ptrf_t *cmap );
 
