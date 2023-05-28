@@ -37,4 +37,4 @@ test_cvector_struct_complex : $(MODDIR_CCONTAINER_TESTS)/test_cvector_struct_com
 clean ::
 	@echo "clean unit_test ccontainer"
 	rm -f $(OBJS_CCONTAINER_TESTS)
-	rm -f test_clist_generic test_clist_cstring test_cvector_generic_with_string test_cvector_struct_complex
+	rm -f test_clist_generic test_clist_cstring test_cvector_generic test_cvector_struct_complex

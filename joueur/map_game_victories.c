@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "cmap_game_victories.h"
+#include "map_game_victories.h"
+#include "ccontainer/clist_generic.h"
 
 /* ** Serialization / Deserialization / Default copy and deleter from value_t ***/
 ccontainer_value_t make_value_pair_victory( const struct pair_game_victory_t *pair_victory_in, ccontainer_err_t *err_code)
@@ -50,18 +51,32 @@ ccontainer_err_t extract_value_pair_victory(const ccontainer_value_t *value, str
 }
 
 /*** Implementation Constructor/Destructor *****/
-cmap_game_victories_t* game_victories_new()
+map_game_victories_t* game_victories_new()
 {
-    return (cmap_game_victories_t*) malloc(sizeof(cmap_game_victories_t));
+    return (map_game_victories_t*) malloc(sizeof(map_game_victories_t));
 }
 
-void game_victories_init(cmap_game_victories_t *cmap)
+void game_victories_init(map_game_victories_t *cmap)
 {
     cmap->clist = clist_gen_new();
     clist_gen_init( cmap->clist );
 }
 
-void game_victories_delete(cmap_game_victories_t *cmap)
+map_game_victories_t game_victories_copy(const map_game_victories_t *cmap_in, ccontainer_err_t *err_code)
+{
+    map_game_victories_t cmap_out;
+    clist_gen_t* tmp_clist;
+
+    assert(cmap_in && cmap_in );
+    /* only pointer avaliable in public API fir clist_gen_t */
+    /* map game victories is a clist of pair_game_victory,
+        no memmory allocation in pair => default copy of "pair_value" is enought */
+    tmp_clist = clist_gen_copy( cmap_in->clist, ccontainer_copy_value, err_code );
+    cmap_out.clist = tmp_clist;
+    return cmap_out;
+}
+
+void game_victories_delete(map_game_victories_t *cmap)
 {
     assert( cmap->clist != NULL);
     /* it is a pointer to clist_gen_t */
@@ -69,19 +84,19 @@ void game_victories_delete(cmap_game_victories_t *cmap)
     cmap->clist = NULL;
 }
 
-void game_victories_free(cmap_game_victories_t *cmap)
+void game_victories_free(map_game_victories_t *cmap)
 {
     game_victories_delete( cmap );
     free(cmap);
 }
 
 /*** Public API ****/
-size_t game_victories_size(cmap_game_victories_t *cmap)
+size_t game_victories_size(map_game_victories_t *cmap)
 {
     return clist_gen_size( cmap->clist );
 }
 
-ccontainer_err_t game_victories_insert( cmap_game_victories_t *cmap, struct pair_game_victory_t pair)
+ccontainer_err_t game_victories_insert( map_game_victories_t *cmap, struct pair_game_victory_t pair)
 {
     ccontainer_err_t err_code;
     /* a temporary value_t to be moved into clist_gen_t */
@@ -90,7 +105,7 @@ ccontainer_err_t game_victories_insert( cmap_game_victories_t *cmap, struct pair
    return err_code;
 }
 
-struct pair_game_victory_t game_victories_get_copy( cmap_game_victories_t *cmap, const char *name)
+struct pair_game_victory_t game_victories_get_copy( map_game_victories_t *cmap, const char *name)
 {
     struct pair_game_victory_t pair;
     ccontainer_value_t *pvalue_clist;

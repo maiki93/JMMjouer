@@ -79,7 +79,7 @@ int arcade_run(arcade_params_t *params)
 
     /*** 1. Identification ***/
     if( play_anonymous) {
-        joueur_init( &joueur, "anonymous", false);
+        joueur_init( &joueur, "anonymous", false, false);
     } else {
         printf("Must implement identification page, try with toto\n");
         joueur = identification_joueur();
@@ -87,7 +87,7 @@ int arcade_run(arcade_params_t *params)
     /* joueur new or not ? Not important at this point, 
         just need to assert it is not invalid for continuing !! */
     /* check if joueur is valid , even if done before ... ? */
-    assert( person_is_valid((person_t *)&joueur) == true);
+    assert( person_status((person_t *)&joueur) == PERSON_VALID);
     joueur_info( &joueur );
     
     /*** 2. Game menu ***/
@@ -117,7 +117,7 @@ int arcade_run(arcade_params_t *params)
         }
         /* exit game properly, function end_game to choose / with error also */
         else if( game_indice == -2 ) {
-            printf("\ngood bye %s!\n",joueur.person.nom);
+            printf("\ngood bye %s!\n", person_name( (person_t*) &joueur));
             exit_loop = true;
             /*
             clear_ressources_and_exit(historique); */ /* not clean at all !*/
@@ -160,8 +160,15 @@ int run_game(joueur_t* joueur, const char *name_game)
        and get results */
     /*victories = pf_game((person_t)*joueur); cast not allowed*/
     /* return structure with results */
-    strcpy(person.nom, joueur->person.nom);
+    /*strcpy(person.nom, joueur->person.nom);*/
+    /*
+    strcpy( person.pname, person_name( (person_t*) &joueur));
     person.is_daltonien = joueur->person.is_daltonien;
+    */
+    /* above , not initialized pname, want to avoid setter */
+    person_init( &person, person_name( (person_t*) &joueur),
+                    person_daltonien( (person_t*) &joueur),
+                    person_admin( (person_t*) &joueur));
 
     /* game execution */
     victory_game = pf_game(person);
@@ -205,14 +212,14 @@ static joueur_t identification_joueur()
 
         joueur = record_find_joueur_from_name((irecord_t *)record, try_name);
         printf("-- In arcade --\n");
-        printf("joueur name: %s\n", joueur.person.nom);
+        printf("joueur name: %s\n", person_name( (person_t*) &joueur ) /*.person.nom*/);
         printf("daltonien: %d\n", joueur.person.is_daltonien);
         printf("adresss of joueur: %p\n", (void*) &joueur);
         /* print the name because frist in structure !! same adreess !! */
         printf("name : %s\n", (char*) &joueur);
 
         
-        if( person_is_valid((person_t*)&joueur) == false) {
+        if( person_status((person_t*)&joueur) == PERSON_INVALID) {
             CLOG_DEBUG("INVALID PERSON %d\n",0);
             printf("Invalid joueur it is a new joueur, TODO to confirm !!\n");
             /* clean, menu for a new joueur: make its profile */
@@ -223,13 +230,13 @@ static joueur_t identification_joueur()
                 joueur_delete(&joueur);
                 printf("NEW JOUEUR INIT\n");
                 CLOG_DEBUG("clear previous joueur and init a new one with name %s\n", try_name);
-                joueur_init(&joueur, try_name, false);
+                joueur_init(&joueur, try_name, false, false);
                 accepted = true;
             }
         /* no printf in this logic function */
         /* joueur found in record */
         } else {
-            printf("Welcome back %s\n", joueur.person.nom);
+            printf("Welcome back %s\n", person_name( (person_t*) &joueur) );
             /* funct_welcome_back()  or deal with it on higher-level ...*/
             accepted = true;
         }

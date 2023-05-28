@@ -53,7 +53,7 @@ typedef struct game_loader_type game_loader_t;
 /*SHARED_EXPORT*/ game_loader_t* game_loader_new();
 /*SHARED_EXPORT*/ void game_loader_init( game_loader_t *gameldr);
 /* Clear content and delete memory */
-/*SHARED_EXPORT*/ void game_loader_delete( game_loader_t *gameldr);
+/*SHARED_EXPORT*/ void game_loader_free( game_loader_t *gameldr);
 
 /* @brief Load all games: static + shared
     Directory providied by plugin_mamanger instance() singleton 

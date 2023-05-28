@@ -14,7 +14,7 @@
 /* function to pointer test, explicit correct argument */
 static victory_t test1(person_t person) {
     victory_t vict_out;
-    strcpy( person.nom, "nom_test");
+    strcpy( person.pname, "nom_test");
     person.is_daltonien = true;
     vict_out.nb_win = 1;
     vict_out.nb_lost = 1;

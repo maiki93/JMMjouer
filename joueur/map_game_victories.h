@@ -12,6 +12,10 @@
  * Provide an interface similar to a map.
 */
 
+/* forward declare, working here ?  no redefinition. again redefinition 
+    need ccontainer_typedef_fwd.h */
+/* typedef struct clist_type clist_gen_t; */
+
 /** Define a pair : <game name, victory_t> to be inserted in a ccontainer.
  * 
  * \ingroup entities_grp
@@ -30,7 +34,7 @@ struct pair_game_victory_t {
 typedef struct {
     /** pointer a clist_gen_t */
     clist_gen_t *clist;
-} cmap_game_victories_t;
+} map_game_victories_t;
 
 
 /** \name Adapter functions to ccontainer for \ref pair_game_victory_t. 
@@ -51,6 +55,7 @@ ccontainer_value_t make_value_pair_victory( const struct pair_game_victory_t *pa
  * \param[out] pointer to a pair_victory_t, memory must be allocated before the call
  * \return error_code from ccontainer library. */
 ccontainer_err_t extract_value_pair_victory( const ccontainer_value_t* value_in, struct pair_game_victory_t *pair_victory_out);
+/* better to use status of joueur if correct ? or level above at least */
 
 /* All allocation on heap : do not need specific deleter or duplicater
 void deleter(value_t* value)
@@ -62,21 +67,27 @@ void deleter(value_t* value)
 /** \name Constructor / Destructor 
  * \{ */
 /** Allocation */
-SHARED_EXPORT cmap_game_victories_t* game_victories_new();
+SHARED_EXPORT map_game_victories_t* game_victories_new();
 /** Constructor */
-SHARED_EXPORT void game_victories_init(cmap_game_victories_t *cmap);
+SHARED_EXPORT void game_victories_init(map_game_victories_t *cmap);
+/** Copy constructor, deep copy.
+ * May change error code, we are calling from core model here.
+ * Add log
+ */
+SHARED_EXPORT map_game_victories_t game_victories_copy(const map_game_victories_t *cmap_in, 
+                                                        ccontainer_err_t *err_code);
 /** Clear all contents */
-SHARED_EXPORT void game_victories_delete(cmap_game_victories_t *cmap);
+SHARED_EXPORT void game_victories_delete(map_game_victories_t *cmap);
 /** Free memory */
-SHARED_EXPORT void game_victories_free(cmap_game_victories_t *cmap);
+SHARED_EXPORT void game_victories_free(map_game_victories_t *cmap);
 /** \} */
 
 /** \name public API */
 /** \{ */
 /** Return the size of the map */
-SHARED_EXPORT size_t game_victories_size(cmap_game_victories_t *cmap);
+SHARED_EXPORT size_t game_victories_size(map_game_victories_t *cmap);
 /** Insert a pair_game_victory_t into the map. */
-SHARED_EXPORT ccontainer_err_t game_victories_insert( cmap_game_victories_t *cmap, struct pair_game_victory_t victory);
+SHARED_EXPORT ccontainer_err_t game_victories_insert( map_game_victories_t *cmap, struct pair_game_victory_t victory);
 /** Retrieve the pair_game_victory_t value with the provided key */
-SHARED_EXPORT struct pair_game_victory_t game_victories_get_copy( cmap_game_victories_t *cmap, const char *name);
+SHARED_EXPORT struct pair_game_victory_t game_victories_get_copy( map_game_victories_t *cmap, const char *name);
 /** \} */

@@ -79,12 +79,13 @@ joueur_t __find_joueur_error( void *this, const char *name)
     assert(name); /* msvc forces to use argument variable */
     _unused(name);
     
-    joueur_init(&joueur, "invalid", false);
+    /*joueur_init(&joueur, "invalid", false);*/
+    joueur_default_init( &joueur );
     printf("-- In record base __get_joueur_error --\n");
-    printf("joueur name: %s\n", joueur.person.nom);
+    printf("joueur name: %s\n", person_name( (person_t*) &joueur));
     printf("daltonien: %d\n", joueur.person.is_daltonien);
     printf("adresss of joueur: %p\n",(void*) &joueur);
-    printf("adresss of joueur.nom: %p\n",(void*) &joueur.person.nom);
+    printf("adresss of joueur.person.pname: %p\n",(void*) &joueur.person.pname);
     return joueur;
 }
 /************  private, static functions ***********/

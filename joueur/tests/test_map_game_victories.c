@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include "cmocka.h"
 
-#include "joueur/cmap_game_victories.c"
+#include "joueur/map_game_victories.c"
 
 /* common data, pair_game_victory_t do not use dynamic allocation
     no explicit free needed  */
@@ -50,8 +50,8 @@ static void value_to_pair_victory()
 
 static void construction_cmap()
 {
-    cmap_game_victories_t map_on_stack;
-    cmap_game_victories_t *map_on_heap;
+    map_game_victories_t map_on_stack;
+    map_game_victories_t *map_on_heap;
 
     game_victories_init(&map_on_stack);
     
@@ -63,10 +63,12 @@ static void construction_cmap()
     map_on_heap = NULL;
 }
 
+
+
 static void insert_new_victory()
 {
     ccontainer_err_t err_code;
-    cmap_game_victories_t map_victory;
+    map_game_victories_t map_victory;
     game_victories_init( &map_victory );
     
     err_code = game_victories_insert( &map_victory, pair_in1 );
@@ -81,9 +83,29 @@ static void insert_new_victory()
     game_victories_delete( &map_victory );
 }
 
+static void copy_cmap()
+{
+    ccontainer_err_t err_code;
+    map_game_victories_t map_victory, map_victory_copy;
+    game_victories_init( &map_victory );
+    
+    err_code = game_victories_insert( &map_victory, pair_in1 );
+    assert_int_equal( CCONTAINER_OK, err_code );
+
+    map_victory_copy = game_victories_copy( &map_victory, &err_code);
+    assert_int_equal( CCONTAINER_OK, err_code );
+    // suppress original
+    game_victories_delete( &map_victory );
+    // need to test / get_victories 
+
+    // suppress copy
+    game_victories_delete( &map_victory );
+    
+}
+
 static void find_not_existing_entry()
 {
-    cmap_game_victories_t map_victory;
+    map_game_victories_t map_victory;
     game_victories_init( &map_victory );
     
     // find with an empty list
@@ -101,7 +123,7 @@ static void find_not_existing_entry()
 int main()
 {
     /* can be inside main, or as global. here no problem with identical name */
-    const struct CMUnitTest tests_cmap_game_victories[] = {
+    const struct CMUnitTest tests_map_game_victories[] = {
         cmocka_unit_test(pair_victory_to_value),
         cmocka_unit_test(value_to_pair_victory),
         cmocka_unit_test(construction_cmap),
@@ -110,5 +132,5 @@ int main()
     };
     /* call group_setup and teardown at the very beginning and end */
     /* return cmocka_run_group_tests(tests_historique, group_setup, group_teardown);*/
-    return cmocka_run_group_tests(tests_cmap_game_victories, NULL, NULL);
+    return cmocka_run_group_tests(tests_map_game_victories, NULL, NULL);
 }

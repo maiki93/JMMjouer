@@ -316,7 +316,7 @@ int p_make_one_pendu()
 }
 
 
-victory_t start_game_pendu( person_t joueur)
+victory_t start_game_pendu( person_t person)
 {
     victory_t victories;
     int victoire = 0;           /* vainqueur de la partie */
@@ -324,7 +324,7 @@ victory_t start_game_pendu( person_t joueur)
 
     victory_init(&victories); 
     /*printf("start jeu du pendu\n");*/
-    printf("Joueur : %s \n", joueur.nom);
+    printf("Joueur : %s \n", person.pname);
 
     do {
         printf("vous etes bien arrive dans le pendu\n");
@@ -337,7 +337,8 @@ victory_t start_game_pendu( person_t joueur)
             victories.nb_win++;
         /* victoire == 2; // ordinateur // ?????? */
         } else {
-            printf("une defaite de plus %s et enregistrée dans votre historique \n", joueur.nom);
+            printf("une defaite de plus %s et enregistrée dans votre historique \n", 
+                    person.pname);
             victories.nb_lost++;
         }
         /*
@@ -347,6 +348,6 @@ victory_t start_game_pendu( person_t joueur)
 
     } while ( (rejouer == true) /*&& (joueur.serie_3_game == false)*/ );
 
-    printf("Le Jeu du Pendu vous dit à bientôt %s, revenez vite\n\n", joueur.nom);
+    printf("Le Jeu du Pendu vous dit à bientôt %s, revenez vite\n\n", person.pname);
     return victories;
 }

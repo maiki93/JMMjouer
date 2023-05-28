@@ -93,7 +93,7 @@ victory_t start_game_mastermind(person_t person)
 
     /* message d'intro au jeu */
     clear_screen();
-    printf("Entrée Mastermind\nBienvenue %s\n", person.nom);
+    printf("Entrée Mastermind\nBienvenue %s\n", person.pname);
     /*
     ( joueur.serie_3_game == true ) ? printf("C'est du sérieux, on est dans une série de 3 jeux\n")
                                     : printf("Mode détente, qq parties pour s'entraîner\n");
@@ -106,7 +106,7 @@ victory_t start_game_mastermind(person_t person)
             victories.nb_win++;
         /* victoire == 2 ordinateur */
         } else {
-            printf("une defaite de plus %s et enregistrée dans votre historique \n", person.nom);
+            printf("une defaite de plus %s et enregistrée dans votre historique \n", person.pname);
             victories.nb_lost++;
         }
 
@@ -116,7 +116,7 @@ victory_t start_game_mastermind(person_t person)
 
     } while ( (rejouer == true) /*&& (joueur.serie_3_game == false)*/ );
 
-    printf("Mastemind vous dit à bientôt %s, revenez vite\n\n", person.nom);
+    printf("Mastemind vous dit à bientôt %s, revenez vite\n\n", person.pname);
     return victories;
 }
 

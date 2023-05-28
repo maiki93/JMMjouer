@@ -6,7 +6,7 @@
 #include "irecord_private.h"
 #include "clogger/clogger.h"
 
-#include "joueur/cmap_game_victories.h"
+#include "joueur/map_game_victories.h"
 
 /** To avoid warning from assert in release mode. */
 #define _unused(x) ((void)(x))
@@ -48,7 +48,7 @@ static bool search_record_joueur_by_name(file_record_t *this, char *line, const 
 static int extract_name_joueur(const char *line, char *name_joueur);
 static int extract_one_record(file_record_t *this, char *line, joueur_t *joueur);
 
-static int extract_map_victories( file_record_t *this, char *line, cmap_game_victories_t *map);
+static int extract_map_victories( file_record_t *this, char *line, map_game_victories_t *map);
 
 /** utilities function **/
 static bool next_record(file_record_t *this, char *line);
@@ -208,7 +208,7 @@ int extract_one_record(file_record_t *this, char *line, joueur_t *joueur)
     /* return errno or nb correct assignement == 2 */
     /* only microsoft bullshit and never standard */
     /*strncpy_s( joueur->person.nom, MAX_SIZE_NOM_PERSON, name_record, MAX_SIZE_NOM_PERSON);*/
-    strncpy( joueur->person.nom, name_record, MAX_SIZE_NOM_PERSON);
+    strncpy( joueur->person.pname, name_record, MAX_SIZE_NOM_PERSON);
     joueur->person.is_daltonien = is_daltonien;
 
 
@@ -222,7 +222,7 @@ int extract_one_record(file_record_t *this, char *line, joueur_t *joueur)
     return retour;
 }
 
-int extract_map_victories( file_record_t *this, char *line, cmap_game_victories_t *map)
+int extract_map_victories( file_record_t *this, char *line, map_game_victories_t *map)
 {
     /* format victories :
     mastermind: 2 2 */

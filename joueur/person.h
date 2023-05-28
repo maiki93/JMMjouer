@@ -1,12 +1,12 @@
-#ifndef PERSON_H_INCLUDED
-#define PERSON_H_INCLUDED
+#pragma once
 
 #include <stdbool.h>
 
+/* very few method marked as export ? it is working on windows ? */
 #include "shared_EXPORTS.h"
 
 /** @file
- * Definition of a person : name and characteristics (daltonien).
+ * Definition of a person : name and characteristics : daltonien + admin.
  * 
  * Used as a base class for @ref joueur_t (by composition)
  * 
@@ -15,55 +15,89 @@
  * Aimed for logic and storage (file, DB...)
 */
 
-/* const int MAX_SIZE_NOM = 50; // not a constant expression */
-/* #define MAX_SIZE_NOM 50     // macro possible */
-/** Maximum size for the name of a player
+/** Maximum size for the name of a player. 
+ *  It is a logic limit person_t contain a pointer to a string.
  * \ingroup entities_grp */
-enum { MAX_SIZE_NOM_PERSON = 20 };    /* or enum considerered as constant expression */
+#define MAX_SIZE_NOM_PERSON 50
+/*enum { MAX_SIZE_NOM_PERSON = 50 };*/    /* or enum considerered as constant expression */
 
 /** \name Enum used for return values errors.
   \ingroup entities_grp */
 /** @{ */
-/** Valid person. */
-#define PERSON_OK 0
-/** Invalid person. */
-#define PERSON_INVALID -1
+typedef enum {
+    /** Invalid person. */
+    PERSON_INVALID = -1,
+    /** Valid person. */
+    PERSON_VALID = 0,
+    /** VALID and with admin right, validity test */
+    PERSON_ADMIN = 1, /* with administration rights, use mask ? */
+    /** for extension */
+    PERSON_ENUM_END = 2
+    /** case anonymous to add ? */
+} person_status_t;
 /** @} */
-/* #define PERSON_ADMIN 1 */ /* with administration rights, use mask ? */
 
 /** Description of a general person with name and specific profile.
-  Full declaration of the structure in header, gives public access in C.
+  Full declaration of the structure in header, but api provides only accessors.
+  How to enforce immutability in C, make_person() ? 
+    hiding  structure declaration in impl ? but cannot use person on stack !!
   Used as a "base" class for joueur_t, so methods apply to both.
   \ingroup entities_grp */
 typedef struct {
-    /** name of the person */
-    char nom[ MAX_SIZE_NOM_PERSON ];
+    /** name of the person.
+     * const char* maybe a good idea here. do not change name of a person !
+     * could use : NULL => PERSON_INVALID
+     */
+    char *pname; /*[ MAX_SIZE_NOM_PERSON ];*/
     /** profile, for use of colors in the game console */
+    /* same for const here , possible ? or only by interface ? */
     bool is_daltonien;
-    /*bool is_admin;*/ /* default false, got info from record */
+    /** admin rights, put here maybe split later.
+     *  default false, got info from record
+    */
+    bool is_admin;
 } person_t;
 
-/** @name Constructor / Destructor */
+/** @name Constructor / Destructor for only stack usage */
 /** @{ */
 /** Default constructor. 
-    Set name:"invalid" and is_daltonien:false */
-int person_default_init(person_t *person);
+    Set name:"invalid" (really needed ?)
+    is_daltonien:false is_admin:false
+    \param[in] pointer to an instance of person_t
+    \return PERSON_INVALID */
+person_status_t person_default_init(person_t *person);
 /** Constructor with parameters.
-    \return PERSON_OK on success, PERSON_INVALID if name too long */
-int person_init(person_t * person, const char * name, bool is_daltonien);
+ *  \param[in] pointer to an instance of person_t
+ *  \param name of the person
+ *  \param is_daltonien : there is worse disease
+    \return PERSON_OK on success, PERSON_INVALID if name too long > MAX_SIZE_NOM_PERSON */
+person_status_t person_init(person_t * person, const char * name, 
+        bool is_daltonien, bool is_admin);
+/** Destructor. 
+ *  param[in] pointer to an instance of person_t */
+void person_delete(person_t *person);
 /** @} */
 
 /** @name Public API usable with person_t or joueur_t */
 /** @{ */
+
 /** Return if a joueur is valid or not.
     To check if previous command succeeded or not */
-SHARED_EXPORT bool person_is_valid(person_t *person);
+SHARED_EXPORT person_status_t person_status(const person_t *person);
+
 /** Return the name of a person or a joueur.
     Explicit cast to person_t needed if use with joueur_t */
-const char* person_name(person_t *person);
+const char* person_name(const person_t *person);
+
+bool person_daltonien(const person_t *person);
+bool person_admin(const person_t *person);
 /** Print info to console.
  *  much better to do later for generalization */
-void person_info(person_t *person);
-/** @} */
+void person_info(const person_t *person);
 
-#endif
+/** Give administrator right.
+ * Only set method of the class
+*/
+/* void person_set_admin(person_t *person); */
+
+/** @} */

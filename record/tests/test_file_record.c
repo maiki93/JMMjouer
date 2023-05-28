@@ -59,7 +59,7 @@ static void joueur_not_found()
     file_record_init( file, "test_record_file.txt");
 
     joueur = record_find_joueur_from_name( (irecord_t*)file, "titi");
-    assert_string_equal( joueur.person.nom, "invalid");
+    assert_string_equal( joueur.person.pname, "invalid");
 
     joueur_delete( &joueur );
     file_record_delete( file );
@@ -75,7 +75,7 @@ static void joueur_valid_daltonien_no_game()
     file_record_init( file, "test_record_file.txt");
 
     joueur = record_find_joueur_from_name( (irecord_t*)file, "kevin");
-    assert_string_equal( joueur.person.nom, "kevin");
+    assert_string_equal( joueur.person.pname, "kevin");
     assert_int_equal( joueur.person.is_daltonien, 1);
     // kevin has no games recorded
     assert_int_equal( 0, game_victories_size( & joueur.map_victories) );
@@ -95,7 +95,7 @@ static void joueur_with_historic()
     file_record_init( file, "test_record_file.txt");
 
     joueur = record_find_joueur_from_name( (irecord_t*)file, "jasmine");
-    assert_string_equal( joueur.person.nom, "jasmine");
+    assert_string_equal( joueur.person.pname, "jasmine");
     assert_int_equal( joueur.person.is_daltonien, 1);
 
     size_t nb_games = game_victories_size( & joueur.map_victories );
@@ -137,7 +137,7 @@ static void default_init_joueur_with_historic()
     /*joueur_default_init( &joueur );*/
     joueur = record_find_joueur_from_name( (irecord_t*)file, "jasmine");
 
-    assert_string_equal( joueur.person.nom, "jasmine");
+    assert_string_equal( joueur.person.pname, "jasmine");
     assert_int_equal( joueur.person.is_daltonien, 1);
 
     size_t nb_games = game_victories_size( & joueur.map_victories );

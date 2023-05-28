@@ -10,7 +10,7 @@
    \ingroup entities_grp
 */
 typedef struct {
-    /** nb of victory */
+    /** nb of victories for a game  */
     int nb_win;
     /** nb of lost */
     int nb_lost;
@@ -22,4 +22,4 @@ typedef struct {
  * \param[in] victory pointer to a allocated victory_t instance
 */
 SHARED_EXPORT void victory_init( victory_t *victory );
-
+/* reset() */
