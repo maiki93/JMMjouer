@@ -191,6 +191,34 @@ void cvector_gen_swap(cvector_gen_t *cvect, size_t index1, size_t index2)
     cvect->array[index2] = ccontainer_move_value( &value_tmp );
 }
 
+/* nice to find the 10 best, may be even better than quicksort algo 
+   just need additional parameter 0 : all, 10 : while ... && ((init_size-size_array ) < 10 */
+void cvector_bubble_sort(cvector_gen_t *cvect, comparater_value_t fct_comparater)
+{
+    size_t size_array, i;
+    bool b_swap;
+ 
+    size_array = cvect->len;
+    
+    do {
+        b_swap = false;
+        for( i = 1; i < size_array; i++)
+        {
+            /* if ( (arr[i-1] > arr[i] ) swap( arr[i-1], arr[i] ) */
+            if( (*fct_comparater)( cvect->array + (i-1), 
+                                   cvect->array + i) ) 
+            {
+                cvector_gen_swap( cvect, i-1, i );
+                b_swap = true;
+            }
+        }
+        /* bigger always placed first, reduce inner loop */
+        size_array--;
+    } while( b_swap == true);
+
+    return;
+}
+
 /******* Private methods *******/
 void delete_elements( cvector_gen_t *cvect, size_t index_begin, size_t index_last )
 {

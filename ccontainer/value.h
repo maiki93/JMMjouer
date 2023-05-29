@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ccontainer/error_code.h"
-#include "stdlib.h" /* size_t */
-
+#include <stdlib.h> /* size_t */
+#include <stdbool.h>
 #include "shared_EXPORTS.h"
 
 /* Do not know where best place to define defgroup ccontainer, 
@@ -46,6 +46,12 @@ typedef void (*deleter_value_t) (ccontainer_value_t* value);
  * \return a copy of the source
  */
 typedef ccontainer_value_t(*duplicater_value_t) (const ccontainer_value_t * value_in, ccontainer_err_t *err_code);
+
+/** Function signature for a comparison.
+ * At level of ccontainer generic, expects a function to compare 2 generic value_t.
+ * Expected return depends on ccontainer alogrithm called.
+ * \return bool , see specific algorithm for the expected criteria */
+typedef bool(*comparater_value_t) (const ccontainer_value_t *value1, const ccontainer_value_t *value2);
 
 
 /** Return a ccontainer_value_t from data input.

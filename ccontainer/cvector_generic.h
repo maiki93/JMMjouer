@@ -2,8 +2,7 @@
 
 #include "ccontainer/value.h"
 /* may be more general to group error_code in a "clean" way 
-    header + implementation, extensible error_code
-*/
+    header + implementation, and check extensible error_code */
 #include "ccontainer/error_code.h"
 
 /** \file
@@ -31,8 +30,8 @@ typedef struct {
     size_t capacity;
     size_t len;
     /* to suppress in generic ? or not too bad here */
-    deleter_value_t ptrf_deleter;  /* only for delete / free / remove */
-    duplicater_value_t ptrf_duplicater; /* only for copy_constructor */
+    deleter_value_t ptrf_deleter;  /* for delete / free / remove(not impl.) */
+    duplicater_value_t ptrf_duplicater; /* for copy_constructor / remove(not impl.) */
 } cvector_gen_t;
 
 
@@ -90,23 +89,25 @@ SHARED_EXPORT void cvector_gen_free(cvector_gen_t *cvect);
 /** @} */ /* end constructor/destructor */
 
 /** \@{ 
- * \name Specific destructor and copy constructor for a specific implementation / specialization
+ * \name Specific destructor and copy constructor for a specialization
 */
 /** Apply an user defined destructor to ccontainer_value_t.
  * Will replace the default implementation \ref ccontainer_delete_value()
  * Mandatory if the user defined structure contains pointer on heap allocated memory
  * \param[in] cvect pointer to a cvector_gen_t instance
- * \param[in] function with signature void(value_t *value)
- */
+ * \param[in] function with signature void(value_t *value) */
 SHARED_EXPORT void cvector_gen_set_deleter( cvector_gen_t *cvect, deleter_value_t fct_delete );
+
 /**  Apply an user defined copy constructor to ccontainer_value_t.
  * Will replace the default implementation \ref ccontainer_copy_value()
  * \param[in] cvect pointer to a cvector_gen_t instance
- * \param[in] function with signature void(value_t *value)
- */
+ * \param[in] function with signature void(value_t *value) */
 SHARED_EXPORT void cvector_gen_set_duplicater( cvector_gen_t *cvect, duplicater_value_t fct_duplicater );
 /** \@} */
 
+/** \@{ 
+ * \name Standard behavior expected by a vector
+*/
 /** Clear all valid contents of the vector.
  * Call duplicater_value_t on elements [0,size()] of the vector, but the capacity stays untouched for later re-use.
   \param[in] cvect pointer to a cvector_gen_t instance */
@@ -126,7 +127,7 @@ SHARED_EXPORT ccontainer_err_t cvector_gen_set_capacity(cvector_gen_t *cvect, si
 SHARED_EXPORT ccontainer_err_t cvector_gen_push_back(cvector_gen_t *cvect, ccontainer_value_t *value_in);
 
 /** Retrive ccontainer_value_t at position given by indice.
- * Should return if error or keep return value and erro_code as a output parameter
+ * Should return if error or keep return value and err_code as a output parameter
  * More flexible if pass value_out as pointer, alllow allocation on heap or stack ? only intermediate...(except string)
  * \param[in] cvect pointer to a cvector_gen_t instance
  * \param[in] index position of the elemnt to retrieve [0,len-1]
@@ -134,13 +135,25 @@ SHARED_EXPORT ccontainer_err_t cvector_gen_push_back(cvector_gen_t *cvect, ccont
  * \return pointer associated to the ccontainer_value_t element in the vector
 */
 SHARED_EXPORT ccontainer_value_t* cvector_gen_get_at(const cvector_gen_t *cvect, size_t index, ccontainer_err_t* err_code);
+/** \@} */
 
+/** \name Algorithms */
+/** @{ */
 /** Swap elements between 2 indices.
  * Efficient because only internal pointers must be exchanged.
  * \param[in] cvect pointer to a cvector_gen_t instance
  * \param[in] index1, index2 elments dex to swap */
 SHARED_EXPORT void cvector_gen_swap(cvector_gen_t *cvect, size_t index1, size_t index2);
 
+/** Sorting algorithm using buuble sort algorithm.
+ * Comparater will be used to compare the value_t, 
+ * if comparater(value1, value2) -> true if value1 > value2
+ *  - the vector will be sorted in ascending order. (see \ref test_cvector_generic)
+ * Efficiency generally bad O(n^2), but maybe not bad to sort X biggest/smallest value
+ * \param[inout] cvect pointer to a cvector_gen_t instance, sorted after the call
+ * \param[in] fct_comparater a comparison function bool(const value_t*, const value_t*) */
+SHARED_EXPORT void cvector_bubble_sort(cvector_gen_t *cvect, comparater_value_t fct_comparater);
+/** @} */
 
 #ifdef __cplusplus
 }

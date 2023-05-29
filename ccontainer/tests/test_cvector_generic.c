@@ -11,6 +11,52 @@
 static ccontainer_value_t value_str1 = {"first", 5};
 static ccontainer_value_t value_str2 = {"second", 6};
 static ccontainer_value_t value_str3 = {.data="tree",.len=4}; /* available C90 */
+static ccontainer_value_t value_str4 = {.data="fourth",.len=6};
+static ccontainer_value_t value_str5 = {.data="five",.len=4};
+static ccontainer_value_t value_str6 = {.data="six",.len=3};
+
+static cvector_gen_t make_cvector_str();
+
+// cannot use strcmp / strncmp because no final '\0' caracter*/
+// miss a check on null size, valid value
+static bool string_comparater_bigger(const ccontainer_value_t *value1, const ccontainer_value_t *value2)
+{
+    bool comp_equal;
+    size_t index = 0;
+    size_t min_size = value1->len < value2->len ? value1->len : value2->len;
+
+    do {
+        comp_equal = (int) value1->data[index] == (int) value2->data[index];
+        // not equal we can decide
+        if( comp_equal == false )
+            return ((int) value1->data[index] > (int) value2->data[index]) ? true
+                                                                           : false;
+        // else continue to loop at next index
+        //index++;
+    } while( index++ <= min_size );
+    // at this stage they are equal => not bigger
+    // need to check size also mic / mica
+    return false;
+}
+
+static bool string_comparater_smaller(const ccontainer_value_t *value1, const ccontainer_value_t *value2)
+{
+    bool comp_equal;
+    size_t index = 0;
+    size_t min_size = value1->len < value2->len ? value1->len : value2->len;
+
+    do {
+        comp_equal = (int) value1->data[index] == (int) value2->data[index];
+        // not equal we can decide
+        if( comp_equal == false )
+            return ((int) value1->data[index] < (int) value2->data[index]) ? true
+                                                                           : false;
+        // else continue to loop at next index
+    } while( index++ <= min_size );
+    // at this stage they are equal => not bigger
+    // need to check size also mic / mica
+    return false;
+}
 
 static void initialization_on_stack()
 {
@@ -187,7 +233,7 @@ static void copy_constructor()
 
     cvector_gen_delete( &cvect_copy );
 }
-
+/*  ***** Algorithm ***** */
 static void swap_2index()
 {
     ccontainer_err_t err_code;
@@ -222,6 +268,101 @@ static void swap_2index()
     cvector_gen_delete( &cvect);
 }
 
+static void bubble_sort_str_bigger()
+{
+    cvector_gen_t cvect;
+    ccontainer_value_t* pvalue_out;
+    ccontainer_err_t err_code;
+
+    cvect = make_cvector_str();
+    assert_int_equal( 6, cvector_gen_size( &cvect) );
+
+    cvector_bubble_sort( &cvect, string_comparater_bigger);
+    pvalue_out = cvector_gen_get_at( &cvect, 0, &err_code);
+    assert_memory_equal( "first", pvalue_out->data, pvalue_out->len );
+    
+    pvalue_out = cvector_gen_get_at( &cvect, 1, &err_code);
+    assert_memory_equal( "five", pvalue_out->data, pvalue_out->len );
+
+    pvalue_out = cvector_gen_get_at( &cvect, 2, &err_code);
+    assert_memory_equal( "fourth", pvalue_out->data, pvalue_out->len );
+
+    pvalue_out = cvector_gen_get_at( &cvect, 3, &err_code);
+    assert_memory_equal( "second", pvalue_out->data, pvalue_out->len );
+
+    pvalue_out = cvector_gen_get_at( &cvect, 4, &err_code);
+    assert_memory_equal( "six", pvalue_out->data, pvalue_out->len );
+    
+    pvalue_out = cvector_gen_get_at( &cvect, 5, &err_code);
+    assert_memory_equal( "tree", pvalue_out->data, pvalue_out->len );
+
+    cvector_gen_delete( &cvect );
+}
+
+static void bubble_sort_str_smaller()
+{
+    cvector_gen_t cvect;
+    ccontainer_value_t* pvalue_out;
+    ccontainer_err_t err_code;
+
+    cvect = make_cvector_str();
+    assert_int_equal( 6, cvector_gen_size( &cvect) );
+
+    cvector_bubble_sort( &cvect, string_comparater_smaller);
+    pvalue_out = cvector_gen_get_at( &cvect, 5, &err_code);
+    assert_memory_equal( "first", pvalue_out->data, pvalue_out->len );
+    
+    pvalue_out = cvector_gen_get_at( &cvect, 4, &err_code);
+    assert_memory_equal( "five", pvalue_out->data, pvalue_out->len );
+
+    pvalue_out = cvector_gen_get_at( &cvect, 3, &err_code);
+    assert_memory_equal( "fourth", pvalue_out->data, pvalue_out->len );
+
+    pvalue_out = cvector_gen_get_at( &cvect, 2, &err_code);
+    assert_memory_equal( "second", pvalue_out->data, pvalue_out->len );
+
+    pvalue_out = cvector_gen_get_at( &cvect, 1, &err_code);
+    assert_memory_equal( "six", pvalue_out->data, pvalue_out->len );
+    
+    pvalue_out = cvector_gen_get_at( &cvect, 0, &err_code);
+    assert_memory_equal( "tree", pvalue_out->data, pvalue_out->len );
+
+    cvector_gen_delete( &cvect );
+}
+
+/* ******** Helpers functions ******* */
+// create vector : first, second,...
+cvector_gen_t make_cvector_str()
+{
+    cvector_gen_t cvect_out;
+    ccontainer_value_t tmp_value_in;
+    ccontainer_err_t err_code;
+
+    cvector_gen_init_with_capacity( &cvect_out, 6);
+    
+    tmp_value_in = ccontainer_make_value(value_str1.data,value_str1.len,&err_code);
+    assert_int_equal( CCONTAINER_OK, err_code);
+    cvector_gen_push_back( &cvect_out, &tmp_value_in );
+    
+    tmp_value_in = ccontainer_make_value(value_str2.data,value_str2.len,&err_code);
+    cvector_gen_push_back( &cvect_out, &tmp_value_in );
+
+    tmp_value_in = ccontainer_make_value(value_str3.data,value_str3.len,&err_code);
+    cvector_gen_push_back( &cvect_out, &tmp_value_in );
+
+    tmp_value_in = ccontainer_make_value(value_str4.data,value_str4.len,&err_code);
+    cvector_gen_push_back( &cvect_out, &tmp_value_in );
+
+    tmp_value_in = ccontainer_make_value(value_str5.data,value_str5.len,&err_code);
+    cvector_gen_push_back( &cvect_out, &tmp_value_in );
+
+    tmp_value_in = ccontainer_make_value(value_str6.data,value_str6.len,&err_code);
+    cvector_gen_push_back( &cvect_out, &tmp_value_in );
+    assert_int_equal( CCONTAINER_OK, err_code);
+
+    return cvect_out;
+}
+
 int main()
 {
     /* can be inside main, or as global. here no problem with identical name */
@@ -233,6 +374,8 @@ int main()
         cmocka_unit_test(get_reference),
         cmocka_unit_test(copy_constructor),
         cmocka_unit_test(swap_2index),
+        cmocka_unit_test(bubble_sort_str_bigger),
+        cmocka_unit_test(bubble_sort_str_smaller),
     };
 
     /* call group_setup and teardown at the very beginning and end */

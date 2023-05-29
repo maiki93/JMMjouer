@@ -3,7 +3,6 @@
 #include "shared_EXPORTS.h"
 
 #include "ccontainer/value.h" /* include error_code.h */
-
 #include "ccontainer/cvector_generic.h" /* or forward declaration */
 
 /** @file
