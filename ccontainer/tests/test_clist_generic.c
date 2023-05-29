@@ -8,29 +8,13 @@
 #include "ccontainer/clist_generic.c"
 #include "ccontainer/value.h"
 
-/* TODO Check comparison by string, when possible/not */
 /* MSVC void **state argument or warning c4113 */
 
-/* maybe a default deleter to give to user ? 
-   works until value does not contain allocated memory himself */
-/*
-void deleter_value( ccontainer_value_t *value)
-{
-    if( value ) {
-        free(value->data);
-        value->data = NULL;
-    }
-    value->len = 0;
-}
-*/
-
-/* const data used by test, use bytes no specifically string */
-ccontainer_value_t value_str1 = {"first", 5}; // 5: do not include '\0'
-ccontainer_value_t value_str2 = {"second", 6};
-ccontainer_value_t value_str3 = {"three", 5};
+/* declare a set of static variables for testing purpose */
+#include "ccontainer/tests/value_str_for_test.h"
 
 /* helper to fill a list with the 3 value string */
-static void add_three_value_str(clist_gen_t *clist);
+static clist_gen_t* make_clist_str(clist_gen_t *clist);
 
 static void initialization_on_stack()
 {
@@ -141,9 +125,11 @@ static void remove_str_as_value()
 
     node =  clist_gen_get_first_node( clist );
     assert_null(node);
+    clist_gen_free( clist, ccontainer_delete_value );
+    clist = NULL;
 
-    add_three_value_str( clist );
-    assert_int_equal( 3, clist->len);
+    clist = make_clist_str( clist );
+    assert_int_equal( 6, clist->len);
 
     node =  clist_gen_get_first_node( clist );
     assert_non_null(node);
@@ -163,7 +149,7 @@ static void remove_str_as_value()
     assert_memory_equal("second", value_out.data, value_out.len);
     ccontainer_delete_value( &value_out );
 
-    assert_int_equal(1, clist_gen_size(clist));
+    assert_int_equal(4, clist_gen_size(clist));
 
     clist_gen_free( clist, ccontainer_delete_value );
     clist = NULL;
@@ -263,11 +249,15 @@ static void find_element_by_comparison()
 }
 
 /* *** Helper functions *** */
-void add_three_value_str(clist_gen_t *clist)
+clist_gen_t* make_clist_str()
 {
     ccontainer_err_t err_code;
     ccontainer_value_t tmp_value_in;
 
+    clist_gen_t *clist;
+    clist = clist_gen_new();
+    clist_gen_init( clist );
+    
     // push_back => same order
     tmp_value_in = ccontainer_make_value(value_str1.data, value_str1.len, &err_code);
     assert_int_equal( CCONTAINER_OK, err_code );
@@ -280,6 +270,18 @@ void add_three_value_str(clist_gen_t *clist)
     tmp_value_in = ccontainer_make_value(value_str3.data, value_str3.len, &err_code);
     err_code = clist_gen_push_back( clist, &tmp_value_in );
     assert_int_equal( CCONTAINER_OK, err_code );
+
+    tmp_value_in = ccontainer_make_value(value_str4.data, value_str4.len, &err_code);
+    err_code = clist_gen_push_back( clist, &tmp_value_in );
+    assert_int_equal( CCONTAINER_OK, err_code );
+
+    // add doublon : 7 and 8
+    tmp_value_in = ccontainer_make_value(value_str7.data, value_str7.len, &err_code);
+    err_code = clist_gen_push_back( clist, &tmp_value_in );
+    tmp_value_in = ccontainer_make_value(value_str8.data, value_str8.len, &err_code);
+    err_code = clist_gen_push_back( clist, &tmp_value_in );
+
+    return clist;
 }
 
 int main()

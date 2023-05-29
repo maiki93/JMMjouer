@@ -6,14 +6,8 @@
 #include "cmocka.h"
 
 #include "ccontainer/cvector_generic.h"
-
-/* test values with simple strings, do not include final \0 */
-static ccontainer_value_t value_str1 = {"first", 5};
-static ccontainer_value_t value_str2 = {"second", 6};
-static ccontainer_value_t value_str3 = {.data="tree",.len=4}; /* available C90 */
-static ccontainer_value_t value_str4 = {.data="fourth",.len=6};
-static ccontainer_value_t value_str5 = {.data="five",.len=4};
-static ccontainer_value_t value_str6 = {.data="six",.len=3};
+/* declare a set of static variables for testing purpose */
+#include "ccontainer/tests/value_str_for_test.h"
 
 static cvector_gen_t make_cvector_str();
 
