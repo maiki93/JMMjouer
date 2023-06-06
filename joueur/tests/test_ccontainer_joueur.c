@@ -222,7 +222,7 @@ joueur_t make_joueur1()
     strcpy( pair1.game_name, "jeu1"); /* game_name[XX] */
     pair1.victories = victory1;
 
-    game_victories_insert( & joueur.map_victories, pair1 );
+    game_victories_insert( &(joueur.map_victories), &pair1 );
     return joueur;
 }
 
@@ -233,21 +233,21 @@ static void make_three_joueur()
     //pair_game_victory_t pair1;
     strcpy( pair1.game_name, "jeu1");
     pair1.victories = victory1;
-    game_victories_insert( &joueur1.map_victories, pair1 );
+    game_victories_insert( &joueur1.map_victories, &pair1 );
 
     joueur_init(&joueur2,"kevin", true, false);
     struct pair_game_victory_t pair2;
     //pair_game_victory_t pair1;
     strcpy( pair2.game_name, "jeu1");
     pair2.victories = victory2;
-    game_victories_insert( &joueur2.map_victories, pair2 );
+    game_victories_insert( &joueur2.map_victories, &pair2 );
 
     joueur_init(&joueur3,"admin", false, true);
     struct pair_game_victory_t pair3;
     //pair_game_victory_t pair1;
     strcpy( pair3.game_name, "jeu1");
     pair3.victories = victory3;
-    game_victories_insert( &joueur3.map_victories, pair3 );
+    game_victories_insert( &joueur3.map_victories, &pair3 );
 
     return;
 }

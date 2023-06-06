@@ -3,10 +3,13 @@
 #include "shared_EXPORTS.h"
 
 /** @file
- * Results of games.
+ * Results of a game
 */
 
 /** Describe the scoring of a game.
+ * Typical example of Value Object, should try to enforce immutability.
+ * Will change interface victory_create() / _with_param( 0, 0, 0) to work only with object (still const* possible)
+ * Only accessor, equality no real meaning here
    \ingroup entities_grp
 */
 typedef struct {

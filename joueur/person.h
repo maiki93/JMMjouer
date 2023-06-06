@@ -19,7 +19,8 @@
  *  It is a logic limit person_t contain a pointer to a string.
  * \ingroup entities_grp */
 #define MAX_SIZE_NOM_PERSON 50
-/*enum { MAX_SIZE_NOM_PERSON = 50 };*/    /* or enum considerered as constant expression */
+/* or enum considerered as constant expression */
+/*enum { MAX_SIZE_NOM_PERSON = 50 };*/
 
 /** \name Enum used for return values errors.
   \ingroup entities_grp */
@@ -40,21 +41,20 @@ typedef enum {
 /** Description of a general person with name and specific profile.
   Full declaration of the structure in header, but api provides only accessors.
   How to enforce immutability in C, make_person() ? 
-    hiding  structure declaration in impl ? but cannot use person on stack !!
-  Used as a "base" class for joueur_t, so methods apply to both.
+    hiding  structure declaration in impl ? but could not use person on stack
+  Used as a "base" class for joueur_t, so methods apply to both with a explicit cast.
   \ingroup entities_grp */
 typedef struct {
+    /* size_t person_id; */
     /** name of the person.
      * const char* maybe a good idea here. do not change name of a person !
-     * could use : NULL => PERSON_INVALID
-     */
+     * could use : NULL => PERSON_INVALID */
     char *pname; /*[ MAX_SIZE_NOM_PERSON ];*/
     /** profile, for use of colors in the game console */
     /* same for const here , possible ? or only by interface ? */
     bool is_daltonien;
     /** admin rights, put here maybe split later.
-     *  default false, got info from record
-    */
+     *  default false, got info from record */
     bool is_admin;
 } person_t;
 

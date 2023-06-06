@@ -20,7 +20,7 @@ LFLAGS = --warn-common -shared -z defs --no-allow-shlib-undefined -lc
 #MODULES := tests tests/test_mock
 # clogger call by an explicit make, no use of module
 # game_loader moved into jmmjouer
-MODULES := ccontainer joueur record jmmjouer src_plugin executables #tests
+MODULES := ccontainer joueur record jmmjouer src_plugins executables #tests
 
 # see advices (and much more than compilation options) https://matt.sh/howto-c
 # compiler option, activate many warning( here seeems common to gcc and clang)

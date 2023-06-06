@@ -8,9 +8,9 @@ extern "C" {
 
 /**
   @file
-  Specialization of  a clist_generic with C-string values.
+  Specialization of  a clist_generic for C-string values.
   
-  Implemented with an internal forward list : clist_generic
+  Implemented with an internal generic clist_gen_t.
   Make interface convenient for C-strings */
 
 /**
@@ -25,12 +25,9 @@ extern "C" {
 typedef struct {
      /** clist_generic container implementation */
     clist_gen_t *clist;
+    size_t len;
 } clist_cstring_t;
 
-/** A unique simple interface to help deletion of 
-        array of structure return by get_array methods.
-    Otherwise typedef / struct overall complex and increase dependencies */
-SHARED_EXPORT void carray_cstring_delete( char **carray, size_t len);
 
 /** @name Constructor/ Destructor */
 /** @{ */
@@ -75,14 +72,21 @@ SHARED_EXPORT ccontainer_err_t clist_cstring_push_back(clist_cstring_t *clist_st
   \param[in] index of the collection to retrieve
   \param[out] err_code ccontainer error code
   \return  pointer to a copy string with terminason caracter, NULL on error */
-SHARED_EXPORT char* clist_cstring_get_copy_at( clist_cstring_t *list, size_t index, ccontainer_err_t *err_code);
+/* SHARED_EXPORT char* clist_cstring_get_copy_at( clist_cstring_t *list, size_t index, ccontainer_err_t *err_code); */
 
 /** Get a reference to one element of the list.
     May be very tricky to modify the original throught the reference (size problems) !!
     \param[in] index of the collection to retrive
     \param[out] err_code ccontainer error code
     \return  pointer to a string in the clist, NULL on error */
-SHARED_EXPORT char* clist_cstring_get_ref_at( clist_cstring_t *clist_str, size_t index, ccontainer_err_t *err_code);
+SHARED_EXPORT char* clist_cstring_pop_front( clist_cstring_t *clist_str, ccontainer_err_t *err_code);
+
+/*
+SHARED_EXPORT clist_node_t* clist_cstring_get_first_node( const clist_cstring_t *clist_str, ccontainer_err_t *err_code);
+SHARED_EXPORT clist_node_t* get_next_node( const clist_cstring_t *clist_str, ccontainer_err_t *err_code);
+*/
+/* need possibilty to do a loop */
+
 
 /** Return a array of string, deep copies of the internal elements.
     \param[in] clist_str pointer to a clist_string_t instance
@@ -90,7 +94,7 @@ SHARED_EXPORT char* clist_cstring_get_ref_at( clist_cstring_t *clist_str, size_t
         (see carray_cstring_delete)
     \param[out] array_len size of array_out
     \return ccontainer error code */
-SHARED_EXPORT int clist_cstring_get_array( clist_cstring_t *list, char ***array_out, size_t *array_len );
+SHARED_EXPORT ccontainer_err_t clist_cstring_get_array( clist_cstring_t *list, char ***array_out, size_t *array_len );
 
 /** @} */ /** public API */
 

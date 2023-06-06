@@ -47,11 +47,6 @@ SHARED_EXPORT void clist_gen_init(clist_gen_t* clist);
 SHARED_EXPORT clist_gen_t* clist_gen_copy(const clist_gen_t* clist_src, duplicater_value_t ptrf_duplicater, 
                                           ccontainer_err_t *err_code );
 
-/** Clear all contents of the list.
-  \param[in] clist pointer to a clist_gen_t
-  \param[in] deleter function with signature \ref deleter_t to properly free the value in case of dynamic allocation */
-SHARED_EXPORT void clist_gen_delete(clist_gen_t *clist, deleter_value_t ptrf_deleter);
-
 /** Free memory of the list.
   Call clist_gen_clear() if not empty (need to store deleter ??)
   \todo check for deleter
@@ -67,36 +62,33 @@ SHARED_EXPORT void clist_gen_free(clist_gen_t *clist, deleter_value_t ptrf_delet
 SHARED_EXPORT size_t clist_gen_size(const clist_gen_t *clist);
 
 /** @brief Transfer the input value at the first element of the list
+ * to check value is null after call
  * \param[in] clist pointer to a clist_gen_t
- * \param[in] value ccontainer_value_t to be copied into the list
- */
+ * \param[in] value ccontainer_value_t to be copied into the list */
 SHARED_EXPORT ccontainer_err_t clist_gen_push_front(clist_gen_t *clist, ccontainer_value_t *value);
 
-/** @brief Make a copy of the input value at the end of the list 
- * \param[in] clist pointer to a clist_gen_t
-*/
+/** @brief Make a copy / a move of the input value at the end of the list
+ * \param[in] clist pointer to a clist_gen_t */
 SHARED_EXPORT ccontainer_err_t clist_gen_push_back(clist_gen_t *clist, ccontainer_value_t *value_in);
-
-/* tricky to remove a node, need to find where !! */
-SHARED_EXPORT void clist_gen_remove_node(clist_gen_t *clist, clist_node_t* node, deleter_value_t ptrf_deleter );
 
 /** Interface and usage not very convenient ** if want to modify only, not safe as well 
    but no copy needed 
    \param[in] clist pointer to a clist_gen_t */
-SHARED_EXPORT ccontainer_value_t* clist_gen_get_at( const clist_gen_t *clist, size_t index, ccontainer_err_t *err_code);
-/** Get a copy of the content , better adapted for use ? 
-     \param[in] clist pointer to a clist_gen_t */
-/* SHARED_EXPORT int clist_gen_get_value_copy( const clist_gen_t *clist, size_t elem_nb, ccontainer_value_t *value_out); */
+/* SHARED_EXPORT ccontainer_value_t* clist_gen_get_at( const clist_gen_t *clist, size_t index, ccontainer_err_t *err_code); */
 
-/** Retrieve a reference of the first value_t matching the criteria.
-   Most important function  for reuse and specialization, very generic at this level 
-   It checks the first n bytes given in buffer (later comp function ?)
-   \todo works for string, need a comp function indeed.
-   \param[in] clist pointer to a clist_gen_t
-   \param[out] value_out pointer to an internally allocated ccontainer_value_t
-   \return ERROR code */
-SHARED_EXPORT ccontainer_value_t* clist_gen_find( const clist_gen_t* clist, 
-                                    const char* buffer, size_t buffer_len, ccontainer_err_t *err_code);
+/** Retrieve a reference of the first value_t matching the criteria given by a fct_equalizer implementation.
+   Most important function  for reuse and specialization, very generic at this level.
+   All elements of the clist will be send as parameter value1 in fct_equalizer
+   \todo extend with find_all return a clist
+   \param[in] clist pointer to a clist_gen_t instance
+   \param[in] fct_equalizer of type \ref equalizer_value_t : bool(value_t *value1, value_t *value2)
+   \param[in] value_to_match a value_t reference used as parameter value2 in fct_equalizer
+   \param[inout] err_code  ccontainer error_code
+   \return reference to the first value_t matching the equality */
+SHARED_EXPORT ccontainer_value_t* clist_gen_find( const clist_gen_t *clist, 
+                        equalizer_value_t fct_equalizer, const ccontainer_value_t* value_to_match,
+                        ccontainer_err_t *err_code);
+
 
 /* tricky to remove generic from a node, need to retieve node before / after(ok) 
   => double link list ? or very not optimised in O(n) to find.
@@ -105,28 +97,49 @@ SHARED_EXPORT ccontainer_value_t* clist_gen_find( const clist_gen_t* clist,
 /*SHARED_EXPORT ccontainer_value_t clist_gen_pop_node_value(const clist_gen_t* clist, clist_node_t *node, ccontainer_err_t *err_code);*/
 
 /* this is optimal, pop_back less */
-SHARED_EXPORT ccontainer_value_t clist_gen_pop_front_node_value(clist_gen_t* clist, ccontainer_err_t *err_code);
+SHARED_EXPORT ccontainer_value_t clist_gen_pop_front(clist_gen_t* clist, ccontainer_err_t *err_code);
 
 /** \name Internal node structure */
 /** @{ */
 /** Return the first node.
- *  Make API simpler to use with 2 methods : get_first(clist), get_next(ciurrent_node)
- * Maybe not necessary public : clist_pop / clist_pop_move better (to make in ccontainer_queue)
- * But convenient for extension */
+ * \param[in] clist pointer to a clist_gen_t instance
+ * \return last node of the clist, NULL if empty */
 clist_node_t* clist_gen_get_first_node( const clist_gen_t* clist);
+
+/** Return the last node.
+ * Complexity O(n)
+ * \pre clist input must be correctly initilaized
+ * \param[in] clist pointer to a clist_gen_t instance
+ * \return first node of the clist, NULL if empty */
+clist_node_t* clist_gen_get_last_node( const clist_gen_t *clist);
 
 /** Return the next node of the provided node.
  * \param[in] current_node pointer to the current node
  * \return pointer to a node, return NULL if end of list is reached */
 clist_node_t* clist_gen_get_next_node( const clist_node_t* current_node);
-/* static
-clist_node_t* get_node_last( clist_node_t *fnode );
-clist_node_t* get_node_number( clist_node_t *fnode, size_t elem_nb);
-*/
-/** @} */
 
-/* first implementation to move in ccontainer_algorithm / helper */
-/*SHARED_EXPORT cvector_gen_t* clist_move_to_cvector(clist_gen_t* clist, ccontainer_err_t *err_code);*/
+ccontainer_value_t* clist_gen_get_node_value(const clist_node_t* current_node);
+
+/** Return the previous node relative to the current one provided.
+ * \param[in] current_node pointer to the current node
+ * \return pointer to a node, return NULL if the start of list is reached */
+clist_node_t* clist_gen_get_previous_node(const clist_node_t* current_node);
+
+SHARED_EXPORT clist_node_t* clist_gen_find_node( const clist_gen_t *clist, const clist_node_t *first_node,
+                        equalizer_value_t fct_equalizer, const ccontainer_value_t* value_to_match,
+                        ccontainer_err_t *err_code );
+
+SHARED_EXPORT clist_gen_t* clist_gen_find_all(const clist_gen_t *clist,
+                        equalizer_value_t fct_equalizer, const ccontainer_value_t* value_to_match,
+                        duplicater_value_t fct_duplicater, ccontainer_err_t *err_code);
+
+/** Remove the node_to_delete from the clist_gen_t.
+ * \param[in] clist pointer to a clist_gen_t instance
+ * \param[in] node_to_delete pointer to a clist_node_t to remove
+ * \return ccontainer error_code */
+SHARED_EXPORT ccontainer_err_t clist_gen_remove_node(clist_gen_t *clist, clist_node_t* node_to_delete, deleter_value_t ptrf_deleter );
+
+/** @} */
 
 #ifdef __cplusplus
 }

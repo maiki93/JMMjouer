@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game_loader/game_loader.h"
+#include "jmmjouer/game_loader/game_loader.h"
 #include "record/irecord_fwd.h" /* typedef irecord_t */
 
 /* forward declaration */

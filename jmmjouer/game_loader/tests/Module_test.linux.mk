@@ -22,8 +22,8 @@ test_mastermind : $(MODDIR_GL_TESTS)/test_mastermind.o jmmjouer/utils.o joueur/v
 	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
 # same as cmap_game_victories, order important clogger last
-test_cmap_game_ptrf: $(MODDIR_GL_TESTS)/test_cmap_game_ptrf.o libccontainer libclogger
-	@echo "Building test_game_ptrf @ :    $@"  # target name
+test_map_game_ptrf: $(MODDIR_GL_TESTS)/test_map_game_ptrf.o libccontainer libclogger
+	@echo "Building test_map_game_ptrf @ :    $@"  # target name
 	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $< -L. -lccontainer -lclogger -L $(LIB_CMOCKA) -lcmocka
 
 # test_plugin_manager, make sense could be appart of jmmjouer
@@ -45,4 +45,3 @@ clean ::
 	rm -f $(OBJS_GL_TESTS)
 	rm -f $(EXE_GL_TESTS)
 #	rm -f test_game_loader test_cmap_game_ptrf test_plugin_manager test_mastermind
-

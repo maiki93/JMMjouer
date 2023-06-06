@@ -2,6 +2,16 @@
 
 #include "ccontainer/ccontainer_utils.h"
 
+void carray_cstring_delete( char **carray, size_t len)
+{
+    size_t i;
+    for( i = 0; i < len; ++i) {
+        free(carray[i]);
+        carray[i] = NULL;
+    }
+    free(carray);
+}
+
 /* move value_t from a clist into a cvector : make "a move" could apply to al lsorts of value_t */
 cvector_gen_t* transfert_clist_to_cvector_gen(clist_gen_t* clist, ccontainer_err_t *err_code)
 {
@@ -23,7 +33,7 @@ cvector_gen_t* transfert_clist_to_cvector_gen(clist_gen_t* clist, ccontainer_err
 
     /* sure it is not empty : first pop correct for sure
         and pop until loop is empty */
-    tmp_value = clist_gen_pop_front_node_value( clist, &err_code_pop );
+    tmp_value = clist_gen_pop_front( clist, &err_code_pop );
     assert(err_code_pop == CCONTAINER_OK);
 
     while ( err_code_pop != CCONTAINER_EMPTY ) {
@@ -35,9 +45,10 @@ cvector_gen_t* transfert_clist_to_cvector_gen(clist_gen_t* clist, ccontainer_err
         assert( !tmp_value.data ); /* assert NULL */
         assert(tmp_value.len == 0);
 
-        tmp_value = clist_gen_pop_front_node_value( clist, &err_code_pop );
+        tmp_value = clist_gen_pop_front( clist, &err_code_pop );
     };
     /* it is NULL, the last one on exit */
     /*ccontainer_delete_value( &tmp_value );*/
     return cvect_out;
 }
+

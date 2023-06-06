@@ -25,7 +25,7 @@ victory_t start_game_morpion(person_t joueur)
        score = 0 si match nul ou victoire de l'IA */
     /*int score = 0;*/
     /* get pseudo from the joueur */
-    const char* pseudo = joueur.nom;
+    const char* pseudo = person_name( (const person_t*) &joueur);
 
     victory_init(&victories);
 

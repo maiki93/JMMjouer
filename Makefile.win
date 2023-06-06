@@ -22,7 +22,7 @@ LFLAGS = /nologo
 
 # List of subdirectories containing a Module.win.mk file
 # for windows, use all modules and no recursive (!= ming64 for clogger)
-MODULES := clogger ccontainer joueur record jmmjouer src_plugin executables # game_loader tests
+MODULES := clogger ccontainer joueur record jmmjouer src_plugins executables # game_loader tests
 
 # Compile source, default name *obj on windows, adviced to keep it
 # /O1, /O2 optimisation , /Ox 'best' optimization'

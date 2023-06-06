@@ -43,6 +43,10 @@ void deleter_value_cstring( ccontainer_value_t *value );
 
 ccontainer_value_t duplicater_value_cstring( const ccontainer_value_t *value_src, ccontainer_err_t *err_code);
 
+/**/
+bool equalizer_value_cstring(const ccontainer_value_t *value1, const ccontainer_value_t *value2);
+
+/* miss comparater, maybe return -1,0,1 not bad, more general than bool */
 /** @} */ /** public API */
 
 /** @} */ /** end ccontainer_value_cstring_grp */

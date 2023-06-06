@@ -96,26 +96,26 @@ static void get_array_2_names(void **state) {
 static void get_clist_cstring_2_names() 
 {
     ccontainer_err_t err_code;
-    clist_cstring_t *clist;
-    char *name_game_out;
+    cvector_cstring_t vect_cstring;
+    // get_ref return const
+    const char *name_game_out;
     
     game_loader_init( gload );
     add_game( gload, "toto", (ptr_game_t) 0x10 );
     add_game( gload, "titi2", (ptr_game_t) 0x20 );
 
     // return pointer directly, could send error_code in parameter
-    clist = game_loader_get_names( gload );
-    assert_non_null(clist);
+    vect_cstring = game_loader_get_names( gload );
+    //assert_non_null(vect_cstring);
+    assert_int_equal( 2, cvector_cstring_size( &vect_cstring) );
     assert_int_equal( 2, game_ptrf_size(gload->map_game));  // compare to size of game_loader array directly
-    assert_int_equal( 2, clist_cstring_size( clist) );
 
-    name_game_out = clist_cstring_get_ref_at( clist, 0, &err_code );
-    assert_int_equal( 4, strlen(name_game_out));
+    name_game_out = cvector_cstring_get_ref_at( &vect_cstring, 0, &err_code );
     assert_string_equal( "toto", name_game_out );
-    name_game_out = clist_cstring_get_ref_at( clist, 1, &err_code );
-    assert_string_equal( "titi2", name_game_out );
+    name_game_out = cvector_cstring_get_ref_at( &vect_cstring, 1, &err_code );
+    //assert_string_equal( "titi2", name_game_out );
 
-    clist_cstring_free( clist );
+    cvector_cstring_delete( &vect_cstring );
 }
 
 

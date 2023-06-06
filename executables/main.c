@@ -150,10 +150,11 @@ int main(int argc, char *argv[])
     retour = arcade_run( &arcade_options );
 
     /* not a bad idea, but do nothing actually */
-    /*arcade_clear()*/
+    /*arcade_clear() / */
 
     /* to pass to clear_ressources */
     file_record_delete( record );
+    free( record ); /* need delete / free, or only free with interface/Inversion */
     record = NULL;
     
     game_loader_free( game_loader );
@@ -167,11 +168,15 @@ int main(int argc, char *argv[])
 /*  see set_terminate() / signals */
 void clear_ressources_and_exit() 
 {
+    int status;
     /* clear / delete singleton instances */
-    /*close_clogger();*/
     plugin_manager_free();
-    /*exit(0);*/
-    exit(EXIT_SUCCESS);
+    status = close_clogger();
+    /*exit(0); failure should be much generic, error at different level */
+    if( !status )
+        exit(EXIT_SUCCESS);
+    else
+        exit(EXIT_FAILURE);
 }
 
 /* further validation of entries : check status file,...
@@ -181,21 +186,6 @@ int treat_options(options_t *options, arcade_params_t *arcade_opt)
     arcade_opt->play_anonymous = options->flags_anomymous ? true : false;
     return EXIT_SUCCESS;
 }
-
-/*
-    set_joueur_and_historique( &joueur, &historique, &b_new_joueur); // pass pointer to pointer of historique
-                                                                     //want to assign local historique to the allocated memory inside the function
-    if( b_new_joueur ) {
-        printf("Ah ! un nouveau venu !! \n");
-        printf("Quelques questions pour mieux voir connaitre  \n");
-        joueur.is_daltonien = ask_yesno_question("Etes-vous daltonien ? [Y/y/n/N] > ");
-    } else {
-        printf("Cela fait plaisir de vous revoir %s \n", joueur.nom);
-        print_info_joueur( &joueur );
-        print_historique( historique );
-        printf("\nCommençons dès maintenant \n\n");
-    }
-*/
 
 /*
 int serie_3_game(Joueur joueur, Historique* historique)
@@ -226,7 +216,7 @@ void log_directives()
 
 /* only if windows.h is incuded */
 #ifdef _WINDOWS_
-	printf("compile avec _WINDOWS_ \n");
+	printf("compile on _WINDOWS_ \n");
 #endif
 /* defined by compiler, safer. WIN32 and UNIX to test also (see stackoverflow, not sure)
    It is about the platform, not the compiler, gcc on mingw64 is 1 */
@@ -250,7 +240,6 @@ void log_directives()
         printf("MSVC in release mode\n");
     #endif
 #elif defined(__GNUC__) || defined(__GNUG__)
-/* #elif __GNUC__ */
     printf("compile with GCC compiler\n");
     #ifdef NDEBUG
         printf("GCC in release mode\n");
@@ -259,7 +248,7 @@ void log_directives()
     #endif
 #endif
 
-#ifdef JMMJ_DEBUG 
+#ifdef JMMJ_DEBUG
     printf("DIRECTIVE JMMJ_DEBUG defined\n");
 #endif
 }

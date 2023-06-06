@@ -17,7 +17,8 @@
 #include "game_loader/plugin_manager.h"
 #include "clogger/clogger.h"
 #include "utils.h"           /* clear_stdin */
-#include "ccontainer/clist_cstring.h"
+#include "ccontainer/clist_cstring.h" /* to delete ?*/
+#include "ccontainer/cvector_cstring.h"
 
 /* no more use ?
 enum { STREAM_INPUT_MAX_SIZE = 25 };
@@ -35,7 +36,7 @@ static game_loader_t *gloader;
 static joueur_t identification_joueur();
 static void print_identification_menu(char *try_name);
 /*** Menu game boucle sur le choix du jeu */ /* why cannot pass const clist ? */
-static int print_game_menu(clist_cstring_t *clist_game_name);
+static int print_game_menu(cvector_cstring_t *vect_game_name);
 /*** Running a game, take out const  ***/
 int run_game(joueur_t* joueur, const char *name_game);
 
@@ -49,8 +50,8 @@ int arcade_init( game_loader_t *game_loader, irecord_t* record_impl)
     CLOG_DEBUG("game_loader nb of games(todo) %d\n",1);
     return 0;
 }
-/* to decide if takes ownership of injected variables.
-    Not at this point */
+/* to decide if takes ownership of injected variables. No ownership now, inject reference, better
+    Not at this point, method not called (created and deleted from main) */
 void arcade_clear() 
 {
     CLOG_DEBUG("arcade::arcade_clear() %d\n", 0);
@@ -65,11 +66,10 @@ int arcade_run(arcade_params_t *params)
     joueur_t joueur;
 
     /* for game choice */
-    clist_cstring_t *clist_game_name = NULL;
-    char *name_game_out = NULL;
+    cvector_cstring_t vector_game_names;
+    const char *name_game_out = NULL;
     ccontainer_err_t err_code;
     int game_indice = -1;
-
 
     bool play_anonymous = params->play_anonymous;
     bool exit_loop = false;
@@ -81,63 +81,60 @@ int arcade_run(arcade_params_t *params)
     if( play_anonymous) {
         joueur_init( &joueur, "anonymous", false, false);
     } else {
-        printf("Must implement identification page, try with toto\n");
         joueur = identification_joueur();
     }
-    /* joueur new or not ? Not important at this point, 
-        just need to assert it is not invalid for continuing !! */
-    /* check if joueur is valid , even if done before ... ? */
+    /* check if joueur is valid , new joueur case deal before  */
     assert( person_status((person_t *)&joueur) == PERSON_VALID);
     joueur_info( &joueur );
     
     /*** 2. Game menu ***/
-    /* error_code, is ok also */
-    clist_game_name = game_loader_get_names( gloader );
-    assert(clist_game_name);
+    /* error_code, is ok also, error code as attribute ok cvector_string ? */
+    vector_game_names = game_loader_get_names( gloader );
+    /* at least the two static games are present */
+    assert( cvector_cstring_size( &vector_game_names) >= 2 );
 
     /* infinite main loop menu */
     do {
         /* usage for printing menu (and starting the game)
            get back the choice of user */
-        game_indice = print_game_menu(clist_game_name);
-
-        /* if choose quit directly, big error */
+        game_indice = print_game_menu( &vector_game_names );
+#ifdef JMMJ_DEBUG
         if( game_indice >= 0) {
             CLOG_DEBUG("game_indice: %d\n",game_indice);
-            /* ok not convenient if not in return */
-            name_game_out = clist_cstring_get_ref_at( clist_game_name, game_indice, &err_code );
-            printf("game name: %s\n", name_game_out );
-            CLOG_DEBUG("game name: %s\n", name_game_out );
+            name_game_out = cvector_cstring_get_ref_at( &vector_game_names, game_indice, &err_code );
+
+            printf("game name chosen : %s\n", name_game_out );
+            CLOG_DEBUG("game name chosen: %s\n", name_game_out );
         }
+#endif
         /* Send scoring page : joueur, record */
         /* could use enum (negative) or game number positive and switch statement ... 
             better, more explicit */
-        if( game_indice == -1 ) {
+        if( game_indice == -1 ) 
+        {
             printf("\n------\nVoir les scores\n-----\n");
         }
         /* exit game properly, function end_game to choose / with error also */
-        else if( game_indice == -2 ) {
+        else if( game_indice == -2 ) 
+        {
             printf("\ngood bye %s!\n", person_name( (person_t*) &joueur));
             exit_loop = true;
-            /*
-            clear_ressources_and_exit(historique); */ /* not clean at all !*/
         }
         /* game_indice [0, size_list_game-1] (assert inside function) */
-        else {
+        else 
+        {
             assert( game_indice >= 0);
-            assert( game_indice < (int)  clist_cstring_size(clist_game_name));
+            assert( game_indice < (int)  cvector_cstring_size( &vector_game_names));
             /* get the game and run it */
-            name_game_out = clist_cstring_get_ref_at( clist_game_name, game_indice, &err_code );
+            name_game_out = cvector_cstring_get_ref_at( &vector_game_names, game_indice, &err_code );
             run_game(&joueur, name_game_out);
-
             /* store result in record */
         }
 
     } while( exit_loop == false );
 
     /** 3. exit game **/
-    clist_cstring_delete( clist_game_name );
-    clist_game_name = NULL;
+    cvector_cstring_delete( &vector_game_names );
     joueur_delete( &joueur );
     return 0;
 }
@@ -156,23 +153,16 @@ int run_game(joueur_t* joueur, const char *name_game)
     if( !pf_game ) {
         CLOG_ERR("Error in loading game name: %s\n", name_game);
     }
-    /* execute game, sending a copy of the joueur
-       and get results */
-    /*victories = pf_game((person_t)*joueur); cast not allowed*/
-    /* return structure with results */
-    /*strcpy(person.nom, joueur->person.nom);*/
-    /*
-    strcpy( person.pname, person_name( (person_t*) &joueur));
-    person.is_daltonien = joueur->person.is_daltonien;
-    */
+    
     /* above , not initialized pname, want to avoid setter */
+    /* person is a joueur, copy good for game execution if new thread */
     person_init( &person, person_name( (person_t*) &joueur),
-                    person_daltonien( (person_t*) &joueur),
-                    person_admin( (person_t*) &joueur));
+                          person_daltonien( (person_t*) &joueur),
+                          person_admin( (person_t*) &joueur));
 
     /* game execution */
     victory_game = pf_game(person);
-    printf("result win mastermind %d\n", victory_game.nb_win);
+    printf("result win %d\n", victory_game.nb_win);
     /* Want to save the results in record ? */
 
     /* update results of victories, use only copies */
@@ -181,11 +171,7 @@ int run_game(joueur_t* joueur, const char *name_game)
     printf("pair vict rec before update %d", pair_vict_rec.victories.nb_win);
 
     pair_vict_rec.victories.nb_win += victory_game.nb_win;
-    game_victories_insert( &joueur->map_victories, pair_vict_rec);
-
-    /* try dr memory error, no crash */
-    /* free(pair_vict_rec.game_name); */
-
+    game_victories_insert( &joueur->map_victories, &pair_vict_rec);
     return 0;
 }
 
@@ -197,16 +183,8 @@ static joueur_t identification_joueur()
     bool accepted = false;
     bool new_joueur_confirmation = false;
 
-    /* avoid memory leak to comment but warning potentially unitialized*/
-    /* joueur_default_init( &joueur ); */
-
-    /* if test before loop, sure initilaized*/
-    /* print_identification_menu(try_name);
-    joueur = record_find_joueur_from_name((irecord_t *)record, try_name); */
-
     /* do... while important, avoid potentialy initialized variable
         => may change interface, passing joueur_t as argument... or other trick */
-    /*while( accepted == false) {*/
     do {
         print_identification_menu(try_name);
 
@@ -216,16 +194,15 @@ static joueur_t identification_joueur()
         printf("daltonien: %d\n", joueur.person.is_daltonien);
         printf("adresss of joueur: %p\n", (void*) &joueur);
         /* print the name because frist in structure !! same adreess !! */
-        printf("name : %s\n", (char*) &joueur);
+        printf("name : %s\n", person_name((person_t*) &joueur));
 
-        
-        if( person_status((person_t*)&joueur) == PERSON_INVALID) {
+        if( person_status((person_t*) &joueur) == PERSON_INVALID) {
             CLOG_DEBUG("INVALID PERSON %d\n",0);
-            printf("Invalid joueur it is a new joueur, TODO to confirm !!\n");
+            /*printf("Invalid joueur you are a new joueur, TODO to confirm !!\n");*/
             /* clean, menu for a new joueur: make its profile */
             new_joueur_confirmation = ask_yesno_question("Nouveau joueur ? confirm by y/n plz: ");
             if( new_joueur_confirmation) {
-                /* delete previous invalid joueur 
+                /* delete previous invalid joueur, reset it is a person indeed 
                     or need to set argument of new joueur setName, dalto... */
                 joueur_delete(&joueur);
                 printf("NEW JOUEUR INIT\n");
@@ -267,19 +244,19 @@ static void print_identification_menu(char *try_name)
      return int : not so nice, an enum not so simple with variable nb of games 
        or enum { QUIT=-2, SCORE=-1 } and test for positive , use of switch */
 /*int print_game_menu(const char**list_game_name, size_t size_list)*/
-static int print_game_menu(clist_cstring_t *clist_game_name)
+static int print_game_menu(cvector_cstring_t *vect_game_name)
 {
     int i, choice_game, nb_game;
-    char *name_out = NULL;
+    const char *name_out = NULL;
     ccontainer_err_t err_code;
     bool valid_entry = false;
     /* allow to deal more easily with integer inside the function */
-    nb_game = (int) clist_cstring_size( clist_game_name);
+    nb_game = (int) cvector_cstring_size( vect_game_name );
     assert( nb_game < INT_MAX );
 
     printf("---------------\nListe des jeux ------\n");
     for( i = 0; i < nb_game; i++) {
-        name_out = clist_cstring_get_ref_at( clist_game_name, i, &err_code);
+        name_out = cvector_cstring_get_ref_at( vect_game_name, i, &err_code);
         printf("%d. %s\n", i, name_out);
     }
     printf("%d. Un jeu au hasard\n", i++);

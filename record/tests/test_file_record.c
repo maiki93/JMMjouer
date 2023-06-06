@@ -48,6 +48,7 @@ static void initialization()
 static void joueur_not_found()
 {
     joueur_t joueur;
+    person_status_t status_p;
     /* dr memory suppress a leak clist_new */
     /* joueur returned by copy, previously allocated is lost 
         return by value, no way to check/clean properly 
@@ -59,7 +60,9 @@ static void joueur_not_found()
     file_record_init( file, "test_record_file.txt");
 
     joueur = record_find_joueur_from_name( (irecord_t*)file, "titi");
-    assert_string_equal( joueur.person.pname, "invalid");
+    //assert_string_equal( joueur.person.pname, "invalid");
+    status_p = person_status( (const person_t*) &joueur);
+    assert_int_equal( PERSON_INVALID, status_p );
 
     joueur_delete( &joueur );
     file_record_delete( file );
@@ -69,13 +72,20 @@ static void joueur_not_found()
 static void joueur_valid_daltonien_no_game()
 {
     joueur_t joueur;
+    person_status_t status_person;
+    const char *name_person;
     /*joueur_default_init( &joueur );*/
 
     file_record_t *file = file_record_new();
     file_record_init( file, "test_record_file.txt");
-
+    // kevin no game=> error
     joueur = record_find_joueur_from_name( (irecord_t*)file, "kevin");
-    assert_string_equal( joueur.person.pname, "kevin");
+
+    //joueur = record_find_joueur_from_name( (irecord_t*)file, "jasmine");
+    status_person = person_status( (const person_t*) &joueur);
+    assert_int_equal( PERSON_VALID, status_person );
+    name_person = person_name( (const person_t*) &joueur );
+    assert_string_equal( name_person, "kevin");
     assert_int_equal( joueur.person.is_daltonien, 1);
     // kevin has no games recorded
     assert_int_equal( 0, game_victories_size( & joueur.map_victories) );

@@ -56,7 +56,7 @@ LFLAGS = --warn-common -shared -z defs --no-allow-shlib-undefined -lc
 # List of subdirectories containing a Module.mk file
 #MODULES := tests tests/test_mock
 # game_loader moved into jmmjouer
-MODULES := clogger ccontainer joueur record jmmjouer src_plugin executables
+MODULES := clogger ccontainer joueur record jmmjouer src_plugins executables
 # game_loader # tests_integration
 
 # see advices (and much more than compilation options) https://matt.sh/howto-c

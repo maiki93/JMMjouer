@@ -114,10 +114,9 @@ joueur_t __get_joueur_from_name( void *this, const char* name)
     assert(this!= NULL);
     assert(file_record != NULL);
 
-    joueur_default_init( &joueur );
-    
     if( open_file( file_record, false ) ) {
         /* fclose( file_record->fp ); */
+        joueur_default_init( &joueur ); /* status invalid */
         return joueur;
     }
     /* advance file pointer unitil a record match the name 
@@ -127,6 +126,7 @@ joueur_t __get_joueur_from_name( void *this, const char* name)
 
     if( !found_joueur ) {
         CLOG_DEBUG("did not find joueur in record %s\n", name);
+        joueur_default_init( &joueur ); /* status invalid */
     }
     else {
         CLOG_DEBUG("found joueur in record: %s\n", name);
@@ -164,7 +164,7 @@ void close_file( file_record_t *this )
     }
 }
 
-/* @brief Parcourt le fichier to find the record starting with name.
+/* \brief Parcourt le fichier to find the record starting with name.
     return fpos_t in the file at the start of the record s*/
 bool search_record_joueur_by_name(file_record_t *this, char *line, const char* name)
 {
@@ -201,21 +201,24 @@ int extract_one_record(file_record_t *this, char *line, joueur_t *joueur)
 {
     char name_record[MAX_SIZE_NOM_PERSON]; /*NAME_MAXSIZE];*/  /* contains name read in file */
     int is_daltonien = false;
+    int is_admin = false;
     int retour;
 
     /*sscanf( line, "\n%s %d\n", &joueur->person.nom, &joueur->person.is_daltonien );*/
     retour = sscanf( line, "\n%s %d\n", name_record, &is_daltonien );
     /* return errno or nb correct assignement == 2 */
-    /* only microsoft bullshit and never standard */
-    /*strncpy_s( joueur->person.nom, MAX_SIZE_NOM_PERSON, name_record, MAX_SIZE_NOM_PERSON);*/
-    strncpy( joueur->person.pname, name_record, MAX_SIZE_NOM_PERSON);
-    joueur->person.is_daltonien = is_daltonien;
-
+    
+    /*strncpy( joueur->person.pname, name_record, MAX_SIZE_NOM_PERSON);*/
+    /* need a makeJoueur + id */
+    /*strncpy( joueur->person.pname, name_record, MAX_SIZE_NOM_PERSON);*/
+    /*joueur->person.is_daltonien = is_daltonien;*/
+    /*joueur->person.is_admin = is_admin;*/
+    joueur_init( joueur, name_record, is_daltonien, is_admin);
 
     /* test if already existing / allocated map_victories */
-    if( joueur->map_victories.clist != NULL) {
+    /*if( joueur->map_victories.clist != NULL) { */
+    if( game_victories_size(  &(joueur->map_victories) ) > 0 ) {
         printf("deallocate the map before extraction of one");
-
     }
     /* read game victories */
     extract_map_victories( this, line, &joueur->map_victories );
@@ -250,7 +253,7 @@ int extract_map_victories( file_record_t *this, char *line, map_game_victories_t
        sscanf( line+pos_delimiter+1, "%d %d", & pair_victory.victories.nb_win
                                             , & pair_victory.victories.nb_lost);
         
-        game_victories_insert( map, pair_victory );
+        game_victories_insert( map, &pair_victory );
         if( !fgets(line, MAX_LINE_SIZE,  this->fp) ) {
             return 1;
         }

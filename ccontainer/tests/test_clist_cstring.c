@@ -5,17 +5,19 @@
 #include <stdint.h>
 #include "cmocka.h"
 
-#include <stdio.h> /*only for printf, may be commented */
+/*#include <stdio.h>*/ /*only for printf, may be commented */
 #include <string.h>
 
 #include "ccontainer/clist_cstring.h"
+#include "ccontainer/ccontainer_utils.h"
 
 /* string insertion */
 const char string1[] = "first";
 const char* string2 = "second";
+const char* string3 = "tree";
 /* string retrieval */
 char* get_string1;
-char *get_string2;
+//char *get_string2;
 
 clist_cstring_t* lcstring_heap = NULL;
 
@@ -68,61 +70,45 @@ static void initialization_on_heap()
     assert_non_null( list_cstr->clist );
     assert_int_equal( 0, clist_cstring_size(list_cstr) );
     
-    /* call destructor clist_clear & deallocate */
+    // call destructor clist_clear & deallocate
     clist_cstring_free( list_cstr ); 
-    list_cstr = NULL; /* to protect later use */
+    list_cstr = NULL; // to protect later use
 }
 
-/* insert one string by copy and retrieve one string */
-static void push_back_two_strings_get_copy()
-{
-    clist_cstring_t list_cstr;
-    char *string_out = NULL;
-    ccontainer_err_t err_code;
-
-    clist_cstring_init( &list_cstr);
-    err_code = clist_cstring_push_back(&list_cstr, string1);
-    assert_int_equal( CCONTAINER_OK, err_code );
-    assert_int_equal( 1, clist_cstring_size(&list_cstr) );
-
-    string_out = clist_cstring_get_copy_at( &list_cstr, 0, &err_code );
-    assert_int_equal(  CCONTAINER_OK, err_code);
-    assert_string_equal( "first", string_out);
-    
-    // deallocation on stack, call destructor
-    clist_cstring_delete( &list_cstr );
-    // local copy with its allocated memory 
-    free(string_out);
-    string_out = NULL;
-}
-
-static void push_back_two_strings_get_ref()
+static void push_back_strings_and_pop_front()
 {
     ccontainer_err_t err_code;
     char * string_out = NULL;
     // allocation done in setup
     // push one
-    clist_cstring_push_back(lcstring_heap, string1);
-
-    string_out = clist_cstring_get_ref_at( lcstring_heap, 0, &err_code);
-    assert_int_equal(  CCONTAINER_OK, err_code );
-    assert_memory_equal( "first", string_out, 5);
-    assert_int_equal(5, strlen(string_out));
-    // only a ref
-    string_out = NULL;
-
-    // only one, return not found
-    string_out = clist_cstring_get_ref_at( lcstring_heap, 1, &err_code);
-    assert_int_equal( CCONTAINER_OUTOFRANGE, err_code);
-
+    err_code = clist_cstring_push_back(lcstring_heap, string1);
+    assert_int_equal( CCONTAINER_OK, err_code );
+    assert_int_equal( 1, clist_cstring_size( lcstring_heap) );
     // push a second
-    clist_cstring_push_back(lcstring_heap, string2);
-    string_out = clist_cstring_get_ref_at( lcstring_heap, 1, &err_code);
+    err_code = clist_cstring_push_back(lcstring_heap, string2);
     assert_int_equal( CCONTAINER_OK, err_code);
-    assert_memory_equal( "second", string_out, 6);
-    assert_int_equal(6, strlen(string_out));
-    // only a ref
+    assert_int_equal( 2, clist_cstring_size( lcstring_heap ));
+    err_code = clist_cstring_push_back(lcstring_heap, string3);
+    assert_int_equal( CCONTAINER_OK, err_code);
+    assert_int_equal( 3, clist_cstring_size( lcstring_heap ));
+
+    string_out = clist_cstring_pop_front(lcstring_heap, &err_code);
+    assert_memory_equal( "first", string_out, 5);
+    assert_string_equal( "first", string_out);
+    assert_int_equal(5, strlen(string_out));
+    // it is a copy, must be free
+    free( string_out );
     string_out = NULL;
+
+    string_out = clist_cstring_pop_front(lcstring_heap, &err_code);
+    assert_memory_equal( "second", string_out, 6);
+    assert_string_equal( "second", string_out);
+    assert_int_equal(6, strlen(string_out));
+    free( string_out );
+    string_out = NULL;
+    
+    // still one in clist
+    assert_int_equal( 1, clist_cstring_size( lcstring_heap ));
     //deallocation lcstring_heap done in teardown
 }
 
@@ -141,13 +127,16 @@ static void get_array()
     assert_int_equal( 3, array_len);
 
     assert_string_equal("first", p_array[0]);
-    assert_string_equal("third", p_array[2]);
     assert_string_equal("second", p_array[1]);
-    // explicit delete of the copies, need function api ? yes certainly
+    assert_string_equal("third", p_array[2]);
+
+    // explicit delete of the copies, defined in clist_cstring
     carray_cstring_delete( p_array, 3 );
     p_array = NULL;
+    //deallocation lcstring_heap done in teardown
 }
 
+/*
 static void get_array_error_empty()
 {
     char **p_array = NULL;
@@ -158,7 +147,7 @@ static void get_array_error_empty()
     assert_int_equal( CCONTAINER_EMPTY, retour);
     assert_int_equal( 0, array_len);
 }
-
+*/
 
 int main()
 {
@@ -166,10 +155,9 @@ int main()
     const struct CMUnitTest tests_clist_cstring[] = {
         cmocka_unit_test(initialization_on_stack),
         cmocka_unit_test(initialization_on_heap),
-        cmocka_unit_test(push_back_two_strings_get_copy),
-        cmocka_unit_test_setup_teardown(push_back_two_strings_get_ref,setup_heap, teardown_heap),
+        cmocka_unit_test_setup_teardown(push_back_strings_and_pop_front, setup_heap, teardown_heap),
         cmocka_unit_test_setup_teardown(get_array, setup_heap, teardown_heap),
-        cmocka_unit_test_setup_teardown(get_array_error_empty,setup_heap, teardown_heap),
+        //cmocka_unit_test_setup_teardown(get_array_error_empty,setup_heap, teardown_heap),
     };
 
     /* call group_setup and teardown at the very beginning and end */

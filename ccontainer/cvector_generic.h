@@ -96,7 +96,7 @@ SHARED_EXPORT void cvector_gen_free(cvector_gen_t *cvect);
  * Mandatory if the user defined structure contains pointer on heap allocated memory
  * \param[in] cvect pointer to a cvector_gen_t instance
  * \param[in] function with signature void(value_t *value) */
-SHARED_EXPORT void cvector_gen_set_deleter( cvector_gen_t *cvect, deleter_value_t fct_delete );
+SHARED_EXPORT void cvector_gen_set_deleter( cvector_gen_t *cvect, deleter_value_t fct_deleter );
 
 /**  Apply an user defined copy constructor to ccontainer_value_t.
  * Will replace the default implementation \ref ccontainer_copy_value()

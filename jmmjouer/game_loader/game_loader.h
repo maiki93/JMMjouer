@@ -2,7 +2,7 @@
 
 /* needed for ptr_game_t definition */
 #include "jmmjouer/ptrf_game_typedef.h"
-#include "ccontainer/clist_cstring.h"
+#include "ccontainer/cvector_cstring.h"
 
 /* not exported as shared library */
 /*#include "shared_EXPORTS.h"*/
@@ -60,7 +60,7 @@ typedef struct game_loader_type game_loader_t;
     TODO better */
 /*SHARED_EXPORT*/ int game_loader_load_all(game_loader_t *gameldr);
 
-/*SHARED_EXPORT*/ clist_cstring_t * game_loader_get_names(const game_loader_t *gameldr);
+/*SHARED_EXPORT*/ cvector_cstring_t game_loader_get_names(const game_loader_t *gameldr);
 /* @brief Return an array with the game names.
    It is copy, the caller owns the array and is responsible of the deallocation 
    TO DO clist_cstring as return

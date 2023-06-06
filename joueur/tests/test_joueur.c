@@ -10,14 +10,14 @@
 /*#include "joueur/person.h"*/
 #include "joueur/adapter_ccontainer_joueur.h"
 
-#include <string.h> /* only for make_joueur1, to move */
+/*#include <string.h>*/ /* only for make_joueur1, to move */
 
 /* not const if want to add/change map_victories associated */
-static joueur_t joueur1;
+/* static joueur_t joueur1;*/
 /* only available C89 + */
-static const victory_t victory1 = {.nb_win=1,.nb_lost=2,.nb_equality=3};
+/*static const victory_t victory1 = {.nb_win=1,.nb_lost=2,.nb_equality=3};*/
 /* helper */
-static joueur_t make_joueur1();
+/*static joueur_t make_joueur1();*/
 
 static void person_constructor()
 {
@@ -73,21 +73,21 @@ static void joueur_constructor()
     joueur_delete(&joueur);
 }
 
-
-
 /* utilities/helper function in joueur */
+/*
 static joueur_t make_joueur1()
 {
     joueur_t joueur;
     joueur_init(&joueur, "maiki", false, true);
-    /* to hide in joueur implementation the usage of pair */
+    // to hide in joueur implementation the usage of pair
     struct pair_game_victory_t pair1;
-    strcpy( pair1.game_name, "jeu1"); /* game_name[XX] */
+    strcpy( pair1.game_name, "jeu1");
     pair1.victories = victory1;
 
-    game_victories_insert( & joueur.map_victories, pair1 );
+    game_victories_insert( & joueur.map_victories, &pair1 );
     return joueur;
-}
+} 
+*/
 
 int main()
 {

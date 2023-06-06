@@ -13,7 +13,7 @@ ccontainer_value_t make_value_cstring( const char* text_to_insert, ccontainer_er
 
     /* include the terminaison caracter */
     text_len = strlen(text_to_insert) + 1;
-    tmp_buffer = (char*)malloc(text_len);
+    tmp_buffer = (char*)malloc( text_len );
     if( !tmp_buffer ) {
         *err_code = CCONTAINER_ALLOCERR;
         return value_out;
@@ -63,4 +63,11 @@ ccontainer_value_t duplicater_value_cstring( const ccontainer_value_t *value_src
     value_out.data = tmp_buffer;
     value_out.len = value_src->len;
     return value_out;
+}
+
+bool equalizer_value_cstring(const ccontainer_value_t *value1, const ccontainer_value_t *value2)
+{
+    assert(value1 && value2);
+    return strcmp(value1->data, value2->data) == 0 ? true
+                                                   : false; 
 }

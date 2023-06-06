@@ -2,16 +2,10 @@
 
 #include "joueur.h"
 
-/* to use optimized list_to_vector, must get internal for casting to gen_t
-   possible to implement in list_joueur also...
-typedef struct list_joueur list_joueur_t;
-*/
 typedef struct {
     clist_gen_t *clist;
     size_t len;
 } list_joueur_t;
-
-/* typedef struct cvector_joueur cvector_joueur_t;*/ /* better out of clist, adapter if not better */
 
 /** @file
  *  In-Memory joueurs with their results, as read / to write from a persistent storage.

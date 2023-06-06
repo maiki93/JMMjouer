@@ -53,6 +53,10 @@ typedef ccontainer_value_t(*duplicater_value_t) (const ccontainer_value_t * valu
  * \return bool , see specific algorithm for the expected criteria */
 typedef bool(*comparater_value_t) (const ccontainer_value_t *value1, const ccontainer_value_t *value2);
 
+/** function signature for find algorithm.
+ * Very flexible in term of definition of "equal", compare bytes in memory, value or pointer to allocated memory...
+ * \return bool if "equal" for 2 value_t, to be defined by usage */
+typedef bool(*equalizer_value_t) (const ccontainer_value_t *value1, const ccontainer_value_t *value2);
 
 /** Return a ccontainer_value_t from data input.
     ccontainer_value_t takes ownership of the data which should not be modified after this call.

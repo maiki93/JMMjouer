@@ -1,17 +1,17 @@
 
-MODDIR_SRC_PLUGIN := src_plugin
+MODDIR_SRC_PLUGIN := src_plugins
 
-OBJS_SRC_PLUGIN_MORP := $(MODDIR_SRC_PLUGIN)/game_morpion.obj
+OBJS_SRC_PLUGINS := $(MODDIR_SRC_PLUGINS)/game_morpion.obj
 
-$(info == SRC_PLUGIN : $(MODDIR_SRC_PLUGIN) ==)
-$(info $$OBJS_SRC_PLUGIN_MORP is [$(OBJS_SRC_PLUGIN_MORP)] )
+$(info == SRC_PLUGIN : $(MODDIR_SRC_PLUGINS) ==)
+$(info $$OBJS_SRC_PLUGIN_MORP is [$(OBJS_SRC_PLUGINS)] )
 
 # independent of other make config, always shared dlibrary
-$(MODDIR_SRC_PLUGIN)/game_morpion.obj : $(MODDIR_SRC_PLUGIN)/game_morpion.c
+$(MODDIR_SRC_PLUGINS)/game_morpion.obj : $(MODDIR_SRC_PLUGINS)/game_morpion.c
 	@echo "Build specific game_morpion in src_plugin : $@"
 	$(CC) $(STD) /DwithLIB /Dshared_EXPORTS $(CFLAGS) /c $< /Fo"$(dir $@)"
 
-game_morpion.dll : $(MODDIR_SRC_PLUGIN)/game_morpion.obj $(MODDIR_JOUEUR)/victory.obj
+game_morpion.dll : $(MODDIR_SRC_PLUGINS)/game_morpion.obj $(MODDIR_JOUEUR)/victory.obj
 	$(LINK) $(LFLAGS) /DLL $^ /NOIMPLIB /OUT:game_morpion.dll
 #	cp $@ .\plugins, do not mage to copy Copy-Item
 

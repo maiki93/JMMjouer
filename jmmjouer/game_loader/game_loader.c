@@ -14,7 +14,7 @@
 */
 
 #include "jmmjouer/game_loader/game_loader.h"
-#include "jmmjouer/game_loader/cmap_game_ptrf.h"
+#include "jmmjouer/game_loader/map_game_ptrf.h"
 
 #include "jmmjouer/game_loader/plugin_manager.h" /* to get singleton instance */
 #include "jmmjouer/utils_file.h"                 /* contains algo generic */
@@ -30,7 +30,7 @@
 
 /* full definition, a bit overkill this class with one data member but clear design and extendable */
 struct game_loader_type {
-    cmap_game_ptrf_t *map_game;
+    map_game_ptrf_t *map_game;
 };
 
 /*********** private functions *********/
@@ -75,7 +75,7 @@ int game_loader_load_all(game_loader_t *gameldr)
     return 0;
 }
 
-clist_cstring_t * game_loader_get_names(const game_loader_t *gameldr)
+cvector_cstring_t game_loader_get_names(const game_loader_t *gameldr)
 {
     return game_ptrf_get_names( gameldr->map_game);
 }
@@ -143,7 +143,7 @@ int load_game_dll_callback( clist_gen_t *clist_base, const char *filename )
     int retour;
     plugin_mgr_t *plg_manager;
     /* down cast , must be sure */
-    cmap_game_ptrf_t *map = (cmap_game_ptrf_t *)clist_base;
+    map_game_ptrf_t *map = (map_game_ptrf_t *)clist_base;
     assert( map );
 
     plg_manager = plugin_manager_get_instance();
@@ -164,7 +164,7 @@ int load_game_dll_callback( clist_gen_t *clist_base, const char *filename )
 }
 
 /* could pass plugin_manager as parameter / or own it / or call getInstance() */
-int load_game_dll( cmap_game_ptrf_t *map, const char *filename )
+int load_game_dll( map_game_ptrf_t *map, const char *filename )
 {
     ptr_game_t pf_game = NULL;
     int retour;

@@ -6,13 +6,6 @@
 #include "ccontainer/clist_generic.h"
 #include "clogger/clogger.h"
 
-/*
-struct clist_joueur {
-    clist_gen_t *clist;
-    size_t len;
-};
-*/
-
 list_joueur_t* list_joueur_new()
 {
     list_joueur_t* this;
@@ -64,7 +57,7 @@ joueur_t list_joueur_pop_front(list_joueur_t *this)
 
     /* pop, we must get a copy because deleted from clist. (or split ?) 
         here a move allow to use default value_t copy and optimize the remove of node */
-    value_joueur = clist_gen_pop_front_node_value( this->clist, &err_code);
+    value_joueur = clist_gen_pop_front( this->clist, &err_code);
 
     /* error : value_joueur.data == NULL */
     if( err_code != CCONTAINER_OK ) 
