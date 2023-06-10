@@ -33,5 +33,18 @@ SHARED_EXPORT person_status_t joueur_default_init(joueur_t *joueur);
 /** Destructor, clear the map */
 SHARED_EXPORT void joueur_delete(joueur_t *joueur);
 
-/** Print info to console, much better to do later for generalization */
-SHARED_EXPORT void joueur_info(joueur_t *joueur);
+/** Print info to console.
+ *  much better to do later for generalization */
+void joueur_info(const joueur_t *joueur);
+
+/** \name methods "inherited" from person_t */
+/** \{ */
+/** Return the name of a person or a joueur.
+    Explicit cast to person_t needed if use with joueur_t */
+const char* joueur_name(const joueur_t *joueur);
+
+bool joueur_daltonien(const joueur_t *joueur);
+bool joueur_admin(const joueur_t *joueur);
+/* validity / right also */
+/** \} */
+

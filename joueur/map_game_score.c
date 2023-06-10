@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "joueur/map_game_victories.h"
+#include "joueur/map_game_score.h"
 #include "ccontainer/clist_generic.h"
 #include "ccontainer/value_cstring.h"
 
@@ -12,7 +12,7 @@
 static bool map_name_match(const ccontainer_value_t *value1, const ccontainer_value_t *value2 );
 
 /* ** Serialization / Deserialization / Default copy and deleter from value_t ***/
-ccontainer_value_t make_value_pair_victory( const struct pair_game_victory_t *pair_victory_in, ccontainer_err_t *err_code)
+ccontainer_value_t make_value_pair_score( const struct pair_game_score_t *pair_victory_in, ccontainer_err_t *err_code)
 {
     ccontainer_value_t value_out;
     char *p_buffer;
@@ -21,7 +21,7 @@ ccontainer_value_t make_value_pair_victory( const struct pair_game_victory_t *pa
 
     ccontainer_reset_value(&value_out);
     /* pointer to follow the serialization */
-    p_buffer = (char *) malloc( sizeof(struct pair_game_victory_t));
+    p_buffer = (char *) malloc( sizeof(struct pair_game_score_t));
     if( !p_buffer ) {
         *err_code = CCONTAINER_ALLOCERR;
         return value_out;
@@ -33,16 +33,16 @@ ccontainer_value_t make_value_pair_victory( const struct pair_game_victory_t *pa
     /*memcpy( p_buffer + 20, &(pair_victory_in->victories), sizeof(victory_t) );*/
 
     /* no pointer in pair structure, can copy byte-to-byte */
-    memcpy( p_buffer, pair_victory_in, sizeof(struct pair_game_victory_t));
+    memcpy( p_buffer, pair_victory_in, sizeof(struct pair_game_score_t));
     
     /* swap and return */
     *err_code = CCONTAINER_OK;
     value_out.data = p_buffer;
-    value_out.len = sizeof(struct pair_game_victory_t);
+    value_out.len = sizeof(struct pair_game_score_t);
     return value_out;
 }
 
-ccontainer_err_t extract_value_pair_victory(const ccontainer_value_t *value, struct pair_game_victory_t *pair_victory_out)
+ccontainer_err_t extract_value_pair_score(const ccontainer_value_t *value, struct pair_game_score_t *pair_victory_out)
 {
     assert( pair_victory_out );
     /* equivalent, here p += 20 working also */
@@ -51,7 +51,7 @@ ccontainer_err_t extract_value_pair_victory(const ccontainer_value_t *value, str
     p += 20;
     memcpy( &(pair_victory_out->victories), p, sizeof(victory_t) );
     */
-    memcpy( pair_victory_out, value->data, sizeof(struct pair_game_victory_t));
+    memcpy( pair_victory_out, value->data, sizeof(struct pair_game_score_t));
     
     return CCONTAINER_OK;
 }
@@ -66,32 +66,32 @@ bool map_name_match(const ccontainer_value_t *value1, const ccontainer_value_t *
 }
 
 /*** Implementation Constructor/Destructor *****/
-map_game_victories_t* game_victories_new()
+map_game_score_t* map_game_score_new()
 {
-    return (map_game_victories_t*) malloc(sizeof(map_game_victories_t));
+    return (map_game_score_t*) malloc(sizeof(map_game_score_t));
 }
 
-void game_victories_init(map_game_victories_t *map)
+void map_game_score_init(map_game_score_t *map)
 {
     map->clist = clist_gen_new();
     clist_gen_init( map->clist );
 }
 
-map_game_victories_t game_victories_copy(const map_game_victories_t *map_in, ccontainer_err_t *err_code)
+map_game_score_t map_game_score_copy(const map_game_score_t *map_in, ccontainer_err_t *err_code)
 {
-    map_game_victories_t map_out;
+    map_game_score_t map_out;
     clist_gen_t* tmp_clist;
 
     assert(map_in);
     /* only pointer avaliable in public API fir clist_gen_t */
-    /* map game victories is a clist of pair_game_victory,
+    /* map game victories is a clist of pair_game_score,
         no memmory allocation in pair => default copy of "pair_value" is enought */
     tmp_clist = clist_gen_copy( map_in->clist, ccontainer_copy_value, err_code );
     map_out.clist = tmp_clist;
     return map_out;
 }
 
-void game_victories_delete(map_game_victories_t *map)
+void map_game_score_delete(map_game_score_t *map)
 {
     assert( map && map->clist); /* != NULL); */
     /* it is a pointer to clist_gen_t */
@@ -99,30 +99,30 @@ void game_victories_delete(map_game_victories_t *map)
     map->clist = NULL;
 }
 
-void game_victories_free(map_game_victories_t *map)
+void map_game_score_free(map_game_score_t *map)
 {
-    game_victories_delete( map );
+    map_game_score_delete( map );
     free(map);
 }
 
 /*** Public API ****/
-size_t game_victories_size(const map_game_victories_t *map)
+size_t map_game_score_size(const map_game_score_t *map)
 {
     return clist_gen_size( map->clist );
 }
 
-ccontainer_err_t game_victories_insert(map_game_victories_t *cmap, const struct pair_game_victory_t* pair_in)
+ccontainer_err_t map_game_score_insert(map_game_score_t *cmap, const struct pair_game_score_t* pair_in)
 {
     ccontainer_err_t err_code;
     /* a temporary value_t to be moved into clist_gen_t */
-    ccontainer_value_t value_clist = make_value_pair_victory( pair_in, &err_code );
+    ccontainer_value_t value_clist = make_value_pair_score( pair_in, &err_code );
     err_code = clist_gen_push_back( cmap->clist, &value_clist );
    return err_code;
 }
 
-struct pair_game_victory_t game_victories_get_copy( map_game_victories_t *map, const char *name)
+struct pair_game_score_t map_game_score_from_name( const map_game_score_t *map, const char *name)
 {
-    struct pair_game_victory_t pair;
+    struct pair_game_score_t pair;
     ccontainer_value_t *pvalue_clist;
     ccontainer_value_t value_name_match;
     ccontainer_err_t err_code;
@@ -148,7 +148,7 @@ struct pair_game_victory_t game_victories_get_copy( map_game_victories_t *map, c
         return pair;
     }
     /* create pair_victory from value_clist */
-    err_code = extract_value_pair_victory( pvalue_clist, &pair );
+    err_code = extract_value_pair_score( pvalue_clist, &pair );
 
     deleter_value_cstring(&value_name_match);
     return pair;

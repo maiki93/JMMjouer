@@ -12,6 +12,25 @@
 /* ** helpers ** */
 static person_status_t make_invalid_person(person_t *person);
 
+person_t make_person(size_t id, const char * name, 
+                     bool is_daltonien, bool is_admin, person_status_t *status)
+{
+    char *pbuffer;
+
+    person_t new_person;
+
+    pbuffer = (char*) malloc( strlen(name) + 1);
+    if( !pbuffer ) {
+        make_invalid_person(&new_person);
+        return new_person;
+    }
+    new_person.person_id = id;
+    new_person.pname = name;
+    new_person.is_daltonien = is_daltonien;
+    new_person.is_admin = is_admin;
+    return new_person;
+}
+
 person_status_t person_init(person_t * person, const char * name, 
                 bool is_daltonien, bool is_admin )
 {
@@ -34,7 +53,8 @@ person_status_t person_init(person_t * person, const char * name,
     person->is_daltonien = is_daltonien;
     /* is admin return */
     person->is_admin = is_admin;
-    return is_admin == true ? PERSON_ADMIN : PERSON_VALID;
+    //return is_admin == true ? PERSON_ADMIN : PERSON_VALID;
+    return PERSON_VALID;
 }
 /* person_status_t */
 int person_default_init(person_t *person)
@@ -57,9 +77,18 @@ void person_delete(person_t *person)
 /* ******** Accessors **********  */
 person_status_t person_status(const person_t *person) 
 {
-    return person->pname == NULL ? PERSON_INVALID 
+    return person->pname == NULL ? PERSON_INVALID
+                                 : PERSON_VALID;
+    /*
                                  : person->is_admin == false ? PERSON_VALID
                                                              : PERSON_ADMIN;
+    */
+}
+
+bool person_valid(const person_t *person)
+{
+    return (person->pname == NULL) ? false
+                                   : true;
 }
 
 const char* person_name(const person_t *person)

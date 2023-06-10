@@ -46,12 +46,29 @@ void joueur_delete(joueur_t *joueur)
     /*game_victories_free( &(joueur->map_victories) );*/
 }
 
-void joueur_info(joueur_t *joueur)
+void joueur_info(const joueur_t *joueur)
 {
     printf("\n--- Profile Joueur ----\n");
     person_info( &joueur->person );
     /* print_info victory */
     printf("-------------------\n");
 }
+
+/*  Inherited simple pass plat */
+const char* joueur_name(const joueur_t *joueur)
+{
+    return person_name((const person_t*) joueur );
+}
+
+bool joueur_daltonien(const joueur_t *joueur)
+{
+    return person_daltonien((const person_t*) joueur);
+}
+
+bool joueur_admin(const joueur_t *joueur)
+{
+    return person_admin((const person_t*) joueur);
+}
+
 
 
