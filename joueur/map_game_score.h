@@ -15,6 +15,11 @@
  * providing an interface similar to a map.
 */
 
+/** Maximum length of the game name (terminal caracter ?).
+ * Assert now, later maybe longer C-string will be tuncated.
+ * Better if defined in jmmjouer / core domain */
+enum { MAX_NAME_GAME_LEN = 20 };
+
 /** Define a pair : <game name, victory_t> to be inserted in a ccontainer.
  * 
  * \ingroup entities_grp
@@ -23,7 +28,7 @@
  should be hidden, really need pair details from outside ? */
 struct pair_game_score_t {
     /** key, constant usually in a map */
-    /*const*/ char game_name[20];
+    /*const*/ char game_name[MAX_NAME_GAME_LEN];
     /** value, results of games a Value Object constness to enforce */
     /*const*/ score_game_t score;
 };
@@ -96,6 +101,9 @@ SHARED_EXPORT size_t map_game_score_size(const map_game_score_t *map);
 SHARED_EXPORT ccontainer_err_t map_game_score_insert(map_game_score_t *map, const struct pair_game_score_t* victory_in);
 
 /** Retrieve the pair_game_score_t value with the provided key */
-SHARED_EXPORT struct pair_game_score_t map_game_score_from_name( const map_game_score_t *map, const char *name);
+SHARED_EXPORT struct pair_game_score_t map_game_score_get_from_name( const map_game_score_t *map, const char *name);
 /** make a ref version ? const *pair to enforce constness */
+
+/** Display content on console. */
+SHARED_EXPORT void map_game_score_print_info(const map_game_score_t* map);
 /** \} */

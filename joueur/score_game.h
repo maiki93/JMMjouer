@@ -27,7 +27,7 @@ typedef struct {
  * @deprecated
  * \param[in] score pointer to a allocated victory_t instance
 */
-SHARED_EXPORT void score_game_init( score_game_t *score );
+SHARED_EXPORT void score_game_init( score_game_t* score );
 
 /** Create a score_game default initialized
  * \post nb_win = nb_lost = nb_equality = 0
@@ -40,6 +40,9 @@ SHARED_EXPORT score_game_t score_game_create();
 SHARED_EXPORT score_game_t score_game_create_with_param(  unsigned int nb_win, 
                             unsigned int nb_lost, unsigned int nb_equality);
 
-SHARED_EXPORT score_game_t score_game_copy( const score_game_t *src_score);
+/* really needed ? */
+/*SHARED_EXPORT score_game_t score_game_copy( const score_game_t *src_score);*/
+
+SHARED_EXPORT void score_game_print_info(const score_game_t* score);
 
 /* reset() */

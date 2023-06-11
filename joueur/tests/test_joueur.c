@@ -5,9 +5,9 @@
 #include <stdint.h>
 #include "cmocka.h"
 
-/* include person_t / cmap_game_victories... */
+/* include person_t and map_game_score */
 #include "joueur/joueur.h"
-/*#include "joueur/person.h"*/
+/* ccontainer adapter */
 #include "joueur/adapter_ccontainer_joueur.h"
 
 /*#include <string.h>*/ /* only for make_joueur1, to move */

@@ -1,25 +1,25 @@
 #pragma once
 
 #include "joueur/person.h"
-/* not needed here, only implementation */
-#include "joueur/map_game_victories.h"
+#include "joueur/map_game_score.h"
 
 #include "shared_EXPORTS.h"
 
-/* Use same define from person.h for specific code error */
 /** @file
  * Defintion of a joueur = person + list of victories.
  * 
- * Memory Allocator/Deallocator, not needed if only use instance on stack ? */
+ * Memory Allocator/Deallocator, not needed if only use instance on stack ? 
+ * Use same define from person.h for specific code error */
 
 /** joueur_t aggregates a person_t with the results of previous games.
-   Can use all public API of person_t (kind of derive class) by using explicit cast
+   Can use all public API of person_t (kind of derive class) by using explicit cast.
+   Use same define from person.h for specific code error
    \ingroup entities_grp */
 typedef struct {
-    /** person_t in first field to allow cast to person_t */
+    /** person_t as first field to allow cast to person_t */
     person_t person;
-    /** associate a map<name_game,victory_t> */
-    map_game_victories_t map_victories;
+    /** associate a map<name_game,score_t> */
+    map_game_score_t map_score;
 } joueur_t;
 
 /* Memory Allocator/Deallocator, not needed if only stack use ? */

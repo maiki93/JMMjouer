@@ -49,7 +49,7 @@ typedef enum {
   */
 /*
     /// VALID and with admin right, validity test
-    PERSON_ADMIN = 1, /* with administration rights, use mask ?
+    PERSON_ADMIN = 1, // with administration rights, use mask
     /// ANONYMOUS, valid but no name or "anynonmous"
     PERSON_ANONYMOUS = 2,
     //// for extension
