@@ -1,0 +1,2 @@
+gcc -std=c90 -Wall -Wextra -pedantic -fPIC -Wno-variadic-macros -I. -g3 -O0 -DJMMJ_DEBUG -c joueur/map_game_score.c -o joueur/map_game_score.o
+

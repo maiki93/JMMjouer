@@ -14,9 +14,9 @@
 /* not const if want to add/change map_victories associated */
 static joueur_t joueur1, joueur2, joueur3;
 /* only available C89 + */
-static victory_t victory1 = {.nb_win=1,.nb_lost=2,.nb_equality=3};
-static victory_t victory2 = {.nb_win=1,.nb_lost=2,.nb_equality=3};
-static victory_t victory3 = {.nb_win=1,.nb_lost=2,.nb_equality=3};
+static victory_t victory1 = {.nb_win=1,.nb_lost=2,.nb_draw=3};
+static victory_t victory2 = {.nb_win=1,.nb_lost=2,.nb_draw=3};
+static victory_t victory3 = {.nb_win=1,.nb_lost=2,.nb_draw=3};
 /* helper */
 static joueur_t make_joueur1();
 static void make_three_joueur();

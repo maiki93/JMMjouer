@@ -17,24 +17,12 @@
 
 /** Maximum length of the game name (terminal caracter ?).
  * Assert now, later maybe longer C-string will be tuncated.
- * Better if defined in jmmjouer / core domain */
+ * Better if defined in jmmjouer / core domain
+ * Or better, a compile time value provided with make -DMAX_NAME_GAME_LEN, coherent across all modules (default 20) 
+ * => necessary #define ? */
 enum { MAX_NAME_GAME_LEN = 20 };
 
-/** Define a pair : <game name, victory_t> to be inserted in a ccontainer.
- * 
- * \ingroup entities_grp
-*/
-/* typedef if used from outside,
- should be hidden, really need pair details from outside ? */
-struct pair_game_score_t {
-    /** key, constant usually in a map */
-    /*const*/ char game_name[MAX_NAME_GAME_LEN];
-    /** value, results of games a Value Object constness to enforce */
-    /*const*/ score_game_t score;
-};
-
-/** Definition of the "map".
- * 
+/** Definition of the "map"
  * \ingroup entities_grp
 */
 typedef struct {
@@ -42,68 +30,65 @@ typedef struct {
     clist_gen_t *clist;
 } map_game_score_t;
 
-
-/** \name Adapter functions to ccontainer for \ref pair_game_score_t. 
- * \{ */
-/** Return a ccontainer_value_t from a pair_game_score_t.
- * Create a copy of all data in pair, for insertion into the cmap
- * \param[in] pointer to a pair
- * \param[out] pointer to a ccontainer error code
- * \return ccontainer_value_t with a copy of the data in pair */
-ccontainer_value_t make_value_pair_score( const struct pair_game_score_t *pair_victory_in, ccontainer_err_t *err_code);
-
-/** Extract a pair_game_score_t from a generic value_t 
- *  Create a copy of the data in value_in into pair_victory_out
- * \pre pair_out must point to a valid adress (memory already allocated on stack or on heap before the call)
- * \note no memory allocation, err_code useless. may change api / return pair_game_score_t
- * \param[in] pointer to a value_t as source
- * \param[out] pointer to a pair_victory_t, memory must be allocated before the call
- * \return error_code from ccontainer library. */
-ccontainer_err_t extract_value_pair_score( const ccontainer_value_t* value_in, struct pair_game_score_t *pair_victory_out);
-/* better to use status of joueur if correct ? or level above at least */
-
-/* All allocation on heap : do not need specific deleter or duplicater because no memory allocation
-void deleter(value_t* value) */
-
-/** \} */ /* end of adapter section */
-
-
 /** \name Constructor / Destructor of the map
  * \{ */
-/** Allocation */
+/** Allocation for a map on heap.
+ * A init function must be called to finalize the instance
+ * \return pointer on an instance of map_game_score_t */
 SHARED_EXPORT map_game_score_t* map_game_score_new();
-/** Constructor */
+
+/** Constructor.
+ * \param[in] pointer on an instance of map_game_score_t */
 SHARED_EXPORT void map_game_score_init(map_game_score_t *map);
 
 /** Copy constructor, deep copy.
- * May change error code, we are calling from core model here.
+ * If map_src is empty, ?
  * Add log
- */
-SHARED_EXPORT map_game_score_t map_game_score_copy(const map_game_score_t *map_in, 
-                                                        ccontainer_err_t *err_code);
+ * \param[in] pointer on an instance of map_game_score_t
+ * \param[out] status code, 0 : no error, to make more core model
+ * \return a new instance on stack */
+SHARED_EXPORT map_game_score_t map_game_score_copy( const map_game_score_t *map_src, 
+                                                    int *status);
 
-/** Clear all contents */
+/** Clear all contents and free internal clist.
+ * Instance is not usable after the call, need a new call to map_game_score_init
+ * \param[in] pointer on an instance of map_game_score_t */
 SHARED_EXPORT void map_game_score_delete(map_game_score_t *map);
-/** Free memory */
+
+/** Free memory on map allocated on heap
+ * \param[in] pointer on an instance of map_game_score_t */
 SHARED_EXPORT void map_game_score_free(map_game_score_t *map);
 /** \} */
 
 /** \name public API */
 /** \{ */
-/** Return the size of the map.
- *  complexity O(n)
- */
+/** Return the number of elements of the map.
+ *  Complexity O(n)
+ *  \param[in] pointer on an instance of map_game_score_t */
 SHARED_EXPORT size_t map_game_score_size(const map_game_score_t *map);
 
-/** Insert a pair_game_score_t into the map. 
+/** Insert (with replcement) a pair_game_score_t into the map. 
  *  May pass pair_in as pointer
-*/
-SHARED_EXPORT ccontainer_err_t map_game_score_insert(map_game_score_t *map, const struct pair_game_score_t* victory_in);
+ * If an entry with the same game name is already present, it is replaced by the new score_t 
+ * \param[in] pointer on an instance of map_game_score_t
+ * \param[in] game_name name of the game, key value in map
+ * \param[in] score of the game
+ * \return status : -1=error, 0=insert new pair, 1=replace new pair */
+SHARED_EXPORT int map_game_score_insert(map_game_score_t *map, const char *name_game, const score_game_t *score);
 
-/** Retrieve the pair_game_score_t value with the provided key */
-SHARED_EXPORT struct pair_game_score_t map_game_score_get_from_name( const map_game_score_t *map, const char *name);
-/** make a ref version ? const *pair to enforce constness */
-
-/** Display content on console. */
+/** Retrieve the pair_game_score_t value with the provided key.
+ *  Create a new entry if not present ? like a map ? need metod is_present()
+    to think: make a ref version ? const *pair to enforce constness
+ * \param[in] pointer on an instance of map_game_score_t
+ * \param[in] name of the game
+ * \param[out] score associated, 0,0,0 in case of errors 
+ * \return  status 0: OK, -1 error or indicate the key was not found */
+/* SHARED_EXPORT score_game_t map_game_score_get_from_name( const map_game_score_t *map, const char *name); */
+SHARED_EXPORT int map_game_score_get_from_name( const map_game_score_t *map, const char *name, score_game_t *score_out);
+   
+/** Display content on console.
+ *  print title and call print_info for each pair of the map. 
+ *  \param[in] pointer on an instance of map_game_score_t */
 SHARED_EXPORT void map_game_score_print_info(const map_game_score_t* map);
+
 /** \} */

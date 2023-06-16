@@ -18,7 +18,7 @@ static victory_t test1(person_t person) {
     person.is_daltonien = true;
     vict_out.nb_win = 1;
     vict_out.nb_lost = 1;
-    vict_out.nb_equality = 1;
+    vict_out.nb_draw = 1;
     return vict_out;
 }
 

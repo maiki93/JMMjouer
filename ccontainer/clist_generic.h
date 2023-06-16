@@ -43,7 +43,8 @@ SHARED_EXPORT clist_gen_t* clist_gen_new();
 SHARED_EXPORT void clist_gen_init(clist_gen_t* clist);
 
 /** Copy constructor. 
-    \param[in] clist pointer to a clist_gen_t */
+    \param[in] clist pointer to a clist_gen_t
+    \param[out] error code : CCONTAINER_OK, CCONTAINER_EMPTY, CCONTAINER_ALLOCERR */
 SHARED_EXPORT clist_gen_t* clist_gen_copy(const clist_gen_t* clist_src, duplicater_value_t ptrf_duplicater, 
                                           ccontainer_err_t *err_code );
 

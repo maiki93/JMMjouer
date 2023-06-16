@@ -71,6 +71,7 @@ clist_gen_t* clist_gen_copy(const clist_gen_t* clist_src, duplicater_value_t ptr
     /* clist is valid, empty */
     if( !curr_node ) {
         assert( clist_gen_size(clist_src) == 0);
+        *err_code = CCONTAINER_EMPTY;
         return clist_dest;
     }
 

@@ -65,7 +65,7 @@ victory_t start_game_morpion(person_t joueur)
         if(jeu_en_cours && test_plateau_rempli(plateau)){
             printf("La teableau est rempli !\nC'est un match nul !\n");
             /*score = 0;*/
-            victories.nb_equality++;
+            victories.nb_draw++;
             jeu_en_cours = 0;
         }
 
@@ -77,7 +77,7 @@ victory_t start_game_morpion(person_t joueur)
     /*return score;*/
     victories.nb_win = 1;
     victories.nb_lost = 1;
-    victories.nb_equality = 0;
+    victories.nb_draw = 0;
     return victories;
 }
 

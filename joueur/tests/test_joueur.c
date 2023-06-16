@@ -15,7 +15,7 @@
 /* not const if want to add/change map_victories associated */
 /* static joueur_t joueur1;*/
 /* only available C89 + */
-/*static const victory_t victory1 = {.nb_win=1,.nb_lost=2,.nb_equality=3};*/
+/*static const victory_t victory1 = {.nb_win=1,.nb_lost=2,.nb_draw=3};*/
 /* helper */
 /*static joueur_t make_joueur1();*/
 

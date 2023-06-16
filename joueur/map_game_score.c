@@ -7,12 +7,46 @@
 #include "ccontainer/value_cstring.h"
 #include "clogger/clogger.h"
 
+
+/** Define a pair : <game name, victory_t> to be inserted in a ccontainer.
+ * \ingroup entities_grp */
+struct pair_game_score_t {
+    /** key, constant usually in a map */
+    /*const*/ char game_name[MAX_NAME_GAME_LEN];
+    /** value, results of games a Value Object constness to enforce */
+    /*const*/ score_game_t score;
+};
+
+/** \name Adapter functions to ccontainer for \ref pair_game_score_t. 
+ * \{ */
+/** Return a ccontainer_value_t from a pair_game_score_t.
+ * Create a copy of all data in the provided pair, for insertion into the clist_gen_t
+ * \param[in] pointer to a pair
+ * \param[out] pointer to a ccontainer error code
+ * \return ccontainer_value_t with a copy of the data in pair */
+static ccontainer_value_t make_value_pair_score( const struct pair_game_score_t *pair_victory_in, ccontainer_err_t *err_code);
+
+/** Extract a pair_game_score_t from a generic value_t 
+ *  Create a copy of the data in value_in into pair_victory_out
+ * \pre pair_out must point to a valid adress (memory already allocated on stack or on heap before the call)
+ * \note no memory allocation, err_code useless. may change api / return pair_game_score_t
+ * \param[in] pointer to a value_t as source
+ * \param[out] pointer to a pair_victory_t, memory must be allocated before the call
+ * \return error_code from ccontainer library. */
+static ccontainer_err_t extract_value_pair_score( const ccontainer_value_t* value_in, struct pair_game_score_t *pair_victory_out);
+
+/* Ddo not need specific deleter or duplicater because no memory allocation on heap in the pair
+void deleter_pair_score(value_t* value) */
+
+/** \} */
+
 /** Implementation of  \ref equalizer_value_t for the key.
- *  It is a simple string comparison on maximum 20 caracters. 
- *  can hide in implementation, or reusue with pair from outside ? */
+ *  It is a simple string comparison on maximum 20 caracters. */
 static bool map_name_match(const ccontainer_value_t *value1, const ccontainer_value_t *value2 );
 
-/* ** Serialization / Deserialization / Default copy and deleter from value_t ***/
+/* ************************ 
+    * Serialization / Deserialization / Default copy and deleter from value_t *
+*************************** */
 ccontainer_value_t make_value_pair_score( const struct pair_game_score_t *pair_victory_in, ccontainer_err_t *err_code)
 {
     ccontainer_value_t value_out;
@@ -50,12 +84,16 @@ ccontainer_err_t extract_value_pair_score(const ccontainer_value_t *value, struc
     /*
     memcpy( pair_victory_out->game_name, value->data, 20);
     p += 20;
-    memcpy( &(pair_victory_out->victories), p, sizeof(victory_t) );
+    memcpy( &(pair_victory_out->victories), p, sizeof(game_score_t) );
     */
     memcpy( pair_victory_out, value->data, sizeof(struct pair_game_score_t));
     
     return CCONTAINER_OK;
 }
+
+/* to test, creation value without an intermediate pair for optimization ??
+static ccontainer_value_t make_value_pair_score2( const char* name, score_game_t score, ccontainer_err_t *err_code)
+*/
 
 bool map_name_match(const ccontainer_value_t *value1, const ccontainer_value_t *value2 )
 {
@@ -79,24 +117,36 @@ void map_game_score_init(map_game_score_t *map)
     clist_gen_init( map->clist );
 }
 
-map_game_score_t map_game_score_copy(const map_game_score_t *map_in, ccontainer_err_t *err_code)
+map_game_score_t map_game_score_copy(const map_game_score_t *map_src, int *status)
 {
     map_game_score_t map_out;
     clist_gen_t* tmp_clist;
+    ccontainer_err_t err_code;
 
-    assert(map_in);
-    /* only pointer avaliable in public API fir clist_gen_t */
+    assert(map_src);
+
     /* map game victories is a clist of pair_game_score,
         no memmory allocation in pair => default copy of "pair_value" is enought */
-    tmp_clist = clist_gen_copy( map_in->clist, ccontainer_copy_value, err_code );
+    tmp_clist = clist_gen_copy( map_src->clist, ccontainer_copy_value, &err_code );
+    /* case empty is also included , not really an error ... */
+    if( err_code == CCONTAINER_ALLOCERR) {
+        /* error, or empty copy */
+        /**status = (err_code == CCONTAINER_EMPTY) ? 0 : 1;*/
+        CLOG_ERR("allocation error in clist_gen_copy %d", 0);
+        *status = 1;
+        /* undefined behavior or an empty list ? */
+        map_game_score_init( &map_out );
+        return map_out;
+    }
+    /* else success : empty is ok, swap clist */
     map_out.clist = tmp_clist;
+    *status = 0;
     return map_out;
 }
 
 void map_game_score_delete(map_game_score_t *map)
 {
-    assert( map && map->clist); /* != NULL); */
-    /* it is a pointer to clist_gen_t */
+    assert( map && map->clist);
     clist_gen_free( map->clist, ccontainer_delete_value );
     map->clist = NULL;
 }
@@ -113,91 +163,90 @@ size_t map_game_score_size(const map_game_score_t *map)
     return clist_gen_size( map->clist );
 }
 
-ccontainer_err_t map_game_score_insert(map_game_score_t *map, const struct pair_game_score_t* pair_in)
+int map_game_score_insert(map_game_score_t *map, const char *name_game, const score_game_t *score)
 {
     ccontainer_err_t err_code;
-    /* a temporary value_t to be moved into clist_gen_t */
-    ccontainer_value_t* pvalue;
-    ccontainer_value_t value_name_match;
+    struct pair_game_score_t pair_in; /* no call to delete, all on stack */
+    ccontainer_value_t new_value, value_name_match;
+    ccontainer_value_t* p_old_value;  /* a temporary value_t to be moved into clist_gen_t */
     clist_node_t *node;
 
-    ccontainer_value_t value_clist = make_value_pair_score( pair_in, &err_code );
+    /* new pair to insert in value_t format */
+    strncpy( pair_in.game_name, name_game, MAX_NAME_GAME_LEN);
+    pair_in.score = *score;
+    new_value = make_value_pair_score( &pair_in, &err_code );
 
-    /* search if exists */
-    value_name_match = make_value_cstring( pair_in->game_name, &err_code);
+    assert( map && map->clist );
+
+    /* search if exists, need name_game in value_t format as well */
+    value_name_match = make_value_cstring( pair_in.game_name, &err_code);
     if( err_code == CCONTAINER_ALLOCERR) {
-        //strcpy( pair.game_name, "invalid");
         return -1;
     }
-    /*
-    pvalue = clist_gen_find( map->clist, equalizer_value_cstring,
-                             pair_in->game_name, &err_code); */
-    node = clist_gen_find_node( map->clist, 
-                                clist_gen_get_first_node( map->clist ), 
+    
+    node = clist_gen_find_node( map->clist,
+                                clist_gen_get_first_node( map->clist ),
                                 map_name_match, &value_name_match, &err_code);
-    /* not present */
+    /* all case, delete temporary value_name_match */
+    deleter_value_cstring(&value_name_match);
+
+    /* case not present, move new_value */
     if( err_code == CCONTAINER_EMPTY || err_code == CCONTAINER_NOT_FOUND ) {
         assert( node == NULL );
-        err_code = clist_gen_push_back( map->clist, &value_clist );
-        deleter_value_cstring(&value_name_match);
-        return err_code;
+        err_code = clist_gen_push_back( map->clist, &new_value );
+        if( err_code != CCONTAINER_OK) {
+            CLOG_ERR("Cannot insert new value %s", pair_in.game_name);
+        }
+        /* return 0 for new insertion */
+        return 0;
     }
 
+    /* already present, move the value directly (always the same size) inside the clist_gen_t */   
     assert( node != NULL );
-    /* already present, replace the value
-        1. remove old, insert new_one with clist_gen_push_back
-        2. replace function in clist_generic replace, not really needed for one case
-            => cmap_generic
-        3. rewrite value directly, same size
-    */
-    /* method 3. get pointer to value_t */
-    pvalue = clist_gen_get_node_value( node );
-    assert( pvalue != NULL );
-    /* must delete old content before trnasfert value_clist 
-        pvalue is not modified, only content (!= free_value)*/
-    ccontainer_delete_value( pvalue );
-    /* move content direclty inside container */
-    *pvalue = ccontainer_move_value( &value_clist );
-    /* value_clist invalidated after move call */
-
-    /* must write two times the delete */
-    deleter_value_cstring(&value_name_match);
-    return CCONTAINER_OK;
+    /* get pointer to previous value_t */
+    p_old_value = clist_gen_get_node_value( node );
+    assert( p_old_value != NULL );
+    /* must delete old content before transfert value_clist */
+    ccontainer_delete_value( p_old_value );
+    /* move content direclty inside the container */
+    *p_old_value = ccontainer_move_value( &new_value );
+    /* new_value invalidated after move call */
+    /* return 1 for replacement */
+    return 1;
 }
 
-struct pair_game_score_t map_game_score_get_from_name( const map_game_score_t *map, 
-                                                       const char *name)
+/* miss not found in the implementation 
+   bool = map_game_score_get_from_name( &map, "toto", &score_out); */
+/* score_game_t map_game_score_get_from_name( const map_game_score_t *map, const char *name) */
+int map_game_score_get_from_name( const map_game_score_t *map, const char *name, score_game_t *score_out)
 {
-    struct pair_game_score_t pair;
+    //struct pair_game_score_t pair;
     ccontainer_value_t *pvalue_clist;
     ccontainer_value_t value_name_match;
     ccontainer_err_t err_code;
     
     /* need to transform name to search into a value_t */
-    /*
-    value_name_match.data = (char*)malloc( strlen(name) + 1 );
-    strncpy( value_name_match.data, name, 20);
-    value_name_match.len = strlen(name) + 1;
-    */
-    /* or use already implemented function for cstring */
     value_name_match = make_value_cstring( name, &err_code);
     if( err_code == CCONTAINER_ALLOCERR) {
-        strcpy( pair.game_name, "invalid");
-        return pair;
+        deleter_value_cstring(&value_name_match);
+        *score_out = score_game_create();
+        return -1;
     }
     
     pvalue_clist = clist_gen_find( map->clist, map_name_match, &value_name_match, &err_code );
-    if( err_code != CCONTAINER_OK )
-    {
+    if( err_code != CCONTAINER_OK )  {
         deleter_value_cstring(&value_name_match);
-        strcpy( pair.game_name, "invalid");
-        return pair;
+        *score_out = score_game_create();
+        return -1;
     }
-    /* create pair_victory from value_clist */
-    err_code = extract_value_pair_score( pvalue_clist, &pair );
-
+    /* temp to free */
     deleter_value_cstring(&value_name_match);
-    return pair;
+
+    /* could create a pair_victory from pvalue_clist and return pair.score
+    extract_value_pair_score( pvalue_clist, &pair ); / *score_out = pair.score; */
+    /* <=> to use static size of name */
+    memcpy( score_out, pvalue_clist->data + MAX_NAME_GAME_LEN, sizeof(score_game_t) );
+    return 0;
 }
 
 void map_game_score_print_info(const map_game_score_t* map)
@@ -212,6 +261,7 @@ void map_game_score_print_info(const map_game_score_t* map)
         CLOG_DEBUG("Empty map_game_score %d\n", 0);
         return;
     }
+
     do {
         pvalue = clist_gen_get_node_value( current_node );
         err_code = extract_value_pair_score( pvalue, &pair_out );
@@ -221,8 +271,8 @@ void map_game_score_print_info(const map_game_score_t* map)
 
         current_node = clist_gen_get_next_node( current_node);
     } while( current_node != NULL);
-
-    /*return;*/
 }
+
+
 
 
