@@ -18,7 +18,10 @@ score_game_t score_game_create_with_param(  unsigned int nb_win, unsigned int nb
 
 void score_game_print_info(const score_game_t* score)
 {
+    /*
     printf("victory : %d\n", score->nb_win);
     printf("lost    : %d\n", score->nb_lost);
     printf("equality: %d\n", score->nb_draw);
+    */
+    printf(" %3d / %3d / %3d\n", score->nb_win, score->nb_lost, score->nb_draw);
 }

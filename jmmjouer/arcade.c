@@ -10,8 +10,8 @@
 /* order of include important */
 #include "arcade_params.h"
 #include "arcade.h"
-#include "joueur/joueur.h"         /* person included */
-#include "joueur/victory.h"
+#include "joueur/joueur.h"         /* person included, map_game_score, score_game_t */
+#include "joueur/score_game.h"
 #include "record/irecord.h"
 #include "game_loader/game_loader.h" /* already in h */
 #include "game_loader/plugin_manager.h"
@@ -79,13 +79,13 @@ int arcade_run(arcade_params_t *params)
 
     /*** 1. Identification ***/
     if( play_anonymous) {
-        joueur_init( &joueur, "anonymous", false, false);
+        joueur_init( &joueur, 10, "anonymous", false, false);
     } else {
         joueur = identification_joueur();
     }
     /* check if joueur is valid , new joueur case deal before  */
-    assert( person_status((person_t *)&joueur) == PERSON_VALID);
-    joueur_info( &joueur );
+    assert( joueur_status(&joueur) == USER_VALID);
+    joueur_print_info( &joueur );
     
     /*** 2. Game menu ***/
     /* error_code, is ok also, error code as attribute ok cvector_string ? */
@@ -113,11 +113,12 @@ int arcade_run(arcade_params_t *params)
         if( game_indice == -1 ) 
         {
             printf("\n------\nVoir les scores\n-----\n");
+            joueur_print_info(&joueur);
         }
         /* exit game properly, function end_game to choose / with error also */
         else if( game_indice == -2 ) 
         {
-            printf("\ngood bye %s!\n", person_name( (person_t*) &joueur));
+            printf("\ngood bye %s!\n", joueur_name(&joueur));
             exit_loop = true;
         }
         /* game_indice [0, size_list_game-1] (assert inside function) */
@@ -142,36 +143,44 @@ int arcade_run(arcade_params_t *params)
 /* person is enought ? take out const */
 int run_game(joueur_t* joueur, const char *name_game) 
 {
-    victory_t victory_game;
-    struct pair_game_victory_t pair_vict_rec;
-
-    person_t person;
+    user_t user;
     ptr_game_t pf_game;
+    score_game_t scores;
+    score_game_t previous_scores;
+    int status;
     
     /*pf_game = game_loader_get_ptr_game( game_indice );*/
     pf_game = game_loader_get_ptr_game( gloader, name_game );
     if( !pf_game ) {
-        CLOG_ERR("Error in loading game name: %s\n", name_game);
+        CLOG_ERR("Error in loading game with name: %s\n", name_game);
     }
     
     /* above , not initialized pname, want to avoid setter */
     /* person is a joueur, copy good for game execution if new thread */
-    person_init( &person, person_name( (person_t*) &joueur),
-                          person_daltonien( (person_t*) &joueur),
-                          person_admin( (person_t*) &joueur));
+    /* make user, with proper copy of name,
+     indeed, need only the id and retrieve it from record from the game (inside the thread) */
+     /* new alloc, need to free */
+    user_init( &user,
+               joueur_id(joueur),
+               joueur_name(joueur),
+               joueur_daltonien(joueur),
+               joueur_admin(joueur));
 
     /* game execution */
-    victory_game = pf_game(person);
-    printf("result win %d\n", victory_game.nb_win);
+    scores = pf_game(user);
+    printf("result win %d\n", scores.nb_win);
     /* Want to save the results in record ? */
 
-    /* update results of victories, use only copies */
-    /* pair maybe too much */
-    pair_vict_rec = game_victories_get_copy( &joueur->map_victories, "mastermind" );
-    printf("pair vict rec before update %d", pair_vict_rec.victories.nb_win);
+    /* need to free after user_init */
+    user_delete( &user );
 
-    pair_vict_rec.victories.nb_win += victory_game.nb_win;
-    game_victories_insert( &joueur->map_victories, &pair_vict_rec);
+    status = map_game_score_get_from_name( &(joueur->map_score), name_game, &previous_scores);
+    if( status == -1) 
+        CLOG_DEBUG("Score not found in map => first game %s\n", name_game);
+    
+    previous_scores.nb_win += scores.nb_win;
+    previous_scores.nb_lost += scores.nb_lost;
+    status = map_game_score_insert( &(joueur->map_score), name_game, &previous_scores);
     return 0;
 }
 
@@ -179,7 +188,7 @@ static joueur_t identification_joueur()
 {
     joueur_t joueur;
     /* +1/-1 to check */
-    char try_name[MAX_SIZE_NOM_PERSON];
+    char try_name[MAX_SIZE_NAME_USER];
     bool accepted = false;
     bool new_joueur_confirmation = false;
 
@@ -190,14 +199,13 @@ static joueur_t identification_joueur()
 
         joueur = record_find_joueur_from_name((irecord_t *)record, try_name);
         printf("-- In arcade --\n");
-        printf("joueur name: %s\n", person_name( (person_t*) &joueur ) /*.person.nom*/);
-        printf("daltonien: %d\n", joueur.person.is_daltonien);
+        joueur_print_info(&joueur);
         printf("adresss of joueur: %p\n", (void*) &joueur);
         /* print the name because frist in structure !! same adreess !! */
-        printf("name : %s\n", person_name((person_t*) &joueur));
+        printf("name : %s\n", joueur_name(&joueur));
 
-        if( person_status((person_t*) &joueur) == PERSON_INVALID) {
-            CLOG_DEBUG("INVALID PERSON %d\n",0);
+        if( joueur_status(&joueur) == USER_INVALID) {
+            CLOG_DEBUG("INVALID USER %d\n",0);
             /*printf("Invalid joueur you are a new joueur, TODO to confirm !!\n");*/
             /* clean, menu for a new joueur: make its profile */
             new_joueur_confirmation = ask_yesno_question("Nouveau joueur ? confirm by y/n plz: ");
@@ -207,13 +215,14 @@ static joueur_t identification_joueur()
                 joueur_delete(&joueur);
                 printf("NEW JOUEUR INIT\n");
                 CLOG_DEBUG("clear previous joueur and init a new one with name %s\n", try_name);
-                joueur_init(&joueur, try_name, false, false);
+                /* make joueur, with try...*/
+                joueur_init(&joueur, 10, try_name, false, false);
                 accepted = true;
             }
         /* no printf in this logic function */
         /* joueur found in record */
         } else {
-            printf("Welcome back %s\n", person_name( (person_t*) &joueur) );
+            printf("Welcome back %s\n", joueur_name(&joueur) );
             /* funct_welcome_back()  or deal with it on higher-level ...*/
             accepted = true;
         }
@@ -229,7 +238,7 @@ static void print_identification_menu(char *try_name)
     printf("\n---- Identifaction ----\n");
     printf("Quel est votre nom ? ");
     /* fgets more secure with size and add automatically a '\0' caracter */
-    if( fgets( try_name, MAX_SIZE_NOM_PERSON, stdin) == NULL) {
+    if( fgets( try_name, MAX_SIZE_NAME_USER, stdin) == NULL) {
         CLOG_ERR("Error in fgets, not treated %d", 0);
     }
     /* case where \n is not present to treat (longer than MAX_SIZE)

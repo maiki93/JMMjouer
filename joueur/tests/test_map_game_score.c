@@ -5,9 +5,9 @@
 #include <stdint.h>
 #include "cmocka.h"
 
-/* include implementation for access to pair_game_score_t */
+/* include implementation for access to pair_game_score_t 
+   or split test_impl_map_game_score if too long */
 #include "joueur/map_game_score.c"
-/* or split test_impl_map_game_score if too long */
 
 /* value object, only on stack.
    pair will stay in implementation, not visible in public API */
@@ -102,7 +102,6 @@ static void insert_and_replace_new_score()
     int status;
     
     map_game_score_init( &map_victory );
-    
     // insert one
     status = map_game_score_insert( &map_victory, name_game1, &score1 );
     assert_int_equal( 0, status ); /* check 0 for insertion new one */

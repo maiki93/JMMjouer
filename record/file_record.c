@@ -6,7 +6,7 @@
 #include "irecord_private.h"
 #include "clogger/clogger.h"
 
-#include "joueur/map_game_victories.h"
+#include "joueur/map_game_score.h"
 
 /** To avoid warning from assert in release mode. */
 #define _unused(x) ((void)(x))
@@ -30,6 +30,13 @@ enum  { MAX_LINE_SIZE = 50 };
 /** Maximum size of ... ? */
 /*static*/ enum { RECORD_MAX_LINE_SIZE = 50 };
 
+/* if not static exported in C ? */
+static size_t next_joueur_id = 1;
+size_t file_record_get_next_joueur_id() 
+{
+    return next_joueur_id++;
+}
+
 /** \name private implementation to override base class methods */
 /** \{ */
 /** Return a joueur_t from its name */
@@ -44,11 +51,10 @@ size_t count_records(file_record_t *this);
 static int open_file( file_record_t *this, bool mode_write );
 static void close_file( file_record_t *this );
 static bool search_record_joueur_by_name(file_record_t *this, char *line, const char* name);
-/* from char* to joueur & victories */
+/* from char* to joueur & score_game */
 static int extract_name_joueur(const char *line, char *name_joueur);
 static int extract_one_record(file_record_t *this, char *line, joueur_t *joueur);
-
-static int extract_map_victories( file_record_t *this, char *line, map_game_victories_t *map);
+static int extract_map_victories( file_record_t *this, char *line, map_game_score_t *map);
 
 /** utilities function **/
 static bool next_record(file_record_t *this, char *line);
@@ -168,9 +174,9 @@ void close_file( file_record_t *this )
     return fpos_t in the file at the start of the record s*/
 bool search_record_joueur_by_name(file_record_t *this, char *line, const char* name)
 {
-    char name_joueur[MAX_SIZE_NOM_PERSON];
+    char name_joueur[MAX_SIZE_NAME_USER];
     /*char name_joueur[110];*/
-    /*char *name_joueur = (char*)calloc(MAX_SIZE_NOM_PERSON, sizeof(char));*/
+    /*char *name_joueur = (char*)calloc(MAX_SIZE_NAME_USER, sizeof(char));*/
     /* loop until line contains 'name: is_daltonien' */
     while( next_record(this, line) ) 
     {
@@ -199,13 +205,13 @@ int extract_name_joueur(const char *line, char *name_joueur)
 
 int extract_one_record(file_record_t *this, char *line, joueur_t *joueur)
 {
-    char name_record[MAX_SIZE_NOM_PERSON]; /*NAME_MAXSIZE];*/  /* contains name read in file */
+    char name_record[MAX_SIZE_NAME_USER]; /*NAME_MAXSIZE];*/  /* contains name read in file */
     int is_daltonien = false;
     int is_admin = false;
     int retour;
 
     /*sscanf( line, "\n%s %d\n", &joueur->person.nom, &joueur->person.is_daltonien );*/
-    retour = sscanf( line, "\n%s %d\n", name_record, &is_daltonien );
+    retour = sscanf( line, "\n%s %d %d\n", name_record, &is_daltonien, &is_admin );
     /* return errno or nb correct assignement == 2 */
     
     /*strncpy( joueur->person.pname, name_record, MAX_SIZE_NOM_PERSON);*/
@@ -213,27 +219,32 @@ int extract_one_record(file_record_t *this, char *line, joueur_t *joueur)
     /*strncpy( joueur->person.pname, name_record, MAX_SIZE_NOM_PERSON);*/
     /*joueur->person.is_daltonien = is_daltonien;*/
     /*joueur->person.is_admin = is_admin;*/
-    joueur_init( joueur, name_record, is_daltonien, is_admin);
+    joueur_init( joueur, 
+                 file_record_get_next_joueur_id(),
+                 name_record, is_daltonien, is_admin);
 
     /* test if already existing / allocated map_victories */
     /*if( joueur->map_victories.clist != NULL) { */
-    if( game_victories_size(  &(joueur->map_victories) ) > 0 ) {
+    if( map_game_score_size(  &(joueur->map_score) ) > 0 ) {
         printf("deallocate the map before extraction of one");
     }
     /* read game victories */
-    extract_map_victories( this, line, &joueur->map_victories );
+    extract_map_victories( this, line, &joueur->map_score );
     return retour;
 }
 
-int extract_map_victories( file_record_t *this, char *line, map_game_victories_t *map)
+int extract_map_victories( file_record_t *this, char *line, map_game_score_t *map)
 {
     /* format victories :
     mastermind: 2 2 */
-    struct pair_game_victory_t pair_victory;
+    /*struct pair_game_victory_t pair_victory;*/
+    char game_name[MAX_SIZE_NAME_USER];
+    score_game_t scores;
+    int win,lost,draw;
+    int status;
     char *delimiter = ":";
     size_t pos_delimiter;
 
-    /*fgets(line, MAX_LINE_SIZE,  this->fp);*/
     if( fgets(line, MAX_LINE_SIZE,  this->fp) == NULL ) {
         return 1;
     }
@@ -247,13 +258,18 @@ int extract_map_victories( file_record_t *this, char *line, map_game_victories_t
                                    , & pair_victory.victories.nb_win
                                    , & pair_victory.victories.nb_lost );
         */
-       pos_delimiter = strcspn( line, delimiter);
-       strncpy(pair_victory.game_name, line, pos_delimiter);
-       pair_victory.game_name[pos_delimiter] = '\0';
-       sscanf( line+pos_delimiter+1, "%d %d", & pair_victory.victories.nb_win
-                                            , & pair_victory.victories.nb_lost);
-        
-        game_victories_insert( map, &pair_victory );
+        pos_delimiter = strcspn( line, delimiter);
+        /*strncpy(pair_victory.game_name, line, pos_delimiter);*/
+        /* check pos_delimiter < MAX_SIZE_NAME_USER */
+        strncpy(game_name, line, pos_delimiter);
+        game_name[pos_delimiter] = '\0';
+        sscanf( line+pos_delimiter+1, "%d %d %d", &win, &lost, &draw);
+        scores = score_game_create_with_param(win, lost, draw); 
+        status = map_game_score_insert( map, game_name, &scores );
+        if( status == 1) {
+            CLOG_ERR("A replacment has been done, check your db %d", status);
+        }
+        /* read next line */
         if( !fgets(line, MAX_LINE_SIZE,  this->fp) ) {
             return 1;
         }
@@ -279,7 +295,8 @@ bool next_record(file_record_t *this, char *line)
 /* basic block, reusable */
 bool match_name( const char* name_record, const char *name)
 {
-    /* string name is the first entry, can compare strng directly by theirs pointers */
+    /* string name is the first entry, can compare string directly by theirs pointers
+        case same pointer ? */
     if ( (strncmp( name_record, name, strlen(name) ) == 0)
         && ( strlen(name_record) ==  strlen(name) ) ) 
     {

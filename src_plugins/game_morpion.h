@@ -1,8 +1,11 @@
 #ifndef MORPION_H_INCLUDED
 #define MORPION_H_INCLUDED
 
+/*
 #include "joueur/person.h"
 #include "joueur/victory.h"
+*/
+#include "jmmjouer/ptrf_game_typedef.h"
 
 #include "shared_EXPORTS.h"
 /*
@@ -20,10 +23,10 @@ void test();
 
 /*  objdump.exe -tT game_morpion.dll | grep 'start' do not see difference start_game_morpion appears in both */
 /* gcc default is visibilty on ? */
-SHARED_EXPORT victory_t start_game_morpion(person_t joueur);
+SHARED_EXPORT score_game_t start_game_morpion(user_t user);
 /*victory_t start_game_morpion(person_t joueur);*/
 
-
+/* only implementation */
 void afficher_plateau(char *, int *);
 
 int test_plateau_rempli(char *);

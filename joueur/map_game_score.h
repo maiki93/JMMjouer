@@ -60,7 +60,7 @@ SHARED_EXPORT void map_game_score_delete(map_game_score_t *map);
 SHARED_EXPORT void map_game_score_free(map_game_score_t *map);
 /** \} */
 
-/** \name public API */
+/** \name public methods API */
 /** \{ */
 /** Return the number of elements of the map.
  *  Complexity O(n)
@@ -82,8 +82,7 @@ SHARED_EXPORT int map_game_score_insert(map_game_score_t *map, const char *name_
  * \param[in] pointer on an instance of map_game_score_t
  * \param[in] name of the game
  * \param[out] score associated, 0,0,0 in case of errors 
- * \return  status 0: OK, -1 error or indicate the key was not found */
-/* SHARED_EXPORT score_game_t map_game_score_get_from_name( const map_game_score_t *map, const char *name); */
+ * \return  status 0: OK, -1: ERROR (may split) or indicate the key was not found */
 SHARED_EXPORT int map_game_score_get_from_name( const map_game_score_t *map, const char *name, score_game_t *score_out);
    
 /** Display content on console.

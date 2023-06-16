@@ -75,7 +75,7 @@ const int colorCode[][3] = { { (int)'R', 31, 41 },   // rouge, Foreground color,
 #define SHIFT_RESULTAT_PLACE 35         /* for printing results bien / mal place */
 
 /** main entry **/
-victory_t start_game_mastermind(person_t person)
+score_game_t start_game_mastermind(user_t user)
 {
     /* constantes du jeu */
     const int NB_PIECE_MM = 4;
@@ -84,30 +84,31 @@ victory_t start_game_mastermind(person_t person)
     const char colors[] = {'V','R','M','B','J'};    /* available colors, use sizeof(colors) to know the size.
                                                        ok, only because sizeof(char) == 1 ( or sizeof(colors)/sizeof(char) ) */
 
-    victory_t victories;        /* results of the game(s) */
+    score_game_t scores;        /* results of the game(s) */
     int victoire = 0;           /* vainqueur de la partie */
     bool rejouer = false;
 
     /* init victories */
-    victory_init(&victories);
+    /*victory_init(&victories);*/
+    scores = score_game_create();
 
     /* message d'intro au jeu */
     clear_screen();
-    printf("Entrée Mastermind\nBienvenue %s\n", person.pname);
+    printf("Entrée Mastermind\nBienvenue %s\n", user.pname);
     /*
     ( joueur.serie_3_game == true ) ? printf("C'est du sérieux, on est dans une série de 3 jeux\n")
                                     : printf("Mode détente, qq parties pour s'entraîner\n");
     */
     do {
-        victoire = mm_make_one_game( colors, SIZE_COLOR, NB_PIECE_MM, MAX_TENTATIVE, person.is_daltonien );
+        victoire = mm_make_one_game( colors, SIZE_COLOR, NB_PIECE_MM, MAX_TENTATIVE, user.is_daltonien );
         /* victoire joueur */
         if (victoire == 1) {
             printf("on incremente votre historique\n");
-            victories.nb_win++;
+            scores.nb_win++;
         /* victoire == 2 ordinateur */
         } else {
-            printf("une defaite de plus %s et enregistrée dans votre historique \n", person.pname);
-            victories.nb_lost++;
+            printf("une defaite de plus %s et enregistrée dans votre historique \n", user.pname);
+            scores.nb_lost++;
         }
 
         /*if( joueur.serie_3_game == false ) {*/
@@ -116,8 +117,8 @@ victory_t start_game_mastermind(person_t person)
 
     } while ( (rejouer == true) /*&& (joueur.serie_3_game == false)*/ );
 
-    printf("Mastemind vous dit à bientôt %s, revenez vite\n\n", person.pname);
-    return victories;
+    printf("Mastemind vous dit à bientôt %s, revenez vite\n\n", user.pname);
+    return scores;
 }
 
 /* color[] copy de tableau par référence

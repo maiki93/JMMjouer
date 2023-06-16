@@ -43,11 +43,13 @@ enum /*PLG_MGR : short */
 /* typedef struct plugin_manager plugin_mgr_t; */
 #include "plugin_manager_fwd.h"
 
-#include "joueur/victory.h"
-#include "joueur/person.h"
+/*#include "joueur/victory.h"*/
+/*#include "joueur/person.h"*/
+#include "jmmjouer/ptrf_game_typedef.h"
 
 /*typedef int(*ptr_plugin_funct)();*/ /* strange, no paramater was working ? */
-typedef victory_t(*ptr_plugin_funct)(person_t);
+/*typedef victory_t(*ptr_plugin_funct)(person_t);*/
+typedef ptr_game_t ptr_plugin_funct;
 
 plugin_mgr_t* plugin_manager_get_instance();
 /* @brief Clear content.

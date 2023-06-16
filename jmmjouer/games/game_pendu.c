@@ -316,15 +316,16 @@ int p_make_one_pendu()
 }
 
 
-victory_t start_game_pendu( person_t person)
+score_game_t start_game_pendu( user_t user)
 {
-    victory_t victories;
+    score_game_t scores;
     int victoire = 0;           /* vainqueur de la partie */
     bool rejouer = false;
 
-    victory_init(&victories); 
+    scores = score_game_create();
     /*printf("start jeu du pendu\n");*/
-    printf("Joueur : %s \n", person.pname);
+    /*printf("Joueur : %s \n", user_name(&user));*/
+    printf("Joueur : %s \n", user.pname);
 
     do {
         printf("vous etes bien arrive dans le pendu\n");
@@ -334,12 +335,12 @@ victory_t start_game_pendu( person_t person)
         /* victoire joueur */
         if (victoire == 1) {
             printf("on incremente votre historique\n");
-            victories.nb_win++;
-        /* victoire == 2; // ordinateur // ?????? */
+            scores.nb_win++;
+        /* victoire == 2; // ordinateur */
         } else {
             printf("une defaite de plus %s et enregistrée dans votre historique \n", 
-                    person.pname);
-            victories.nb_lost++;
+                    user.pname);
+            scores.nb_lost++;
         }
         /*
         if( joueur.serie_3_game == false ) {
@@ -348,6 +349,8 @@ victory_t start_game_pendu( person_t person)
 
     } while ( (rejouer == true) /*&& (joueur.serie_3_game == false)*/ );
 
-    printf("Le Jeu du Pendu vous dit à bientôt %s, revenez vite\n\n", person.pname);
-    return victories;
+    /* using attribute, no need of user.o in the compilation of library, to retry ..(compile flag will play a role ?)*/
+    /*printf("Le Jeu du Pendu vous dit à bientôt %s, revenez vite\n\n", user_name(&user));*/
+    printf("Le Jeu du Pendu vous dit à bientôt %s, revenez vite\n\n", user.pname);
+    return scores;
 }

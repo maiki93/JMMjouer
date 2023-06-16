@@ -257,6 +257,7 @@ void usage(char *progname, bool opt_verbose)
 {
     printf("Usage: opt %d\n", opt_verbose);
     printf(USAGE_FMT, progname);
+    printf("\n");
 
     if( opt_verbose) {
         printf("\nMore details in verbose ...\n");

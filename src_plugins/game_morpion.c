@@ -13,9 +13,9 @@ void test(){
 
 /* Lance le jeu morpion et renvoie le score du joueur en cas de victoire
    int lancer_morpion(char * pseudo){ */
-victory_t start_game_morpion(person_t joueur) 
+score_game_t start_game_morpion(user_t user)
 {
-    victory_t victories;
+    score_game_t scores;
     /* Initialisation des variables */
     char plateau [] = {'1','2','3','4','5','6','7','8','9','\0'};
     int jeu_en_cours = 1;
@@ -25,9 +25,9 @@ victory_t start_game_morpion(person_t joueur)
        score = 0 si match nul ou victoire de l'IA */
     /*int score = 0;*/
     /* get pseudo from the joueur */
-    const char* pseudo = person_name( (const person_t*) &joueur);
+    const char* pseudo = user_name( &user);
 
-    victory_init(&victories);
+    scores = score_game_create();
 
     /* Bienvenue au joueur dans le jeu */
     printf("Bienvenue %s dans le jeu du morpion !\n",pseudo);
@@ -46,8 +46,7 @@ victory_t start_game_morpion(person_t joueur)
             if( test_victoire(plateau,'O') ){
                     printf("Bravo !\nVous avez gagne !!!\n");
                     jeu_en_cours = 0;
-                    /*score = 1;*/
-                    victories.nb_win++;
+                    scores.nb_win++;
             }
         }else{
             printf("C'est au tour de l'IA.\n");
@@ -56,16 +55,14 @@ victory_t start_game_morpion(person_t joueur)
             if( test_victoire(plateau,'X') ){
                     printf("Oh non !\nL'IA vous a battu !!!");
                     jeu_en_cours = 0;
-                    /*score = 0;*/
-                    victories.nb_lost++;
+                    scores.nb_lost++;
             }
         }
         /* S'il n'y a pas de victoire a ce tour (le jeu est toujours en cours), on regarde si le tableau n'est pas rempli */
         /* Si le tableau est rempli alors c'est un match nul */
         if(jeu_en_cours && test_plateau_rempli(plateau)){
             printf("La teableau est rempli !\nC'est un match nul !\n");
-            /*score = 0;*/
-            victories.nb_draw++;
+            scores.nb_draw++;
             jeu_en_cours = 0;
         }
 
@@ -75,10 +72,12 @@ victory_t start_game_morpion(person_t joueur)
     }while( jeu_en_cours && nb_case_joue<9 );/* On ne peut pas jouer plus de 9 cases ! */
 
     /*return score;*/
+    /*
     victories.nb_win = 1;
     victories.nb_lost = 1;
     victories.nb_draw = 0;
-    return victories;
+    */
+    return scores;
 }
 
 /* Affiche le plateau de jeu proprement et le nombre de cases remplis */
@@ -224,7 +223,7 @@ void maj_plateau(char * plateau, char tentative, char symbole)
 {
     /* Instruction qui permet de convertir un caractere de 0 a 9 en entier
        On le decremente de 1 aussi car notre tableau est de 0 a 8 et non de 1 a 9 */
-    int i = (int)tentative - '0' -1;  /* warning to the next line if cast is not explicit */
+    int i = (int)tentative - '0' - 1;  /* warning to the next line if cast is not explicit */
 
     *(plateau + i) = symbole;
 }

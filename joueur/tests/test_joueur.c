@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include "cmocka.h"
 
-/* include person_t and map_game_score */
+/* include user_t and map_game_score */
 #include "joueur/joueur.h"
 /* ccontainer adapter */
 #include "joueur/adapter_ccontainer_joueur.h"
@@ -19,56 +19,59 @@
 /* helper */
 /*static joueur_t make_joueur1();*/
 
-static void person_constructor()
+static void user_constructor()
 {
-    person_status_t status;
+    user_status_t status;
 
-    person_t person;
-    status = person_default_init(&person);
+    user_t user;
+    status = user_default_init(&user);
+    assert_int_equal(USER_INVALID, status);
+    assert_int_equal( USER_INVALID, user_status( &user) );
+    assert_false( user_valid(&user));
+    assert_int_equal(0, user_id(&user));
+    assert_false(user_daltonien(&user));
+    assert_false(user_admin(&user));
+    assert_null(user_name(&user));
 
-    assert_int_equal(PERSON_INVALID, status);
-    assert_int_equal( PERSON_INVALID, person_status( &person) );
-    assert_false(person_daltonien(&person));
-    assert_false(person_admin(&person));
+    user_delete(&user);
 
-    person_delete(&person);
-
-    status = person_init(&person, "maiki", true, false);
-    assert_int_equal(PERSON_VALID, status);
-    assert_int_equal( PERSON_VALID, person_status( &person));
-    assert_string_equal("maiki", person_name(&person));
-    assert_true( person_daltonien(&person));
+    status = user_init(&user, 1, "maiki", true, false);
+    assert_int_equal(USER_VALID, status);
+    assert_int_equal( USER_VALID, user_status( &user));
+    assert_true( user_valid(&user));
+    assert_int_equal(1, user_id(&user));
+    assert_string_equal("maiki", user_name(&user));
+    assert_true( user_daltonien(&user));
     // only here a setter... may avoid
-    assert_false( person_admin(&person));
-    //person_set_admin( &person );
-    assert_int_not_equal( PERSON_ADMIN, person_status( &person) );
+    assert_false( user_admin(&user));
+    //user_set_admin( &user );
+    //assert_int_not_equal( USER_ADMIN, user_status( &user) );
 
-    person_delete(&person);
+    user_delete(&user);
 }
 
 static void joueur_constructor()
 {
-    person_status_t status;
+    user_status_t status;
 
     joueur_t joueur;
     status = joueur_default_init( &joueur );
 
-    assert_int_equal(PERSON_INVALID, status);
-    assert_int_equal( PERSON_INVALID, person_status( (person_t*) &joueur) );
-    assert_false(person_daltonien( (person_t*) &joueur));
-    assert_false(person_admin( (person_t*) &joueur));
+    assert_int_equal(USER_INVALID, status);
+    assert_int_equal( USER_INVALID, joueur_status( &joueur));
+    assert_false(joueur_daltonien( &joueur));
+    assert_false(joueur_admin( &joueur));
 
     joueur_delete(&joueur);
 
-    status = joueur_init(&joueur, "maiki", 
+    status = joueur_init(&joueur, 5, "maiki", 
             true /*is_daltonien*/, true /*is_admin*/);
-    assert_int_equal(PERSON_ADMIN, status);
     /* one way to test if not an error */
-    assert_true( PERSON_VALID <= person_status( (person_t*) &joueur));
-    assert_int_equal( PERSON_ADMIN, person_status( (person_t*) &joueur));
-    assert_string_equal("maiki", person_name( (person_t*) &joueur));
-    assert_true( person_daltonien((person_t*) &joueur));
-    assert_true( person_admin((person_t*) &joueur));
+    assert_true( joueur_valid( &joueur));
+    assert_int_equal(5, joueur_id(&joueur));
+    assert_string_equal("maiki", joueur_name( &joueur));
+    assert_true( joueur_daltonien( &joueur));
+    assert_true( joueur_admin( &joueur));
 
     joueur_delete(&joueur);
 }
@@ -93,7 +96,7 @@ int main()
 {
     /* can be inside main, or as global. here no problem with identical name */
     const struct CMUnitTest tests_joueur[] = {
-        cmocka_unit_test(person_constructor),
+        cmocka_unit_test(user_constructor),
         cmocka_unit_test(joueur_constructor),
         /*
         cmocka_unit_test(pair_victory_to_value),

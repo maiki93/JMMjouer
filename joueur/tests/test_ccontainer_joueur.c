@@ -11,16 +11,21 @@
 #include "joueur/adapter_ccontainer_joueur.h"
 
 /* same as test joueur , to combine */
-/* not const if want to add/change map_victories associated */
+/* not const if want to add/change map_score associated */
 static joueur_t joueur1, joueur2, joueur3;
 /* only available C89 + */
-static victory_t victory1 = {.nb_win=1,.nb_lost=2,.nb_draw=3};
-static victory_t victory2 = {.nb_win=1,.nb_lost=2,.nb_draw=3};
-static victory_t victory3 = {.nb_win=1,.nb_lost=2,.nb_draw=3};
+static score_game_t victory1 = {.nb_win=1,.nb_lost=2,.nb_draw=3};
+static score_game_t victory2 = {.nb_win=1,.nb_lost=2,.nb_draw=3};
+static score_game_t victory3 = {.nb_win=1,.nb_lost=2,.nb_draw=3};
 /* helper */
 static joueur_t make_joueur1();
 static void make_three_joueur();
 static void delete_three_joueur();
+
+static size_t get_next_joueur_id() {
+    static size_t id = 1;
+    return id++;
+}
 
 static void adapter_ccontainer_joueur()
 {
@@ -38,12 +43,12 @@ static void adapter_ccontainer_joueur()
 
     err_code = extract_value_joueur( &value_joueur, &joueur_extracted );
     assert_int_equal( CCONTAINER_OK, err_code );
-    assert_string_equal("maiki", person_name( (person_t*) &joueur_extracted) );
-    assert_false( person_daltonien( (person_t*) &joueur_extracted) );
-    assert_true( person_admin( (person_t*) &joueur_extracted) );
-    assert_int_equal( PERSON_ADMIN, person_status( (person_t*) &joueur_extracted) );
-    // check map_victories
-    assert_int_equal( 1, game_victories_size( &(joueur_extracted.map_victories)) );
+    assert_string_equal("maiki", joueur_name(&joueur_extracted) );
+    assert_false( joueur_daltonien( (joueur_t*) &joueur_extracted) );
+    assert_true( joueur_admin( (joueur_t*) &joueur_extracted) );
+    assert_int_equal( USER_VALID, joueur_status( (joueur_t*) &joueur_extracted) );
+    // check map_score
+    assert_int_equal( 1, map_game_score_size( &(joueur_extracted.map_score)) );
 
     joueur_delete( &joueur_extracted );
     // must suprress allocated in values if not inserted into ccontainer
@@ -81,10 +86,10 @@ static void list_push_back_and_pop_joueur()
     // pop first
     joueur_extracted = list_joueur_pop_front( list_joueur );
 
-    assert_string_equal("maiki", person_name( (person_t*) &joueur_extracted) );
-    assert_false( person_daltonien( (person_t*) &joueur_extracted) );
-    assert_true( person_admin( (person_t*) &joueur_extracted) );
-    assert_int_equal( PERSON_ADMIN, person_status( (person_t*) &joueur_extracted) );
+    assert_string_equal("maiki", joueur_name(&joueur_extracted) );
+    assert_false( joueur_daltonien(&joueur_extracted) );
+    assert_true( joueur_admin(&joueur_extracted) );
+    assert_int_equal( USER_VALID, joueur_status(&joueur_extracted) );
 
     // state of list is empty now
     assert_int_equal( 0, list_joueur_size( list_joueur ));
@@ -92,7 +97,7 @@ static void list_push_back_and_pop_joueur()
     joueur_delete( &joueur_extracted );
     // pop but empty
     joueur_extracted = list_joueur_pop_front( list_joueur );
-    assert_int_equal( PERSON_INVALID, person_status( (person_t*) &joueur_extracted) );
+    assert_int_equal( USER_INVALID, joueur_status(&joueur_extracted) );
     
     joueur_delete( &joueur_extracted );
 
@@ -142,15 +147,15 @@ static void vector_push_back_and_get_joueur()
 
     // get copy valid
     joueur_extracted = vector_joueur_get_at( &vector_joueur, 0);
-    assert_string_equal("maiki", person_name( (person_t*) &joueur_extracted) );
-    assert_false( person_daltonien( (person_t*) &joueur_extracted) );
-    assert_true( person_admin( (person_t*) &joueur_extracted) );
-    assert_int_equal( PERSON_ADMIN, person_status( (person_t*) &joueur_extracted) );
+    assert_string_equal("maiki", joueur_name(&joueur_extracted) );
+    assert_false( joueur_daltonien(&joueur_extracted) );
+    assert_true( joueur_admin(&joueur_extracted) );
+    assert_int_equal( USER_VALID, joueur_status(&joueur_extracted) );
     joueur_delete( &joueur_extracted );
 
     // copy invalid
     joueur_extracted = vector_joueur_get_at( &vector_joueur, 1);
-    assert_int_equal( PERSON_INVALID, person_status( (person_t*) &joueur_extracted) );
+    assert_int_equal( USER_INVALID, joueur_status(&joueur_extracted) );
     joueur_delete( &joueur_extracted );
 
     vector_joueur_delete( &vector_joueur );
@@ -216,38 +221,31 @@ static void list_to_vector_joueur_gen_optimized()
 joueur_t make_joueur1()
 {
     joueur_t joueur;
-    joueur_init(&joueur, "maiki", false, true);
-    /* to hide in joueur implementation the usage of pair */
-    struct pair_game_victory_t pair1;
-    strcpy( pair1.game_name, "jeu1"); /* game_name[XX] */
-    pair1.victories = victory1;
-
-    game_victories_insert( &(joueur.map_victories), &pair1 );
+    joueur_init(&joueur, 
+                1,
+                "maiki", false, true);
+    map_game_score_insert( &(joueur.map_score), "jeu1", &victory1 );
     return joueur;
 }
 
 static void make_three_joueur()
 {
-    joueur_init(&joueur1,"maiki", false, false);
-    struct pair_game_victory_t pair1;
-    //pair_game_victory_t pair1;
-    strcpy( pair1.game_name, "jeu1");
-    pair1.victories = victory1;
-    game_victories_insert( &joueur1.map_victories, &pair1 );
+    joueur_init(&joueur1,
+                get_next_joueur_id(),
+                "maiki", false, false);
 
-    joueur_init(&joueur2,"kevin", true, false);
-    struct pair_game_victory_t pair2;
-    //pair_game_victory_t pair1;
-    strcpy( pair2.game_name, "jeu1");
-    pair2.victories = victory2;
-    game_victories_insert( &joueur2.map_victories, &pair2 );
+    
+    map_game_score_insert( &(joueur1.map_score), "jeu1", &victory1 );
 
-    joueur_init(&joueur3,"admin", false, true);
-    struct pair_game_victory_t pair3;
-    //pair_game_victory_t pair1;
-    strcpy( pair3.game_name, "jeu1");
-    pair3.victories = victory3;
-    game_victories_insert( &joueur3.map_victories, &pair3 );
+    joueur_init(&joueur2,
+                get_next_joueur_id(),
+                "kevin", true, false);
+    map_game_score_insert( &(joueur2.map_score), "jeu2", &victory2 );
+
+    joueur_init(&joueur3,
+                get_next_joueur_id(),
+                "admin", false, true);
+    map_game_score_insert( &joueur3.map_score, "jeu3", &victory3 );
 
     return;
 }

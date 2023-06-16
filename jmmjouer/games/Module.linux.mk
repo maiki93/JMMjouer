@@ -20,7 +20,7 @@ OBJS_ALL_STATIC += $(OBJS_GAMES)
 # compile shared library to include at compile-time in main executable
 # for victory / important to match the correct rule in module joueur
 # $(MODDIR_JOUEUR)/person.o => adds lots of dependencies (clogger...) not nice for plugins
-libgame_pendu.so : $(MODDIR_GAMES)/game_pendu.o $(MODDIR_JOUEUR)/victory.o
+libgame_pendu.so : $(MODDIR_GAMES)/game_pendu.o $(MODDIR_JOUEUR)/score_game.o
 	$(LINK) $(LFLAGS) -o $@ $^
 #	$(CC) -shared $(CFLAGS) -o $@ $^ -Wl,--out-implib,game_pendu_dll.lib
 

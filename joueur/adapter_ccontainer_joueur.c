@@ -9,34 +9,35 @@
 /* an optimized version in ccontainer */
 #include "ccontainer/ccontainer_utils.h"
 
-/* joueur = person_t + map_victories
-    => person_t = (char *) + 2 bool = 8+2x4 = 16 => name copy need memory allocation
-    => map_victories = (clist_gen_t*) = 8 / All the map(clist* ) stays heap allocated in this version
+/* joueur = user_t + map_game_score
+    => user_t = (char *) + 2 bool = 8+2x4 = 16 => name copy need memory allocation
+    => map_score = (clist_gen_t*) = 8 / All the map(clist* ) stays heap allocated in this version
     Total : 24
 
-    Here map_victories kept in heap.
+    Here map_score kept in heap.
 
     Possible (better ?) linerize everything, all pair are name[20]+3*int
     Already written for a pair => just linearize all (limit < data.len is reached)
 
-    No need of specifc duplicater for joueur, a copy of map_game_victories is done on the heap
+    No need of specifc duplicater for joueur, a copy of map_score is done on the heap
 */
 ccontainer_value_t make_value_joueur(const joueur_t *joueur_in, ccontainer_err_t *err_code)
 {
     ccontainer_value_t value_out;
     
     char *p_name_tmp;
-    const char *p_person_name; /* ref to the person name */
-    map_game_victories_t map_copy;
+    const char *p_user_name; /* ref to the user name */
+    map_game_score_t map_copy;
     size_t size_joueur_t;
+    int status;
 
     /* only for debug 
     char **dbg_str;
     bool *dbg_bool1, *dbg_bool2;
-    map_game_victories_t *dbg_cmap;
-    size_t size_person_t
-    size_person_t = sizeof(person_t);
-    size_map_t = sizeof(map_game_victories_t);
+    map_game_score_t *dbg_cmap;
+    size_t size_user_t
+    size_user_t = sizeof(user_t);
+    size_map_t = sizeof(map_game_score_t);
     dbg_cmap = &(joueur_in->map_victories); 
     */
 
@@ -44,18 +45,17 @@ ccontainer_value_t make_value_joueur(const joueur_t *joueur_in, ccontainer_err_t
 
     size_joueur_t = sizeof(joueur_t);
     
-    /* person_t.p_name */
-    p_person_name = person_name( (const person_t*) joueur_in);
-    p_name_tmp = (char *) malloc( strlen( p_person_name ) + 1 );
+    p_user_name = joueur_name( joueur_in);
+    p_name_tmp = (char *) malloc( strlen( p_user_name ) + 1 );
     if( !p_name_tmp ) {
         *err_code = CCONTAINER_ALLOCERR;
         return value_out;
     }
-    strcpy( p_name_tmp, p_person_name );
+    strcpy( p_name_tmp, p_user_name );
 
-    /* joueur_t.map_victories */
-    map_copy = game_victories_copy( &(joueur_in->map_victories), err_code );
-    if( *err_code != CCONTAINER_OK) {
+    map_copy = map_game_score_copy( &(joueur_in->map_score), &status );
+    if( status != 0 ) /*CCONTAINER_OK)*/ {
+        *err_code = 1;
         return value_out;
     }
 
@@ -64,14 +64,15 @@ ccontainer_value_t make_value_joueur(const joueur_t *joueur_in, ccontainer_err_t
     value_out.data = (char *) malloc( size_joueur_t );
 
     /* Make a full copy of the input */
-    memcpy(value_out.data, &p_name_tmp, sizeof(char *) );
-    memcpy(value_out.data + sizeof(char *), &(joueur_in->person.is_daltonien), sizeof(bool));
-    memcpy(value_out.data + sizeof(char *) + sizeof(bool), &(joueur_in->person.is_admin), sizeof(bool));
-    /* copy of the cmap => need deep copy like person_name */
+    memcpy(value_out.data, &(joueur_in->user.user_id), sizeof(size_t) );
+    memcpy(value_out.data + sizeof(size_t), &p_name_tmp, sizeof(char *) );
+    memcpy(value_out.data + sizeof(size_t) + sizeof(char *), &(joueur_in->user.is_daltonien), sizeof(bool));
+    memcpy(value_out.data + sizeof(size_t) + sizeof(char *) + sizeof(bool), &(joueur_in->user.is_admin), sizeof(bool));
+    /* copy of the cmap => need deep copy like user_name */
     /* first version, like the same reference to cmap.clist* */
-    /*memcpy(value_out.data + sizeof(person_t), &(joueur_in->map_victories), sizeof(map_game_victories_t));*/
+    /*memcpy(value_out.data + sizeof(user_t), &(joueur_in->map_victories), sizeof(map_game_score_t));*/
     /* second version, use new allocated copy */
-    memcpy(value_out.data + sizeof(person_t), &map_copy, sizeof(map_game_victories_t));
+    memcpy(value_out.data + sizeof(user_t), &map_copy, sizeof(map_game_score_t));
     /* other possible, linearize all pairs of <game,victory> code for pair to reuse
         => increase a lot the size of each value_t, use len to know how much pair are present 'or header data' */
 
@@ -79,7 +80,7 @@ ccontainer_value_t make_value_joueur(const joueur_t *joueur_in, ccontainer_err_t
     dbg_str = (char **) value_out.data;
     dbg_bool1 = (bool*) (value_out.data + sizeof(char*));
     dbg_bool2 = (bool*) (value_out.data + sizeof(char*)+sizeof(bool));
-    dbg_cmap = (map_game_victories_t*) (value_out.data + sizeof(person_t));
+    dbg_cmap = (map_game_score_t*) (value_out.data + sizeof(user_t));
     */
 
     *err_code = CCONTAINER_OK;
@@ -90,39 +91,40 @@ ccontainer_value_t make_value_joueur(const joueur_t *joueur_in, ccontainer_err_t
  Queue pop / push not be the case in fact ... */
 ccontainer_err_t extract_value_joueur(const ccontainer_value_t *value_in, joueur_t *joueur_out)
 {
-    ccontainer_err_t err_code;
     char **p_name;
-    map_game_victories_t *map_victories_value;
+    map_game_score_t *map_score_value;
+    int status;
     
-    /* extract person : to do joueur_init(...) or person_init + joueur with map_game_victories ? */
-    p_name = (char **) value_in->data;
-    joueur_out->person.pname = malloc( strlen( *p_name ) + 1);
-    strcpy( joueur_out->person.pname, *p_name );
+    joueur_out->user.user_id = *( (size_t *) (value_in->data) );
+    /* extract user : to do joueur_init(...) or user_init + joueur with map_game_score ? */
+    p_name = (char **) (value_in->data + sizeof(size_t));
+    joueur_out->user.pname = malloc( strlen( *p_name ) + 1);
+    strcpy( joueur_out->user.pname, *p_name );
     /* 2 boolean, may memcopy both  */
-    joueur_out->person.is_daltonien = *( (bool *) (value_in->data + sizeof(char *)) );
-    joueur_out->person.is_admin = *( (bool *) (value_in->data + sizeof(char *) + sizeof(bool)) );
+    joueur_out->user.is_daltonien = *( (bool *) (value_in->data + sizeof(size_t) + sizeof(char *)) );
+    joueur_out->user.is_admin = *( (bool *) (value_in->data + + sizeof(size_t) + sizeof(char *) + sizeof(bool)) );
 
     /* extract map_victories in making a copy and return the last error code */
-    map_victories_value = (map_game_victories_t*) (value_in->data + sizeof(person_t));
-    joueur_out->map_victories = game_victories_copy( map_victories_value, &err_code );
-    return err_code;
+    map_score_value = (map_game_score_t*) (value_in->data + sizeof(user_t));
+    joueur_out->map_score = map_game_score_copy( map_score_value, &status );
+    return (ccontainer_err_t)status; /*err_code;*/
 }
 
 void joueur_deleter_value(ccontainer_value_t* value_in)
 {
-    map_game_victories_t *map;
+    map_game_score_t *map;
     /*
     if( !value_in || !value_in->data)
         return;
     */
-    /* first field for person.p_name */
-    char **p_str = (char **)value_in->data;
+    /* first field for user.p_name */
+    char **p_str = (char **)(value_in->data + sizeof(size_t));
     if( *p_str )
         free(*p_str);
     /*p_str = NULL;*/
     /* second field in joueur */
-    map = (map_game_victories_t*) (value_in->data + sizeof(person_t));
-    game_victories_delete( map );
+    map = (map_game_score_t*) (value_in->data + sizeof(user_t));
+    map_game_score_delete( map );
     free(value_in->data);
     value_in->data = NULL;
     value_in->len = 0;
@@ -173,11 +175,11 @@ vector_joueur_t* list_joueur_to_vector( list_joueur_t *list)
     pvector_joueur = vector_joueur_new();
     vector_joueur_init_with_capacity( pvector_joueur, size_list );
 
-    /* size > 0, first always valid ? not sure an invalid person is possible */
+    /* size > 0, first always valid ? not sure an invalid user is possible */
     joueur = list_joueur_pop_front( list );
-    assert( person_status( (const person_t *) &joueur ) >= PERSON_VALID );
+    assert( joueur_status( &joueur ) == USER_VALID );
 
-    while ( person_status( (const person_t *) &joueur ) >= PERSON_VALID ) 
+    while ( joueur_status( &joueur ) == USER_VALID )
     {
         /* joueur _status */
         status = vector_joueur_push_back( pvector_joueur, &joueur);

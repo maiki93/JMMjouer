@@ -82,10 +82,10 @@ joueur_t __find_joueur_error( void *this, const char *name)
     /*joueur_init(&joueur, "invalid", false);*/
     joueur_default_init( &joueur );
     printf("-- In record base __get_joueur_error --\n");
-    printf("joueur name: %s\n", person_name( (person_t*) &joueur));
-    printf("daltonien: %d\n", joueur.person.is_daltonien);
+    printf("joueur name: %s\n", joueur_name(&joueur));
+    printf("daltonien: %d\n", joueur_daltonien(&joueur));
     printf("adresss of joueur: %p\n",(void*) &joueur);
-    printf("adresss of joueur.person.pname: %p\n",(void*) &joueur.person.pname);
+    printf("adresss of joueur.person.pname: %p\n",(void*) &(joueur.user.pname));
     return joueur;
 }
 /************  private, static functions ***********/

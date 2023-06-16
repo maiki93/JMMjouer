@@ -17,7 +17,7 @@ $(info dir: $(dir $(lastword $(MAKEFILE_LIST))) )
 unit_test :: $(EXE_GL_TESTS)
 
 ####
-test_mastermind : $(MODDIR_GL_TESTS)/test_mastermind.o jmmjouer/utils.o joueur/victory.o
+test_mastermind : $(MODDIR_GL_TESTS)/test_mastermind.o jmmjouer/utils.o joueur/score_game.o
 	@echo "Building test_game_loader @ :    $@"  # target name
 	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
@@ -36,9 +36,9 @@ test_plugin_manager: $(MODDIR_GL_TESTS)/test_plugin_manager.o libclogger
 	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $< -L. -lclogger -L $(LIB_CMOCKA) -lcmocka
 
 # add libgame_pendu, otherwise does not compile with shared libgame_loader.so
-test_game_loader: $(MODDIR_GL_TESTS)/test_game_loader.o jmmjouer/utils.o jmmjouer/utils_file.o joueur/victory.o libgame_loader libccontainer libclogger libgame_pendu
+test_game_loader: $(MODDIR_GL_TESTS)/test_game_loader.o jmmjouer/utils.o jmmjouer/utils_file.o joueur/score_game.o libgame_loader libccontainer libclogger libgame_pendu
 	@echo "Building test_game_loader @ :    $@"  # target name
-	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $(MODDIR_GL_TESTS)/test_game_loader.o jmmjouer/utils.o jmmjouer/utils_file.o joueur/victory.o -L. -lgame_loader -lccontainer -lclogger -lgame_pendu -L $(LIB_CMOCKA) -lcmocka
+	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $(MODDIR_GL_TESTS)/test_game_loader.o jmmjouer/utils.o jmmjouer/utils_file.o joueur/score_game.o -L. -lgame_loader -lccontainer -lclogger -lgame_pendu -L $(LIB_CMOCKA) -lcmocka
 
 clean ::
 	@echo "Clean test unit game_loader: $(MODDIR_GL_TESTS)"

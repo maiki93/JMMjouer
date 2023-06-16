@@ -9,12 +9,14 @@
 
 
 /** Define a pair : <game name, victory_t> to be inserted in a ccontainer.
+ * Implementation detail, stay in implementation.
+ * Using const for game and score is very restrictive, enfocre Value Object by usage only
  * \ingroup entities_grp */
 struct pair_game_score_t {
     /** key, constant usually in a map */
-    /*const*/ char game_name[MAX_NAME_GAME_LEN];
+    char game_name[MAX_NAME_GAME_LEN];
     /** value, results of games a Value Object constness to enforce */
-    /*const*/ score_game_t score;
+    score_game_t score;
 };
 
 /** \name Adapter functions to ccontainer for \ref pair_game_score_t. 
@@ -131,7 +133,6 @@ map_game_score_t map_game_score_copy(const map_game_score_t *map_src, int *statu
     /* case empty is also included , not really an error ... */
     if( err_code == CCONTAINER_ALLOCERR) {
         /* error, or empty copy */
-        /**status = (err_code == CCONTAINER_EMPTY) ? 0 : 1;*/
         CLOG_ERR("allocation error in clist_gen_copy %d", 0);
         *status = 1;
         /* undefined behavior or an empty list ? */
@@ -215,12 +216,8 @@ int map_game_score_insert(map_game_score_t *map, const char *name_game, const sc
     return 1;
 }
 
-/* miss not found in the implementation 
-   bool = map_game_score_get_from_name( &map, "toto", &score_out); */
-/* score_game_t map_game_score_get_from_name( const map_game_score_t *map, const char *name) */
 int map_game_score_get_from_name( const map_game_score_t *map, const char *name, score_game_t *score_out)
 {
-    //struct pair_game_score_t pair;
     ccontainer_value_t *pvalue_clist;
     ccontainer_value_t value_name_match;
     ccontainer_err_t err_code;
@@ -266,7 +263,8 @@ void map_game_score_print_info(const map_game_score_t* map)
         pvalue = clist_gen_get_node_value( current_node );
         err_code = extract_value_pair_score( pvalue, &pair_out );
         assert( err_code == CCONTAINER_OK );
-        printf("%s : ", pair_out.game_name);
+        printf("%25s : ", pair_out.game_name);
+        /* print on the same line */
         score_game_print_info( &(pair_out.score) );
 
         current_node = clist_gen_get_next_node( current_node);

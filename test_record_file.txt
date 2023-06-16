@@ -3,28 +3,28 @@
 # pseudonyme : nom is_daltonien
 # pour chaque jeu : nbre de victoire / nbre de defaite [/nbre d'égalite]
 +++++
-michael 0
-mastermind: 10 5
-pendu: 2 1
-morpion: 1 3
+michael 0 1
+mastermind: 10 5 0
+pendu: 2 1 0
+morpion: 1 3 2
 +++++
-kevin 1
+kevin 1 1
 +++++
-mathieu 0
-mastermind: 2 2
-pendu: 3 5
+mathieu 0 0
+mastermind: 2 2 0
+pendu: 3 5 0
 +++++
-mic 1
-mastermind: 4 5
-pendu: 2 1
-morpion: 1 3
+mic 1 0
+mastermind: 4 5 0
+pendu: 2 1 0
+morpion: 1 3 1
 +++++
-jasmine 1
-mastermind: 4 5
-pendu: 2 1
-morpion: 1 3
+jasmine 1 0 
+mastermind: 4 5 0
+pendu: 2 1 0
+morpion: 1 3 0
 +++++
-martin 0
-mastermind: 2 1
-pendu: 0 1
-morpion: 2 0
+nicolas 0 0
+mastermind: 2 1 0
+pendu: 0 1 0
+morpion: 2 0 0
