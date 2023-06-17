@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include "cmocka.h"
 
-/* No ! main test is make_value / extract_value, others are only recopy */
+/* main test is make_value / extract_value(in impl.), others are only list generic */
 #include "jmmjouer/game_loader/map_game_ptrf.c"
 /*#include "jmmjouer/game_loader/map_game_ptrf.h"*/
 #include "ccontainer/ccontainer_utils.h"
@@ -13,26 +13,16 @@
 /* https://stackoverflow.com/questions/777261/avoiding-unused-variables-warnings-when-using-assert-in-a-release-build */
 #define _unused(x) ((void)(x))
 
-/* function to pointer test, explicit correct argument
-    really need to include person from other module for a test ? */
-
+/* function to pointer test, must folow ptr_game signature */
 static score_game_t test1(user_t user) {
     score_game_t score_out;
-    //strcpy( user.pname, "nom_test");
     user.user_id = -1;
     _unused(user);
-    /*user.is_daltonien = true;*/
     score_out.nb_win = 1;
     score_out.nb_lost = 1;
     score_out.nb_draw = 1;
     return score_out;
 }
-/*
-static int test1(int number)
-{
-    return 2*number;
-}
-*/
 
 pair_game_ptrf_t pair_in1 = {"first",
                                  NULL};

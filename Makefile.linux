@@ -122,14 +122,14 @@ $(info $$LFLAGS is $(LFLAGS) )
 $(info $$MAKECMDGOALS is $(MAKECMDGOALS) )
 $(info $$EXE is $(EXE) )
 
-# updated from visit in all modules, no need to define here (would still be better)
+# updated from the visit in all modules, no need to define here (would still be better)
 #OBJS_ALL_STATIC = ''
 #OBJS_ALL_TESTS = ''
-# MAKELIST
 
-### Libraries compilation
+### Libraries compilation,
+# 	suprees libgame_loader included in jmmjouer now.to see later.
 # libgame_pendu always shared and linked at compilation
-LIB_STATIC = libclogger libccontainer libgame_loader
+LIB_STATIC = libclogger libccontainer
 # libjouer : linked with -shared -Bstatic against libclogger and libccontainer
 # librecord need only libjoueur ! (good, bad ?) cannot really works ?
 LIB_DYNAMIC = libjoueur librecord 
@@ -140,7 +140,7 @@ LIB_DYNAMIC = libjoueur librecord
 #LIB_DYNAMIC = libclogger libccontainer
 
 # moved before for EXE
-# include the description for each module
+# include the description for each module, will be recursive if submodules
 include $(patsubst %,%/Module.linux.mk,$(MODULES))
 
 # alternative to target as files
@@ -148,7 +148,7 @@ include $(patsubst %,%/Module.linux.mk,$(MODULES))
 # make all, generic way to use make produce executable JMMjouer
 all: $(EXE) unit_test
 
-# specific target for unit testing in tests/ , dependencies with CMocka
+# specific target for unit testing, dependencies with CMocka
 unit_test::
 
 # general rule for compiling c files when header file is available 
@@ -161,18 +161,6 @@ unit_test::
 	@echo "Build file generic rule without header in root:   $@"
 	$(CC) $(STD) $(CFLAGS) -c $< -o $@
 
-# include the description for each module
-#include $(patsubst %,%/Module.linux.mk,$(MODULES))
-
-# include core in jmmjouer
-#include jmmjouer/Module.linux.mk
-
-# only for plugins
-#include src_plugin/Module.linux.mk
-
-# main executable
-#include executables/Module.linux.mk
-
 $(info == ROOT after include modules ==)
 $(info $$OBJS_ALL_STATIC is $(OBJS_ALL_STATIC) )
 $(info $$OBJS_ALL_TESTS  is $(OBJS_ALL_TESTS) )
@@ -183,38 +171,9 @@ $(OBJS_ALL_TESTS): %.o: %.c
 	@echo "Build *.o overriden generic rules for tests:   $@"
 	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -c $< -o $@ -I . -I $(INCLUDE_CMOCKA)
 
-
-###### Main executables 
-# -Wl,-rpath,dir1  or -rpath=dir1 # -Wl to pass argument to linker, rpath runtime to search for lib
-#JMMjouer: $(OBJS_EXE) main.o libgame_pendu.so
-#JMMjouer: $(OBJS_EXE) main.o libclogger.so
-#JMMjouer: $(OBJS_EXE) main.o $(LIB_STATIC) $(LIB_DYNAMIC)
-#	@echo "Build $(EXE): all dependencies $^"
-#	$(CC) -o $@ $(OBJS_EXE) main.o -L .  -lgame_loader -lrecord -ljoueur -lccontainer -lclogger
-
-#JMMjouer_nolib : main.o $(OBJS_EXE) $(OBJS_ALL_STATIC)
-#	@echo "Build JMMjouer_nolib ^: all dependencies $^"
-#	@echo "Build JMMjouer_nolib <: all dependencies $<"
-#	$(CC) $(STD) $(CFLAGS) -o $@ $^
-
-
-##### compile shared library to include at compile-time
-# linux, ask only for shared or static
-#libgame_pendu.so : game_pendu.o game_pendu.h victory.o
-#	$(CC) -shared $(CFLAGS) $^ -o $@
-
-##### compile shared library to include at run-time (game_morpion)
-# version unix-like available more recently in mingw
-#libmorpion.dll : game_morpion.o game_morpion.h
-#	$(CC) -shared game_morpion.o -o libmorpion.dll
-
-# windows style, with importing lib, not used at run-time link anyway
-#libgame_morpion.so : game_morpion.o game_morpion.h victory.o
-#	$(CC) -shared $(CFLAGS) $^ -o $@
-
 # call clean here and in subdirectories
 clean::
 	@echo "Clean in root directory"
 	rm -f ./*.o
 	rm -f ./*.so ./*.a
-#	rm -f JMMjouer JMMjouer_nolib
+

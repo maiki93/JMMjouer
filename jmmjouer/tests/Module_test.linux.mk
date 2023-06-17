@@ -1,7 +1,6 @@
 
 
 ## tests core
-#
 
 SRCS_JMMJOUER_TESTS := $(wildcard $(MODDIR_JMMJOUER_TESTS)/*.c) # keep full path tests/test_mastermind.c
 OBJS_JMMJOUER_TESTS := $(patsubst %.c, %.o, $(SRCS_JMMJOUER_TESTS)) # keep full path tests/test_mastermind.o
@@ -19,9 +18,9 @@ unit_test:: $(EXE_JMMJOUER_TESTS)
 
 OBJS_NO_ARCADE := $(filter-out $(MODDIR_JMMJOUER)/arcade.o, $(OBJS_JMMJOUER))
 
-test_arcade: $(MODDIR_JMMJOUER_TESTS)/test_arcade.o $(OBJS_NO_ARCADE) librecord libgame_loader libjoueur libccontainer libclogger libgame_pendu
+test_arcade: $(MODDIR_JMMJOUER_TESTS)/test_arcade.o $(OBJS_NO_ARCADE) librecord libjoueur libccontainer libclogger libgame_pendu
 	@echo "Building test_arcade @ :    $@"  # target name
-	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $(MODDIR_JMMJOUER_TESTS)/test_arcade.o $(OBJS_NO_ARCADE) -L . -lrecord -lgame_loader -ljoueur -lccontainer -lclogger -lgame_pendu -L $(LIB_CMOCKA) -lcmocka
+	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $(MODDIR_JMMJOUER_TESTS)/test_arcade.o $(OBJS_NO_ARCADE) -L . -lrecord -ljoueur -lccontainer -lclogger -lgame_pendu -L $(LIB_CMOCKA) -lcmocka
 
 clean::
 	@echo "Clean unit tests in $(MODDIR_JMMJOUER_TESTS)"
