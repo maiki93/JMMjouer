@@ -30,7 +30,7 @@ endif
 JMMjouer: $(OBJS_EXEC) $(OBJS_JMMJOUER) $(LIB_STATIC) $(LIB_DYNAMIC) libgame_pendu.dll
 	@echo "Build $(EXE): all dependencies $^"
 #	$(CC) -o $@ $(OBJS_JMMJOUER) main.o -L .  -lgame_loader -lrecord -ljoueur -lccontainer -lclogger
-	$(CC) -o $@ $(OBJS_EXEC) $(OBJS_JMMJOUER) -L.  -l$(IMPORT_LIB_GAME_LOADER) -l$(IMPORT_LIB_RECORD) -l$(IMPORT_LIB_JOUEUR) -l$(IMPORT_LIB_CCONTAINER) -l$(IMPORT_LIB_CLOGGER) -lgame_pendu_dll
+	$(CC) -o $@ $(OBJS_EXEC) $(OBJS_JMMJOUER) -L. -l$(IMPORT_LIB_RECORD) -l$(IMPORT_LIB_JOUEUR) -l$(IMPORT_LIB_CCONTAINER) -l$(IMPORT_LIB_CLOGGER) -lgame_pendu_dll
 
 JMMjouer_nolib : $(OBJS_EXEC) $(OBJS_ALL_STATIC) libclogger libgame_pendu.dll
 	@echo "Build JMMjouer_nolib ^: all dependencies $^"

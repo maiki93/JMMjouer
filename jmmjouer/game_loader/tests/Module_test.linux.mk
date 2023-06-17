@@ -21,7 +21,7 @@ test_mastermind : $(MODDIR_GL_TESTS)/test_mastermind.o jmmjouer/utils.o joueur/s
 	@echo "Building test_game_loader @ :    $@"  # target name
 	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
-# same as cmap_game_victories, order important clogger last
+# same as map_game_score, order important clogger last
 test_map_game_ptrf: $(MODDIR_GL_TESTS)/test_map_game_ptrf.o libccontainer libclogger
 	@echo "Building test_map_game_ptrf @ :    $@"  # target name
 	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $< -L. -lccontainer -lclogger -L $(LIB_CMOCKA) -lcmocka

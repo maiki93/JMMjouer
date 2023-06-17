@@ -13,9 +13,9 @@ $(info == CCONTAINER : $(MODDIR_CCONTAINER) ==)
 $(info $$SRCS_CCONTAINER is [$(SRCS_CCONTAINER)] )
 $(info $$OBJS_CCONTAINER is [$(OBJS_CCONTAINER)] )
 
-libccontainer.so : $(OBJS_CCONTAINER) libclogger
+libccontainer.so : $(OBJS_CCONTAINER)
 	@echo "Create shared library -- ccontainer"
-	$(LINK) $(LFLAGS) -o $@ $(OBJS_CCONTAINER) -L . -lclogger
+	$(LINK) $(LFLAGS) -o $@ $(OBJS_CCONTAINER)
 #	$(CC) -shared -o $@ $(OBJS_CCONTAINER) -L . -lclogger
 
 libccontainer.a : $(OBJS_CCONTAINER)

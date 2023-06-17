@@ -127,7 +127,7 @@ void user_info(const user_t *user)
     printf("daltonien: %d\n", user->is_daltonien);
     printf("admin: %d\n", user->is_admin);
 #ifdef JMMJ_DEBUG
-    printf("id: %ld\n", user->user_id);
+    printf("id: %ld\n", (long)user->user_id);
 #endif
 }
 

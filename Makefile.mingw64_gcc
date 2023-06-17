@@ -17,9 +17,7 @@ LINK = ld
 LFLAGS = --warn-common -shared -z defs --no-allow-shlib-undefined -lc
 
 # List of subdirectories containing a Module.mk file
-#MODULES := tests tests/test_mock
-# clogger call by an explicit make, no use of module
-# game_loader moved into jmmjouer
+# clogger call by an explicit make, no use of module with mingw
 MODULES := ccontainer joueur record jmmjouer src_plugins executables #tests
 
 # see advices (and much more than compilation options) https://matt.sh/howto-c
@@ -41,20 +39,23 @@ CFLAGS = -Wall -Wextra -pedantic -Wno-variadic-macros -I .
 # gcc c89/90 : -ansi, -std=c90 or -std=iso9899:1990
 STD = -std=c90
 
+### FOR TU
+CFLAGS_TESTS = -g3 -W -Wall -fPIC -Wunused -Wextra -pedantic -Wstrict-overflow=5 -Wno-unused-local-typedefs -fno-inline
+# need c99 standard to use cmocka
+# gnu implements inline -std=gnu89 or -fgnu89-inline but does not seem to work. Other errors appears with c89
+STD_TESTS = -std=c99
+
+##### External libraries
+# use of Windows CMocka
+INCLUDE_CMOCKA = C:\dev\cmocka_local_mingw\include
+LIB_CMOCKA = C:\dev\cmocka_local_mingw\lib
+
 # search for all *.c files and make *.o files
-# keep for example
+# keep for example, to put in doc file
 #SRCS := $(wildcard *.c)
 #OBJS := $(patsubst %.c, %.o, $(SRCS))
 # take away main.o to avoid mutliple main() functions
 #OBJS := $(filter-out main.o, $(OBJS))
-
-# define main executable
-NO_LIB ?= 0
-ifeq ($(NO_LIB),0)
-	EXE:= JMMjouer
-else
-	EXE:= JMMjouer_nolib
-endif
 
 # standard gcc defines usually NDEBUG for release code (assert.h affected)
 # code uses internally a JMMJ_DEBUG, defined in preprocessor stage 
@@ -78,45 +79,30 @@ $(info $$LFLAGS is $(LFLAGS) )
 $(info $$MAKECMDGOALS is $(MAKECMDGOALS) )
 $(info $$EXE is $(EXE) )
 
+### Libraries compilation,
+#  suprees libgame_loader included in jmmjouer now.to see later.
+#  libgame_pendu always shared and linked at compilation
+
 # JMMjouer compile if all static
-# LIB_STATIC = libccontainer libclogger libgame_loader libjoueur librecord
-# try all dynamic, compile also !
-#LIB_DYNAMIC = libccontainer libclogger libjoueur librecord
-#LIB_STATIC = libgame_loader
+# LIB_STATIC = libccontainer libclogger libjoueur librecord
+# ok if all dynamic
+# LIB_DYNAMIC = libccontainer libclogger libjoueur librecord
 
-# else multiple definition... in many cases (librecord and libccontainer)
-# may work if linkage with -lrecord (link directly to library)
-# or use  -Wl,-allow-multiple-definition
-#LIB_STATIC = libccontainer libclogger libgame_loader libjoueur
-# libjouer : linked with -shared -Bstatic against libclogger and libccontainer
-# librecord need only libjoueur ! (good, bad ?) cannot really works ?
-#LIB_DYNAMIC = librecord
-
-# from previous multiple definition, both as shared : working !! ?? why ???
-LIB_STATIC = libclogger libgame_loader libjoueur
+# ok, from previous multiple definition, both as shared : working !! ?? why ???
+LIB_STATIC = libclogger libjoueur
 LIB_DYNAMIC = librecord libccontainer
 
+# ok TU, bad (multi definition of ccontainer)
+#LIB_DYNAMIC = libclogger libjoueur
+#LIB_STATIC = librecord libccontainer
+
+# include the description for each module
+include $(patsubst %,%/Module.mingw64_gcc.mk,$(MODULES))
+
 # alternative to target as files
-#.PHONY : all clean unit_test
-# commented, maybe not bad..
-#.PHONY : dep_lib
-#dep_lib : libclogger.a libccontainer.a libjoueur.dll librecord.dll libgame_pendu.dll
-#.PHONY : all clean unit_test
+.PHONY : all clean unit_test
 
-# make all, generic way to use make produce executable JMMjouer
-#all: $(EXE)
-# necessary for vscode-makefile.tool ?
-#all : JMMjouer
 all : $(EXE) unit_test
-# unit_test
-
-### FOR TU
-CFLAGS_TESTS = -g3 -W -Wall -fPIC -Wunused -Wextra -pedantic -Wstrict-overflow=5 -Wno-unused-local-typedefs -fno-inline
-# need c99 standard to use cmocka
-# gnu implements inline -std=gnu89 or -fgnu89-inline but does not seem to work. Other errors appears with c89
-STD_TESTS = -std=c99
-INCLUDE_CMOCKA = C:\dev\cmocka_local_mingw\include
-LIB_CMOCKA = C:\dev\cmocka_local_mingw\lib
 
 # specific target for unit testing in tests/ , dependencies with CMocka
 unit_test::
@@ -134,13 +120,7 @@ unit_test::
 	@echo "Build file generic rule without header in root:   $@"
 	$(CC) $(STD) $(CFLAGS) -c $< -o $@
 
-# include the description for each module
-include $(patsubst %,%/Module.mingw64_gcc.mk,$(MODULES))
 
-# include core in jmmjouer, could be in MODULES
-#include jmmjouer/Module.mingw64_gcc.mk
-# only for plugins, could in MODULES
-#include src_plugin/Module.mingw64_gcc.mk
 
 $(info == ROOT after include modules ==)
 $(info $$OBJS_ALL_STATIC is $(OBJS_ALL_STATIC) )

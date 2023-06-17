@@ -18,6 +18,9 @@ ifeq ($(RELEASE),1)
 	debug = no
 endif
 
+# List of subdirectories containing a Module.mk file
+MODULES := clogger ccontainer joueur record jmmjouer src_plugins executables
+
 # compilers, may give different errors/warning
 # “-save-temps" to see *.i file
 CC = gcc
@@ -52,12 +55,6 @@ LINK = ld
 # --no-allow-shlib-undefined : makes the linker treat any undefined symbols in shared libraries linked in as errors. 
 #      In other words, this option prevents linker from creating shared libraries that are missing indirect dependencies.
 LFLAGS = --warn-common -shared -z defs --no-allow-shlib-undefined -lc
-
-# List of subdirectories containing a Module.mk file
-#MODULES := tests tests/test_mock
-# game_loader moved into jmmjouer
-MODULES := clogger ccontainer joueur record jmmjouer src_plugins executables
-# game_loader # tests_integration
 
 # see advices (and much more than compilation options) https://matt.sh/howto-c
 # compiler option, activate many warning( here seeems common to gcc and clang)
@@ -100,18 +97,6 @@ else
 	CFLAGS += -DNDEBUG -O2
 endif
 
-# to move into executables ?
-#NO_LIB ?= 0
-# equivalent is
-#ifeq ($(origin NO_LIB), undefined)
-# NO_LIB = 0
-#endif
-#ifeq ($(NO_LIB),0)
-#	EXE:= JMMjouer
-#else
-#	EXE:= JMMjouer_nolib
-#endif
-
 $(info == Makefile ROOT ==)
 $(info $$NO_LIB is $(NO_LIB) )
 $(info $$RELEASE is $(RELEASE) )
@@ -134,10 +119,9 @@ LIB_STATIC = libclogger libccontainer
 # librecord need only libjoueur ! (good, bad ?) cannot really works ?
 LIB_DYNAMIC = libjoueur librecord 
 
-# play with different setup, all compile
-#LIB_DYNAMIC = librecord libclogger libccontainer libgame_loader libjoueur 
-#LIB_STATIC = libjoueur libgame_loader librecord
-#LIB_DYNAMIC = libclogger libccontainer
+# on mingw => error JMMjouer
+#LIB_DYNAMIC = libclogger libjoueur
+#LIB_STATIC = librecord libccontainer
 
 # moved before for EXE
 # include the description for each module, will be recursive if submodules

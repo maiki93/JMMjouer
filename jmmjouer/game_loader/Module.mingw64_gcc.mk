@@ -1,15 +1,11 @@
 
 MODDIR_GAME_LOADER := jmmjouer/game_loader
-#MODULES_TESTS = $(MODDIR_GAME_LOADER)/tests
 
 SRCS_GAME_LOADER := $(wildcard $(MODDIR_GAME_LOADER)/*.c)
 OBJS_GAME_LOADER = $(patsubst %.c, %.o, $(SRCS_GAME_LOADER))
 
 # update global variable
-OBJS_ALL_STATIC += $(OBJS_GAME_LOADER)
-
-# define tests file
-#MODDIR_GAME_LOADER_TESTS = $(MODDIR_GAME_LOADER)/tests
+# OBJS_ALL_STATIC += $(OBJS_GAME_LOADER)
 
 $(info == GAME_LOADER : $(MODDIR_GAME_LOADER) ==)
 $(info $$SRCS_GAME_LOADER is [$(SRCS_GAME_LOADER)] )
@@ -39,27 +35,32 @@ $(info $$OBJS_GAME_LOADER is [$(OBJS_GAME_LOADER)] )
 
 # fine with dll, but include lots of dependencies (and repeat in others)
 # still better with games included here
+
+##### LAST
 # last : do not compile because undefined ref to start_game_pendu in default_games
-libgame_loader.dll : $(OBJS_GAME_LOADER) $(OBJS_GAMES) jmmjouer/utils_file.o jmmjouer/utils.o joueur/victory.o libjoueur libccontainer libclogger
-	@echo "Create shared library -- game_loader"
+#libgame_loader.dll : $(OBJS_GAME_LOADER) $(OBJS_GAMES) jmmjouer/utils_file.o jmmjouer/utils.o joueur/victory.o libjoueur libccontainer libclogger
+#	@echo "Create shared library -- game_loader"
+
 # like in liunx, libjoueur is not enought, missing clist_cstring modules
 # include libccontainer.lib => multiple definition clist_gen_X free_value...
 #	$(CC) -shared $(CFLAGS) -Wl,--export-all-symbols -o $@ $^ -Wl,--out-implib,libgame_loader_dll.a -L. -ljoueur_dll libccontainer.lib
 # fine with shared lib. to compare linux. same with libccontainer.dll. -ljoueur_dll, victory enough
+
+###### LAST
 # last, need clogger. because --export-all-symbols ?
-	$(CC) -shared $(CFLAGS) -Wl,--export-all-symbols -o $@ $(OBJS_GAME_LOADER) $(OBJS_GAMES) jmmjouer/utils_file.o jmmjouer/utils.o joueur/victory.o -Wl,--out-implib,libgame_loader_dll.a -L. -l$(IMPORT_LIB_CCONTAINER) -l$(IMPORT_LIB_CLOGGER)
+#	$(CC) -shared $(CFLAGS) -Wl,--export-all-symbols -o $@ $(OBJS_GAME_LOADER) $(OBJS_GAMES) jmmjouer/utils_file.o jmmjouer/utils.o joueur/victory.o -Wl,--out-implib,libgame_loader_dll.a -L. -l$(IMPORT_LIB_CCONTAINER) -l$(IMPORT_LIB_CLOGGER)
 
-libgame_loader.a : $(OBJS_GAME_LOADER) $(OBJS_GAMES)
-	@echo "Create static library -- game_loader"
-	ar rcs $@ $^
-
-ifneq ($(findstring libgame_loader,$(LIB_STATIC)),)
-IMPORT_LIB_GAME_LOADER = game_loader
-libgame_loader : libgame_loader.a
-else
-IMPORT_LIB_GAME_LOADER = game_loader_dll
-libgame_loader : libgame_loader.dll
-endif
+#libgame_loader.a : $(OBJS_GAME_LOADER) $(OBJS_GAMES)
+#	@echo "Create static library -- game_loader"
+#	ar rcs $@ $^
+#
+#ifneq ($(findstring libgame_loader,$(LIB_STATIC)),)
+#IMPORT_LIB_GAME_LOADER = game_loader
+#libgame_loader : libgame_loader.a
+#else
+#IMPORT_LIB_GAME_LOADER = game_loader_dll
+#libgame_loader : libgame_loader.dll
+#endif
 
 ##### compile shared library to include at compile-time
 #libgame_pendu.dll : $(MODDIR_GAME_LOADER)/game_pendu.o $(MODDIR_GAME_LOADER)/game_pendu.h joueur/victory.o
@@ -70,5 +71,5 @@ include $(MODDIR_GAME_LOADER)/tests/Module_test.mingw64_gcc.mk
 
 clean ::
 	@echo "Clean module game_loader"
-	rm -f $(MODDIR_GAME_LOADER)/*.o
-	rm -f libgame_loader.dll libgame_loader_dll.a libgame_loader.a
+#	rm -f $(MODDIR_GAME_LOADER)/*.o
+#	rm -f libgame_loader.dll libgame_loader_dll.a libgame_loader.a

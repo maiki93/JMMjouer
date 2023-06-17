@@ -16,24 +16,20 @@ test_clist_generic: $(MODDIR_CCONTAINER_TESTS)/test_clist_generic.o $(MODDIR_CCO
 	@echo "Building test_clist_generic @ :    $@"  # target name
 	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
-# here test with public API only(don't include impl *c), must provide *.o dependencies
-#test_clist_cstring: $(MODDIR_CCONTAINER_TESTS)/test_clist_cstring.o libccontainer 
-#	@echo "Building test_clist_cstring @ :    $@"  # target name
-#	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $(MODDIR_CCONTAINER_TESTS)/test_clist_cstring.o -L . -lccontainer -lclogger -L $(LIB_CMOCKA) -lcmocka
-
 test_clist_cstring: $(MODDIR_CCONTAINER_TESTS)/test_clist_cstring.o $(MODDIR_CCONTAINER)/clist_cstring.o $(MODDIR_CCONTAINER)/clist_generic.o $(MODDIR_CCONTAINER)/cvector_generic.o $(MODDIR_CCONTAINER)/ccontainer_utils.o \
 			$(MODDIR_CCONTAINER)/value_cstring.o $(MODDIR_CCONTAINER)/value.o
 	@echo "Building test_clist_cstring @ :    $@"  # target name
 	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
-test_cvector_cstring: $(MODDIR_CCONTAINER_TESTS)/test_cvector_cstring.o  $(MODDIR_CCONTAINER)/cvector_cstring.o $(MODDIR_CCONTAINER)/cvector_generic.o \
+test_cvector_generic : $(MODDIR_CCONTAINER_TESTS)/test_cvector_generic.o $(MODDIR_CCONTAINER)/cvector_generic.o $(MODDIR_CCONTAINER)/value.o
+	@echo "Building test_cvector_generic @ :    $@"  # target name
+	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
+
+test_cvector_cstring: $(MODDIR_CCONTAINER_TESTS)/test_cvector_cstring.o $(MODDIR_CCONTAINER)/cvector_cstring.o $(MODDIR_CCONTAINER)/cvector_generic.o \
 			$(MODDIR_CCONTAINER)/value_cstring.o $(MODDIR_CCONTAINER)/ccontainer_utils.o $(MODDIR_CCONTAINER)/clist_generic.o $(MODDIR_CCONTAINER)/value.o
 	@echo "Building test_cvector_cstring @ :    $@"  # target name
 	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
-test_cvector_generic : $(MODDIR_CCONTAINER_TESTS)/test_cvector_generic.o $(MODDIR_CCONTAINER)/cvector_generic.o $(MODDIR_CCONTAINER)/value.o
-	@echo "Building test_cvector_generic @ :    $@"  # target name
-	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
 test_cvector_struct_complex : $(MODDIR_CCONTAINER_TESTS)/test_cvector_struct_complex.o $(MODDIR_CCONTAINER)/cvector_generic.o $(MODDIR_CCONTAINER)/value.o
 	@echo "Building test_cvector_struct_complex @ :    $@"

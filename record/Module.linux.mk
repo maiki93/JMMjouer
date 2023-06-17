@@ -7,14 +7,11 @@ OBJS_RECORD := $(patsubst %.c, %.o, $(SRCS_RECORD))
 # update global variable
 OBJS_ALL_STATIC += $(OBJS_RECORD)
 
-# define tests file
-#MODDIR_RECORD_TESTS = $(MODDIR_RECORD)/tests
-
 $(info == RECORD : $(MODDIR_RECORD) ==)
 $(info $$SRCS_RECORD is [$(SRCS_RECORD)] )
 $(info $$OBJS_RECORD is [$(OBJS_RECORD)] )
 
-
+# use libjoueur -shared -Bstatic (become fully independent, and very small !?)
 librecord.so : $(OBJS_RECORD) libclogger libccontainer libjoueur
 	@echo "Create shared library -- record"
 #	$(CC) -shared -o $@ $(OBJS_RECORD) -L . -ljoueur -lclogger -lccontainer

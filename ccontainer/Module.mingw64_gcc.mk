@@ -19,11 +19,11 @@ $(info $$OBJS_CCONTAINER is [$(OBJS_CCONTAINER)] )
 # --export-all-symbols : done or not ?
 # compile with : must include evrything -lccontainer and -lmsvcrt (whatever defined option)
 # ld -shared --no-undefined --no-allow-shlib-undefined ccontainer/clist_generic.o ccontainer/clist_cstring.o -o libccontainer.dll --out-implib libccontainer_dll.a -L. -lclogger -lmsvcrt
-libccontainer.dll : $(OBJS_CCONTAINER) #libclogger
+libccontainer.dll : $(OBJS_CCONTAINER)
 	@echo "Create shared library -- ccontainer"
 #	$(LINK) $(LFLAGS) -o $@ $(OBJS_CCONTAINER) -L . -lclogger
 #	$(CC) -shared -o $@ $(OBJS_CCONTAINER) -L . -lclogger
-	$(CC) -shared $(CFLAGS) -o $@ $(OBJS_CCONTAINER) -Wl,--out-implib,libccontainer_dll.a -L. -lclogger
+	$(CC) -shared $(CFLAGS) -o $@ $(OBJS_CCONTAINER) -Wl,--out-implib,libccontainer_dll.a
 
 # not so clear, use *lib or *a for windows ?
 # try keeping lib (and see if -lccontainer is working), seems working
