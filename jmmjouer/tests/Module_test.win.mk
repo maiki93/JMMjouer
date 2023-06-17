@@ -30,4 +30,4 @@ test_arcade: $(MODDIR_JMMJOUER_TESTS)/test_arcade.obj $(OBJS_NO_ARCADE) $(MODDIR
 clean::
 	@echo "Clean unit tests in $(MODDIR_JMMJOUER_TESTS) "
 	del $(MODDIR_JMMJOUER_TESTS)\*.obj
-	del test_*.exe
+	del test_mastermind.exe, test_mastermind.*

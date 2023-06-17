@@ -27,12 +27,12 @@ test_clist_cstring: $(OBJ_T_CLIST_CSTRING)
 	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $(OBJ_T_CLIST_CSTRING) -L $(LIB_CMOCKA) -lcmocka
 
 test_cvector_generic : $(MODDIR_CCONTAINER_TESTS)/test_cvector_generic.o $(MODDIR_CCONTAINER)/cvector_generic.o $(MODDIR_CCONTAINER)/value.o
-	@echo "Building test_clist_cstring @ :    $@"  #
+	@echo "Building test_cvector_generic @ :    $@"  #
 	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
 test_cvector_cstring : $(MODDIR_CCONTAINER_TESTS)/test_cvector_cstring.o $(MODDIR_CCONTAINER)/cvector_cstring.o $(MODDIR_CCONTAINER)/cvector_generic.o \
 		$(MODDIR_CCONTAINER)/value_cstring.o $(MODDIR_CCONTAINER)/ccontainer_utils.o $(MODDIR_CCONTAINER)/clist_generic.o $(MODDIR_CCONTAINER)/value.o
-	@echo "Building test_cvector_generic_with_string @ :    $@"  # target name
+	@echo "Building test_cvector_cstring @ :    $@"  # target name
 	$(CC) $(STD_TESTS) $(CFLAGS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
 
 test_cvector_struct_complex : $(MODDIR_CCONTAINER_TESTS)/test_cvector_struct_complex.o $(MODDIR_CCONTAINER)/cvector_generic.o $(MODDIR_CCONTAINER)/value.o

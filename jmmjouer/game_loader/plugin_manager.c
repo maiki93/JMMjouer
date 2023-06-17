@@ -238,13 +238,11 @@ ptr_plugin_funct plugin_manager_get_game_ptrf( const plugin_mgr_t* manager, cons
 
     /* only GCC : error: cast between incompatible function types from 'FARPROC' {aka 'long long int (*)()'} to */
     /* if add (void*) pedantic error throw */ /* and on linux ?? */
-#if defined(__GNUC__) || defined(__GNUG__)   
+#if defined(__GNUC__) || defined(__GNUG__)
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wcast-function-type" /* mingw64 (x86_64-mingw32 (not 64 bits!) ) warning -Wcast-function-type */
     #pragma GCC diagnostic ignored "-Wpedantic" /* on linux, previous one is not enought */
 #endif
-    /* mingw64 (x86_64-mingw32 (not 64 bits) ) warning -Wcast-function-type */
-
 
     funct_casted = (ptr_plugin_funct) fptr;
 

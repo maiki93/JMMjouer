@@ -11,10 +11,6 @@ $(info $$OBJS_SRC_PLUGINS is [$(OBJS_SRC_PLUGINS)] )
 libgame_morpion.dll : $(OBJS_SRC_PLUGINS) libjoueur libclogger
 	$(CC) -shared $(CFLAGS) -o $@ $(OBJS_SRC_PLUGINS) -L . -ljoueur -lclogger
 
-# utils clear stdin : not included, found in core jmmjouer...
-#libgame_morpion.so : $(OBJS_SRC_PLUGIN_MORP) joueur/victory.o
-#	$(CC) -shared $(CFLAGS) -o $@ $^
-
 # only shared library
 libgame_morpion : libgame_morpion.dll
 

@@ -49,7 +49,7 @@ SHARED_EXPORT void cvector_cstring_init_with_capacity(cvector_cstring_t* cvector
 /** Clear all contents of the vector.
  * Call deleter_value_t on all elements of the vector, but the capacity stays untouched.
  * \param[in] cvect pointer to a cvector_gen_t instance */
-void cvector_cstring_clear(cvector_cstring_t *cvector_str);
+SHARED_EXPORT void cvector_cstring_clear(cvector_cstring_t *cvector_str);
 
 /** Destructor, delete before all the content of the list.
  * To call to free memory when list cvector_cstring_t is allocated on stack
@@ -74,7 +74,14 @@ SHARED_EXPORT size_t cvector_cstring_size(const cvector_cstring_t *cvector_str);
  * \param[in] cvector_str pointer to an instance of cvector_cstring_t 
  * \return capacity of the vector */
 SHARED_EXPORT size_t cvector_cstring_capacity(const cvector_cstring_t *cvector_str);
+
+/** Set a new capacity for the vector.
+ * Works only for extended
+ * \pre new_capacity >= actual_capacity
+ * \param[in] cvector_str pointer to an instance of cvector_cstring_t 
+ * \param[in] new capacity of the vector */
 SHARED_EXPORT ccontainer_err_t cvector_cstring_set_capacity(cvector_cstring_t *cvector_str, size_t new_size);
+
 /** Insert a value_cstring_t at the end of the list.
    The null terminaison caracter is present in value_t::data  to allow the retrieval by reference 
    \param[inout] cvector_str pointer to an instance of cvector_cstring_t 

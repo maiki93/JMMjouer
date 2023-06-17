@@ -28,23 +28,27 @@ extern "C" {
  * The returned structure can be inserted in any ccontainer of the library.
  * \param[in] text_to_insert well-formed string with a null terminal character
  * \return ccontainer_value_t containing a copy of the input */
-ccontainer_value_t make_value_cstring( const char* text_to_insert, ccontainer_err_t *err_code);
+SHARED_EXPORT ccontainer_value_t make_value_cstring( const char* text_to_insert, ccontainer_err_t *err_code);
 
 /** Return an heap allocated cstring from a ccontainer_value_t.
    It creates a copy which must be freed by the caller.
    \param[inout]  value_in 
    \return a well formed string with the terminason character. */
-char* extract_value_cstring( const ccontainer_value_t *value_in, ccontainer_err_t *err_code);
+SHARED_EXPORT char* extract_value_cstring( const ccontainer_value_t *value_in, ccontainer_err_t *err_code);
 
 /** Specific destructor for ccontainer_value_t representation value_cstring data.
    Method to provide to ccontainer for safe deallocation of memory : delete/free/remove...
    \param[inout] pointer to ccontainer_value_t to deallocate */
-void deleter_value_cstring( ccontainer_value_t *value );
+SHARED_EXPORT void deleter_value_cstring( ccontainer_value_t *value );
 
-ccontainer_value_t duplicater_value_cstring( const ccontainer_value_t *value_src, ccontainer_err_t *err_code);
+SHARED_EXPORT ccontainer_value_t duplicater_value_cstring( const ccontainer_value_t *value_src, ccontainer_err_t *err_code);
 
-/**/
-bool equalizer_value_cstring(const ccontainer_value_t *value1, const ccontainer_value_t *value2);
+/** Default function to check equality of 2 C-string in value_t.
+ *  Its follow the sigmature of equalizer to ccontainer_value_t
+ *  Use strcmp internally.
+ *  \param[in] value1, value2 C-string(value_t format) to compare
+ *  \param[out] true if equal */
+SHARED_EXPORT bool equalizer_value_cstring(const ccontainer_value_t *value1, const ccontainer_value_t *value2);
 
 /* miss comparater, maybe return -1,0,1 not bad, more general than bool */
 /** @} */ /** public API */

@@ -105,26 +105,26 @@ SHARED_EXPORT ccontainer_value_t clist_gen_pop_front(clist_gen_t* clist, ccontai
 /** Return the first node.
  * \param[in] clist pointer to a clist_gen_t instance
  * \return last node of the clist, NULL if empty */
-clist_node_t* clist_gen_get_first_node( const clist_gen_t* clist);
+SHARED_EXPORT clist_node_t* clist_gen_get_first_node( const clist_gen_t* clist);
 
 /** Return the last node.
  * Complexity O(n)
  * \pre clist input must be correctly initilaized
  * \param[in] clist pointer to a clist_gen_t instance
  * \return first node of the clist, NULL if empty */
-clist_node_t* clist_gen_get_last_node( const clist_gen_t *clist);
+SHARED_EXPORT clist_node_t* clist_gen_get_last_node( const clist_gen_t *clist);
 
 /** Return the next node of the provided node.
  * \param[in] current_node pointer to the current node
  * \return pointer to a node, return NULL if end of list is reached */
-clist_node_t* clist_gen_get_next_node( const clist_node_t* current_node);
+SHARED_EXPORT clist_node_t* clist_gen_get_next_node( const clist_node_t* current_node);
 
-ccontainer_value_t* clist_gen_get_node_value(const clist_node_t* current_node);
+SHARED_EXPORT ccontainer_value_t* clist_gen_get_node_value(const clist_node_t* current_node);
 
 /** Return the previous node relative to the current one provided.
  * \param[in] current_node pointer to the current node
  * \return pointer to a node, return NULL if the start of list is reached */
-clist_node_t* clist_gen_get_previous_node(const clist_node_t* current_node);
+SHARED_EXPORT clist_node_t* clist_gen_get_previous_node(const clist_node_t* current_node);
 
 SHARED_EXPORT clist_node_t* clist_gen_find_node( const clist_gen_t *clist, const clist_node_t *first_node,
                         equalizer_value_t fct_equalizer, const ccontainer_value_t* value_to_match,

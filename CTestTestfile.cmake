@@ -2,7 +2,6 @@
 # File created manually, 
 # Allow to use the CTest tool to combine multiple executable
 # Create output in default Testing\Temporary\LastTest.log
-#
 
 # specific makefile, where best to make test ? in jmmjouer/tests ?
 # add_test (test_clogger "test_clogger")

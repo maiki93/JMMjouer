@@ -3,15 +3,11 @@
 #include <assert.h>
 
 #include "jmmjouer/game_loader/map_game_ptrf.h"
-/*#include "ccontainer/clist_cstring.h"*/
-/*#include "ccontainer/cvector_cstring.h"*/
 #include "ccontainer/value_cstring.h"
 
 struct map_game_ptrf_type {
     /** first data member, cast to (clist_gen_t*) valid */
     clist_gen_t *clist;
-    /** size */
-    /*size_t len;*/
 };
 
 /** intermediate for storage / ccontainer_value_t specialization 

@@ -4,9 +4,7 @@ MODDIR_JMMJOUER := jmmjouer
 OBJS_JMMJOUER = $(MODDIR_JMMJOUER)/utils.obj $(MODDIR_JMMJOUER)/utils_file.obj \
 				$(MODDIR_JMMJOUER)/arcade.obj
 
-OBJS_ALL_STATIC += $(OBJS_JMMJOUER)
-
-MODDIR_JMMJOUER_TESTS = $(MODDIR_JMMJOUER)\tests
+#MODDIR_JMMJOUER_TESTS = $(MODDIR_JMMJOUER)\tests
 
 $(info == CORE JMMJOUER ==)
 #$(info $$SRCS_JMMJOUER is [$(SRCS_JMMJOUER)] )
@@ -17,6 +15,11 @@ $(info $$OBJS_JMMJOUER is [$(OBJS_JMMJOUER)] )
 # include the games BEFORE : game_pendu compiled as shared library and linked at compilation
 include jmmjouer\games\Module.win.mk
 include jmmjouer/game_loader/Module.win.mk
+
+# regroup all, included at the same time for the executable
+OBJS_JMMJOUER += $(OBJS_GAMES) $(OBJS_GAME_LOADER)
+$(info $$OBJS_JMMJOUER is [$(OBJS_JMMJOUER)] )
+OBJS_ALL_STATIC += $(OBJS_JMMJOUER)
 
 # In this module, we consume all the libraries, overidde SHARED_EXPORTS with import
 $(OBJS_JMMJOUER): %.obj: %.c
@@ -38,7 +41,8 @@ $(OBJS_JMMJOUER): %.obj: %.c
 
 
 # test core, integration tests
-include $(MODDIR_JMMJOUER_TESTS)\Module_test.win.mk
+#include $(MODDIR_JMMJOUER_TESTS)\Module_test.win.mk
+include $(MODDIR_JMMJOUER)\tests\Module_test.win.mk
 
 clean::
 	@echo "Clean in jmmjouer core directory"

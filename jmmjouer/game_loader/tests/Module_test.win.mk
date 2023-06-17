@@ -32,7 +32,7 @@ $(OBJS_GL_TESTS): %.obj: %.c
 #	$(CC) /Zi $(CFLAGS_TESTS) /DwithLIB /c $< /I. /I"$(INCLUDE_CMOCKA)" /Fo"$(dir $@)"
 	$(CC) /Zi $(CFLAGS_TESTS) /c $< /I. /I"$(INCLUDE_CMOCKA)" /Fo"$(dir $@)"
 
-unit_test :: test_mastermind test_cmap_game_ptrf test_plugin_manager test_game_loader
+unit_test :: test_mastermind test_map_game_ptrf test_plugin_manager test_game_loader
 
 # include implementation game_mastermind
 # if use joueur/victory.obj => always exported function (dllexport) in compilation
@@ -40,10 +40,15 @@ unit_test :: test_mastermind test_cmap_game_ptrf test_plugin_manager test_game_l
 # all dependent libraries to build
 #test_mastermind : $(MODDIR_GL_TESTS)/test_mastermind.obj jmmjouer/utils.obj $(IMPORT_LIB_JOUEUR)
 # compile even with WITH_LIB=0
-test_mastermind : $(MODDIR_GL_TESTS)/test_mastermind.obj jmmjouer/utils.obj joueur/victory.obj
+test_mastermind : $(MODDIR_GL_TESTS)/test_mastermind.obj jmmjouer/utils.obj joueur/score_game.obj
 	@echo "Building test_mastermind @ :    $@"  # target name
 	@echo "arg ? :    $?"
 #	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $^ -L $(LIB_CMOCKA) -lcmocka
+	$(LINK) $(LFLAGS) $? /LIBPATH:$(LIB_CMOCKA) cmocka.lib
+
+# $(IMPORT_LIB_CLOGGER) not needed , not used or because already in CCONTAINER (compiled clogger static seems the case)?
+test_map_game_ptrf: $(MODDIR_GL_TESTS)/test_map_game_ptrf.obj $(IMPORT_LIB_CCONTAINER) $(IMPORT_LIB_CLOGGER)
+	@echo "Building test_cmap_game_ptrf @ :    $@"  # target name
 	$(LINK) $(LFLAGS) $? /LIBPATH:$(LIB_CMOCKA) cmocka.lib
 
 # same with clogger, need library 
@@ -55,13 +60,9 @@ test_plugin_manager: $(MODDIR_GL_TESTS)/test_plugin_manager.obj $(IMPORT_LIB_CLO
 	@echo "Building test_plugin_manager ^ :    $?"  # 
 	$(LINK) $(LFLAGS) $? /LIBPATH:$(LIB_CMOCKA) cmocka.lib
 
-# $(IMPORT_LIB_CLOGGER) not needed , not used or because already in CCONTAINER (compiled clogger static seems the case)?
-test_cmap_game_ptrf: $(MODDIR_GL_TESTS)/test_cmap_game_ptrf.obj $(IMPORT_LIB_CCONTAINER) $(IMPORT_LIB_CLOGGER)
-	@echo "Building test_cmap_game_ptrf @ :    $@"  # target name
-	$(LINK) $(LFLAGS) $? /LIBPATH:$(LIB_CMOCKA) cmocka.lib
 
 # libjoueur does not allow to get libcontainer function ? but ok for clogger ?
-test_game_loader: $(MODDIR_GL_TESTS)/test_game_loader.obj $(MODDIR_GAME_LOADER)/cmap_ptrf_game.obj \
+test_game_loader: $(MODDIR_GL_TESTS)/test_game_loader.obj $(MODDIR_GAME_LOADER)/map_game_ptrf.obj \
 				$(MODDIR_GAME_LOADER)/plugin_manager.obj $(MODDIR_JMMJOUER)/utils_file.obj  $(MODDIR_JMMJOUER)/utils.obj \
 				$(MODDIR_GAMES)/default_games.obj $(MODDIR_GAMES)/game_mastermind.obj \
 				$(IMPORT_LIB_CCONTAINER) $(IMPORT_LIB_JOUEUR) $(IMPORT_LIB_CLOGGER) game_pendu_dll.lib

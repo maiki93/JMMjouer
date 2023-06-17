@@ -51,10 +51,11 @@ LIB_CMOCKA = C:\dev\cmocka_local_msvc\lib
 #STD = /Za # winnt error !
 
 # can choose which modules are build as static or shared libraries
-LIB_DYNAMIC =  libccontainer libclogger librecord
+LIB_DYNAMIC =  libccontainer libclogger libjoueur librecord
 # problem of (not) export in game_loader, need static only for this module
+# => suppress game_loader library
 # to try equivalent --export-all like with mingw64_gcc
-LIB_STATIC = libgame_loader libjoueur
+#LIB_STATIC =  libjoueur librecord
 
 # define main executable and with NO_LIB=1 no libraries created
 NO_LIB ?= 0

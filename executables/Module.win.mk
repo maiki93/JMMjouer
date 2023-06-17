@@ -38,8 +38,8 @@ executable/main.obj : executables/main.c
 
 # now compile (still JMMjouer.lib produced), but with static record library
 # dumpbin.exe /EXPORTS .\JMMjouer.lib => game_pendu.lib / nm -gC also
-JMMjouer : $(OBJS_EXEC) $(OBJS_JMMJOUER) game_pendu_dll.lib $(IMPORT_LIB_GAME_LOADER) $(IMPORT_LIB_JOUEUR) $(IMPORT_LIB_RECORD) \
-			$(IMPORT_LIB_GAME_LOADER) $(IMPORT_LIB_CCONTAINER) $(IMPORT_LIB_CLOGGER)
+JMMjouer : $(OBJS_EXEC) $(OBJS_JMMJOUER) game_pendu_dll.lib $(IMPORT_LIB_JOUEUR) $(IMPORT_LIB_RECORD) \
+			$(IMPORT_LIB_CCONTAINER) $(IMPORT_LIB_CLOGGER)
 	@echo "Build $(EXE): all dependencies $^"
 	$(LINK) $(LFLAGS) $^ /OUT:JMMjouer.exe
 #	$(LINK) $(LFLAGS) /OUT:JMMjouer.exe $^ /LIBPATH:. librecord.dll

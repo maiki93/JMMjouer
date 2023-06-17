@@ -87,6 +87,11 @@
             "binaryPath": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer\\test_cmap_game_ptrf.exe",
             "binaryArgs": []
         },
+        {
+            "cwd": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer",
+            "binaryPath": "c:\\Users\\mic_w\\source\\gitHub\\JMMjouer\\test_cvector_struct_complex.exe",
+            "binaryArgs": []
+        }
     ],
     "C_Cpp.default.includePath": [
         "C:\\dev\\cmocka_local_msvc\\include",

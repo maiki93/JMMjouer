@@ -24,7 +24,8 @@
  * \ingroup entities_grp */
 #define MAX_SIZE_NAME_USER 50
 
-/** Anonymous users, "anonymous" name, are valid , same name but unqiue id identifer */
+/** Anonymous users, "anonymous" name, are valid , same name but unqiue id identifer
+ * really need to be in API ? */
 extern const char* ANONYMOUS_NAME; /* extern avoid multiple definition at link stage */
 
 /** \name Enum used for return values code error.
@@ -84,22 +85,22 @@ typedef struct {
     is_daltonien:false is_admin:false
     \param[in] pointer to an instance of user_t
     \return USER_INVALID */
-user_status_t user_default_init(user_t *user);
+SHARED_EXPORT user_status_t user_default_init(user_t *user);
 /** Constructor with parameters.
  *  \param[in] pointer to an instance of user_t
  *  \param name of the user
  *  \param is_daltonien : there is worse disease
     \return USER_OK on success, USER_INVALID if name too long > MAX_SIZE_NAME_USER */
-user_status_t user_init(user_t *user, size_t id, const char * name,
+SHARED_EXPORT user_status_t user_init(user_t *user, size_t id, const char * name,
                         bool is_daltonien, bool is_admin );
 
 /** Test */
-user_t make_user(size_t id, const char *name, 
-        bool is_daltonien, bool is_admin, user_status_t *status);
+SHARED_EXPORT user_t make_user(size_t id, const char *name, 
+                        bool is_daltonien, bool is_admin, user_status_t *status);
 
 /** Destructor. 
  *  param[in] pointer to an instance of user_t */
-void user_delete(user_t *user);
+SHARED_EXPORT void user_delete(user_t *user);
 /** @} */
 
 /** @name Public API usable with user_t or joueur_t */
@@ -110,23 +111,23 @@ void user_delete(user_t *user);
 SHARED_EXPORT user_status_t user_status(const user_t *user);
 
 /** Alternative */
-bool user_valid(const user_t *user);
+SHARED_EXPORT bool user_valid(const user_t *user);
 
 /** Return uuid of the joueur
  * \param[in]
  * \param[out] valid users > 0, invalid == 0 */
-size_t user_id(const user_t *user);
+SHARED_EXPORT size_t user_id(const user_t *user);
 
 
 /** Return the name of a user or a joueur.
     Explicit cast to user_t needed if use with joueur_t */
-const char* user_name(const user_t *user);
+SHARED_EXPORT const char* user_name(const user_t *user);
 
-bool user_daltonien(const user_t *user);
-bool user_admin(const user_t *user);
+SHARED_EXPORT bool user_daltonien(const user_t *user);
+SHARED_EXPORT bool user_admin(const user_t *user);
 
 /** Print info to console.
  *  much better to do later for generalization */
-void user_info(const user_t *user);
+SHARED_EXPORT void user_info(const user_t *user);
 
 /** @} */

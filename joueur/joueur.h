@@ -38,21 +38,21 @@ SHARED_EXPORT void joueur_delete(joueur_t *joueur);
 
 /** Print info to console.
  *  much better to do later for generalization */
-void joueur_print_info(const joueur_t *joueur);
+SHARED_EXPORT void joueur_print_info(const joueur_t *joueur);
 
-user_status_t joueur_status(const joueur_t *joueur);
-bool joueur_valid(const joueur_t *joueur);
+SHARED_EXPORT user_status_t joueur_status(const joueur_t *joueur);
+SHARED_EXPORT bool joueur_valid(const joueur_t *joueur);
 
-size_t joueur_id(const joueur_t *joueur);
+SHARED_EXPORT size_t joueur_id(const joueur_t *joueur);
 
 /** \name methods "inherited" from user_t */
 /** \{ */
 /** Return the name of a user or a joueur.
     Explicit cast to user_t needed if use with joueur_t */
-const char* joueur_name(const joueur_t *joueur);
+SHARED_EXPORT const char* joueur_name(const joueur_t *joueur);
 
-bool joueur_daltonien(const joueur_t *joueur);
-bool joueur_admin(const joueur_t *joueur);
+SHARED_EXPORT bool joueur_daltonien(const joueur_t *joueur);
+SHARED_EXPORT bool joueur_admin(const joueur_t *joueur);
 /* validity / right also */
 /** \} */
 
