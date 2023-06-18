@@ -8,15 +8,14 @@ extern "C" {
 
 /** @file
  *
- * @defgroup ccontainer_cvector_cstring_grp cvector specialization for C-strings
- * @ingroup ccontainer_grp
+ * @ingroup ccontainer_spec_cstring_grp
  * 
  * Specialization of  a cvector for C-string values.
 *
 *  Implemented with an internal generic cvector_gen_t.
 *  Make interface convenient for C-strings */
 
-/** @{ \ingroup ccontainer_cvector_cstring_grp */
+/** @{ \ingroup ccontainer_spec_cstring_grp */
 
 /** Typedef of the type. */
 typedef struct {
@@ -27,9 +26,8 @@ typedef struct {
 /** @name Constructor/ Destructor */
 /** @{ */
 /** Allocation memory for a cvector cstring allocated on heap.
- * A constructor (\ref cvector_cstring_init) must be called to have a functional container
- * \return a pointer to an instance of cvector_cstring_t
- */
+ * A constructor (cvector_cstring_init()) must be called to have a functional container
+ * \return a pointer to an instance of cvector_cstring_t */
 SHARED_EXPORT cvector_cstring_t* cvector_cstring_new();
 
 /** Constructor.

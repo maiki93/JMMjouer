@@ -5,11 +5,20 @@
 
 #include "game_morpion.h"
 
+/* only implementation */
+static void afficher_plateau(char *, int *);
+static int test_plateau_rempli(char *);
+static int test_victoire(char *, char );
+static int test_case_libre(char *, int *);
+static void tour_joueur(int *, char *);
+static void tour_ia(char *);
+static int saisie_est_correct(char *, char );
+static void maj_plateau(char *, char, char );
+
 /* Pour voir si le header fonctionne */
 void test(){
     printf("Tout marche !");
 }
-
 
 /* Lance le jeu morpion et renvoie le score du joueur en cas de victoire
    int lancer_morpion(char * pseudo){ */

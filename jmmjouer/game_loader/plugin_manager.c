@@ -204,7 +204,7 @@ int plugin_manager_load_shared_library(plugin_mgr_t *plg_manager, const char *fi
 
 /*void (*)(void *) get_funct_from_last_inserted(const char *name)*/
 /*void  (*get_funct_from_last_inserted(const char *name)(void*)*/
-ptr_plugin_funct plugin_manager_get_game_ptrf( const plugin_mgr_t* manager, const char *name)
+ptr_plugin_funct plugin_manager_get_game_ptrf( const plugin_mgr_t* manager, const char *name, char** name_game_out)
 {
 #if defined(_WIN32)
     HINSTANCE current_handle;
@@ -253,5 +253,30 @@ ptr_plugin_funct plugin_manager_get_game_ptrf( const plugin_mgr_t* manager, cons
     /*CLOG_DEBUG("handle: %p\n", (long *)funct_casted);*/
     CLOG_DEBUG("record in handle nb_element=%d",manager->nb_handle);
 
+    /* read global variable "name_game_plugin" */
+    /* void * f = dlopen ("lib.dylib", RTLD_NOW);
+        void * obj = dlsym (f, "barleyCorn");
+        int * ptr = (int *) obj; */
+    //void *obj 
+
+#if defined(_WIN32)
+    fptr = GetProcAddress(current_handle, "name_game_plugin");
+    if( fptr == (FARPROC)NULL ) 
+    {
+        CLOG_ERR("Error cannot find function %s in library", name);
+        printf("Error cannot find function %s in library", name);
+        return NULL;
+    }
+#else
+    fptr = dlsym( current_handle, name);
+    if( fptr == NULL) {
+        CLOG_ERR("Error cannot find function %s in linux library", name);
+        printf("Error cannot find function %s in linux library", name);
+        return NULL;
+    }
+#endif
+    CLOG_DEBUG("Found name of the plugin %s", (char*)fptr);
+
     return funct_casted;
 }
+

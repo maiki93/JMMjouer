@@ -8,7 +8,7 @@ extern "C" {
 
 /** @file
  * 
- * @defgroup ccontainer_value_cstring_grp adapter example for C-strings
+ * @defgroup ccontainer_spec_cstring_grp specialization for C-strings
  * @ingroup ccontainer_grp
  * 
  * Adapter function for storing a string into any ccontainer.
@@ -17,7 +17,7 @@ extern "C" {
  * to provide an access by reference (see clist_cstring::clist_gen_get_ref_at)
  * which is directly usable as a valid string by standard C methods (strlen,strcmp..) */
 
-/** @{ \ingroup ccontainer_value_cstring_grp */
+/** @{ \ingroup ccontainer_spec_cstring_grp */
 
 /** @name Constructor/ Destructor / Copy */
 /** @{ */

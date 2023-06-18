@@ -1,13 +1,19 @@
 #ifndef MORPION_H_INCLUDED
 #define MORPION_H_INCLUDED
 
-/*
-#include "joueur/person.h"
-#include "joueur/victory.h"
-*/
 #include "jmmjouer/ptrf_game_typedef.h"
 
 #include "shared_EXPORTS.h"
+
+/** @defgroup plugins_src_grp plugins source code */
+
+/** @file
+ * 
+ * Game implementation of the Morpion as a plugin, dynamiccaly load during the game.
+ * 
+ * @ingroup plugins_src_grp 
+*/
+
 /*
 #if defined(_WIN32)
     #define SHARED_LIB __declspec(dllexport)
@@ -18,30 +24,15 @@
 */
 /* to check also exported __stdcall (more windows eg. win32) or __cdecl(more standard) */
 /*#define SHARED_LIB __declspec(dllexport)*/
+/* void test(); */
 
-void test();
+/** Plugins must indicate a unique name (check performed during loading) */
+SHARED_EXPORT const char name_game_plugin[] = "morpion";
 
-/*  objdump.exe -tT game_morpion.dll | grep 'start' do not see difference start_game_morpion appears in both */
-/* gcc default is visibilty on ? */
+/* objdump.exe -tT game_morpion.dll | grep 'start' do not see difference start_game_morpion appears in both */
+/** Run a game 
+ * \param[in] user
+ * \return the result of the game */
 SHARED_EXPORT score_game_t start_game_morpion(user_t user);
-/*victory_t start_game_morpion(person_t joueur);*/
-
-/* only implementation */
-void afficher_plateau(char *, int *);
-
-int test_plateau_rempli(char *);
-
-int test_victoire(char *, char );
-
-int test_case_libre(char *, int *);
-
-void tour_joueur(int *, char *);
-
-/* void tour_ia(int *, char *); */
-void tour_ia(char *);
-
-int saisie_est_correct(char *, char );
-
-void maj_plateau(char *, char, char );
 
 #endif

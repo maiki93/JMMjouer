@@ -51,8 +51,6 @@ void vector_joueur_free( vector_joueur_t *this )
     free(this);
 }
 
-/** \} */
-
 size_t vector_joueur_size( const vector_joueur_t *this )
 {
     return cvector_gen_size( this->cvect );
@@ -67,15 +65,12 @@ joueur_t vector_joueur_get_at( const vector_joueur_t *this, size_t index)
     /* get a reference */
     pvalue_joueur = cvector_gen_get_at(this->cvect, index, &err_code);
     if( err_code == CCONTAINER_OK) {
-        /* make a copy into joueur, err_code not used here... 
-        // copy of cmap may cause error , != of invalid... or to male in extract
-        //  (person_invalid very domain) */
+        /*  (person_invalid very domain) */
         err_code = extract_value_joueur( pvalue_joueur, &joueur_out );
     } else {
         /* status invalid by default */
         joueur_default_init( &joueur_out );
     }
-    /* valid or invalid */
     return joueur_out;
 }
 

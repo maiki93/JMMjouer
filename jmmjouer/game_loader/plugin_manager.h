@@ -68,9 +68,11 @@ void plugin_manager_set_directory( plugin_mgr_t *plg_manager, const char *direct
 /* @brief Load dll "filename"(.so or .dll) in currently set directory */
 int plugin_manager_load_shared_library( plugin_mgr_t *plg_manager, const char *filename);
 
-/* restrictive must be call on the last inserted, need better container
+/** Restrictive must be call on the last inserted, need better container
     if array, can call by indice */
-ptr_plugin_funct plugin_manager_get_game_ptrf( const plugin_mgr_t *plg_manager, const char *name);
-/*void  (*get_funct_from_last_inserted(void*))(const char *name);*/
+ptr_plugin_funct plugin_manager_get_game_ptrf(const plugin_mgr_t *plg_manager, const char *name, char** name_game_out);
+
+/** Read the name of the game indicated in the plugin */
+/*int plugin_manager_get_name_game(const plugin_mgr_t *plg_manager, const char **name, char** name_game_out);*/
 
 #endif

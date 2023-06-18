@@ -8,15 +8,14 @@ extern "C" {
 
 /** @file
  * 
- * @defgroup ccontainer_clist_cstring_grp clist specialization for C-strings
- * @ingroup ccontainer_grp
+ * @ingroup ccontainer_spec_cstring_grp
  * 
  * Specialization of  a clist generic with C-string values.
  * 
  * Implemented with an internal generic clist_gen_t and use of value_cstring_t
  * Make interface convenient for C-strings */
 
-/** @{ \ingroup ccontainer_clist_cstring_grp */
+/** @{ \ingroup ccontainer_spec_cstring_grp */
 
 /** Use a clist_gen_t for container implementation with private value_cstring */
 typedef struct {
@@ -29,7 +28,7 @@ typedef struct {
 /** @name Constructor/ Destructor */
 /** @{ */
 /** Allocation memory for a clist cstring allocated on heap.
- * A constructor (\ref  clist_cstring_init) must be called to have a functional container
+ * A constructor (clist_cstring_init() ) must be called to have a functional container
  * \return a pointer to an instance of clist_cstring_t
  */
 SHARED_EXPORT clist_cstring_t* clist_cstring_new();
