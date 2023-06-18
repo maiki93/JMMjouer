@@ -257,7 +257,6 @@ ptr_plugin_funct plugin_manager_get_game_ptrf( const plugin_mgr_t* manager, cons
     /* void * f = dlopen ("lib.dylib", RTLD_NOW);
         void * obj = dlsym (f, "barleyCorn");
         int * ptr = (int *) obj; */
-    //void *obj 
 
 #if defined(_WIN32)
     fptr = GetProcAddress(current_handle, "name_game_plugin");
@@ -265,17 +264,17 @@ ptr_plugin_funct plugin_manager_get_game_ptrf( const plugin_mgr_t* manager, cons
     {
         CLOG_ERR("Error cannot find function %s in library", name);
         printf("Error cannot find function %s in library", name);
-        return NULL;
+        /*return NULL;*/
     }
 #else
-    fptr = dlsym( current_handle, name);
+    fptr = dlsym( current_handle, "name_game_plugin");
     if( fptr == NULL) {
         CLOG_ERR("Error cannot find function %s in linux library", name);
         printf("Error cannot find function %s in linux library", name);
-        return NULL;
+        /*return NULL;*/
     }
 #endif
-    CLOG_DEBUG("Found name of the plugin %s", (char*)fptr);
+    /*printf("Found name of the plugin %s", (char*)fptr);*/
 
     return funct_casted;
 }

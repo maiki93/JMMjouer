@@ -68,11 +68,13 @@ static void load_one_existing_dll()
 static void retrieve_function_from_dll()
 {
     ptr_plugin_funct pf_game = NULL;
+    char *p_name_game = NULL;
+
     plugin_mgr_t *manager = plugin_manager_get_instance();
     plugin_manager_set_directory( manager, DIR_PLUGINS );
     plugin_manager_load_shared_library( manager, NAME_DLL_MORPION);
     
-    pf_game = plugin_manager_get_game_ptrf( manager, START_GAME_FUNCTION);
+    pf_game = plugin_manager_get_game_ptrf( manager, START_GAME_FUNCTION, &p_name_game);
     assert_non_null( pf_game );
 
     plugin_manager_free();
@@ -93,12 +95,13 @@ static void shared_library_does_not_exist()
 static void function_does_not_exist()
 {
     ptr_plugin_funct pf_game = NULL;
+    char *p_name_game = NULL;
     plugin_mgr_t *manager = plugin_manager_get_instance();
     plugin_manager_set_directory( manager, "test_plugins");
     plugin_manager_load_shared_library( manager, NAME_DLL_MORPION );
 
     /* api cannot use PLG_MANAGER_FCT_NOT_FOUUND */
-    pf_game = plugin_manager_get_game_ptrf( manager, "start_game_titi");
+    pf_game = plugin_manager_get_game_ptrf( manager, "start_game_titi", &p_name_game);
     assert_null( pf_game );
 
     plugin_manager_free();
