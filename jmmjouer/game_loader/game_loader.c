@@ -140,7 +140,7 @@ static int load_shared_game(game_loader_t *gload)
 int load_game_dll_callback( clist_gen_t *clist_base, const char *filename )
 {
     ptr_game_t pf_game = NULL;
-    char *p_name_game;
+    char *p_name_game_plugin;
     int retour;
     plugin_mgr_t *plg_manager;
     /* down cast , must be sure */
@@ -156,7 +156,10 @@ int load_game_dll_callback( clist_gen_t *clist_base, const char *filename )
         CLOG_ERR("Error in loading library %s ", filename);
         return 1;   
     }
-    pf_game = (ptr_game_t) plugin_manager_get_game_ptrf( plg_manager, "start_game_morpion", &p_name_game);
+
+    /*p_name_game_plugin = plugin_manager_get_name_game( plg_manager );*/
+
+    pf_game = (ptr_game_t) plugin_manager_get_game_ptrf( plg_manager, "start_game_morpion");
     
     /* need only map_game to be updated */
     retour = game_ptrf_insert( map, "Morpion", pf_game);
@@ -184,13 +187,11 @@ int load_game_dll( map_game_ptrf_t *map, const char *filename )
     
     /* need only map_game to be updated */
     retour = game_ptrf_insert( map, "Morpion", pf_game);
-
     return retour;
 }
 
 int add_game(game_loader_t *gload, const char *name, ptr_game_t pf_game) 
 {
-    
     CLOG_DEBUG("name: %s, ptr_game %p\n", name, pf_game);
     return game_ptrf_insert( gload->map_game, name, pf_game);
 }

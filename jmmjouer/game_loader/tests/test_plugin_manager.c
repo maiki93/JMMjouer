@@ -76,7 +76,9 @@ static void retrieve_function_from_dll()
     
     pf_game = plugin_manager_get_game_ptrf( manager, START_GAME_FUNCTION, &p_name_game);
     assert_non_null( pf_game );
+    assert_string_equal("morpion", p_name_game);
 
+    free(p_name_game);
     plugin_manager_free();
 }
 

@@ -209,12 +209,19 @@ ptr_plugin_funct plugin_manager_get_game_ptrf( const plugin_mgr_t* manager, cons
 #if defined(_WIN32)
     HINSTANCE current_handle;
     FARPROC fptr; /* typedef INT_PTR (*FARPROC)() , INT_PTR long long*/
+    FARPROC fptr2; /* for the name */
 #else
     void* current_handle;
     void* fptr;
+    void *fptr2;
 #endif
 
     ptr_plugin_funct funct_casted;
+    /*char *name_game_dll;*/
+
+    fptr =NULL;
+    fptr2 = NULL;
+    name_game_out = NULL;
 
     current_handle = manager->handle_dll[manager->nb_handle-1];
     assert( current_handle != NULL );
@@ -259,22 +266,29 @@ ptr_plugin_funct plugin_manager_get_game_ptrf( const plugin_mgr_t* manager, cons
         int * ptr = (int *) obj; */
 
 #if defined(_WIN32)
-    fptr = GetProcAddress(current_handle, "name_game_plugin");
-    if( fptr == (FARPROC)NULL ) 
+    fptr2 = GetProcAddress(current_handle, "name_game_plugin");
+    if( fptr2 == (FARPROC)NULL ) 
     {
         CLOG_ERR("Error cannot find function %s in library", name);
         printf("Error cannot find function %s in library", name);
-        /*return NULL;*/
+        return NULL;
     }
 #else
-    fptr = dlsym( current_handle, "name_game_plugin");
-    if( fptr == NULL) {
+    fptr2 = dlsym( current_handle, "name_game_plugin");
+    /*name_game_dll = (char*) fptr;*/
+    if( fptr2 == NULL) {
         CLOG_ERR("Error cannot find function %s in linux library", name);
         printf("Error cannot find function %s in linux library", name);
-        /*return NULL;*/
+        return NULL;
     }
 #endif
-    /*printf("Found name of the plugin %s", (char*)fptr);*/
+
+    printf("Found name of the plugin : %s %ld \n", (char*)fptr2, strlen(fptr2));
+    /* name_game_dll = (char*)fptr2; intermediate cause error valgrind
+    *name_game_out = (char*) malloc( strlen(name_game_dll) + 1);
+    strncpy( *name_game_out, name_game_dll, 40);*/
+    *name_game_out = (char*) malloc( strlen((char*)fptr2) + 1);
+    strcpy( *name_game_out, (char*)fptr2 );
 
     return funct_casted;
 }
