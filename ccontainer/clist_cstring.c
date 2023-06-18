@@ -111,7 +111,7 @@ int clist_cstring_get_array( clist_cstring_t *list, char ***array_out, size_t *a
 }
 */
 
-ccontainer_err_t clist_cstring_get_array( clist_cstring_t *list_str, char ***array_out, size_t *array_len )
+ccontainer_err_t clist_cstring_get_array( clist_cstring_t *clist_str, char ***array_out, size_t *array_len )
 {
     ccontainer_value_t* pvalue_out; /* temporary value */
     clist_node_t* curr_node;
@@ -119,12 +119,12 @@ ccontainer_err_t clist_cstring_get_array( clist_cstring_t *list_str, char ***arr
     char **array = NULL; /* use local only */
     size_t lgen_len, indice;
     
-    assert( list_str );
+    assert( clist_str );
     /* default return in case of error, use swap idiom */
     *array_out = NULL;
     *array_len = 0;
     /* get size for allocation of array of cstring */
-    if( (lgen_len = clist_gen_size( list_str->clist)) == 0 ) {
+    if( (lgen_len = clist_gen_size( clist_str->clist)) == 0 ) {
         return CCONTAINER_EMPTY;
     }
     array = (char**) malloc( lgen_len * sizeof(char*) );
@@ -132,7 +132,7 @@ ccontainer_err_t clist_cstring_get_array( clist_cstring_t *list_str, char ***arr
         return CCONTAINER_OK;
         
    indice = 0;
-   curr_node = clist_gen_get_first_node( list_str->clist );
+   curr_node = clist_gen_get_first_node( clist_str->clist );
    while( curr_node != NULL )
    {
         pvalue_out = clist_gen_get_node_value( curr_node) ;

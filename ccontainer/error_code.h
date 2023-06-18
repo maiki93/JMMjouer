@@ -1,14 +1,15 @@
 #pragma once
 
-/** \file
- * Error code for all ccontainer's of the library.
+/** @file
  * 
- * First implementation : only in a header
-*/
+ * @defgroup ccontainer_error_grp ccontainer error code
+ * @ingroup ccontainer_grp
+ * Error code for all ccontainer's of the library
+ * 
+ * First implementation : only in a header */
 
 /** Error code for the library.
- * \ingroup ccontainer_grp
-*/
+ * \ingroup ccontainer_error_grp */
 typedef enum CCONTAINER_ENUM_ERROR { /* suggested E_CCONTAINER */
     CCONTAINER_OK = 0,
     CCONTAINER_OUTOFRANGE = 1,

@@ -6,23 +6,19 @@
 extern "C" {
 #endif
 
-/**
-  @file
-  Specialization of  a cvector_generic for C-string values.
-  
-  Implemented with an internal generic cvector_gen_t.
-  Make interface convenient for C-strings */
-
-/**
+/** @file
+ *
  * @defgroup ccontainer_cvector_cstring_grp cvector specialization for C-strings
  * @ingroup ccontainer_grp
- */
+ * 
+ * Specialization of  a cvector for C-string values.
+*
+*  Implemented with an internal generic cvector_gen_t.
+*  Make interface convenient for C-strings */
 
 /** @{ \ingroup ccontainer_cvector_cstring_grp */
 
-/** Definition of the type. 
- * Use a cvector_gen_t for container implementation with private value_cstring */
-
+/** Typedef of the type. */
 typedef struct {
      /** cvector_generic container implementation */
     cvector_gen_t *cvector;
@@ -48,7 +44,7 @@ SHARED_EXPORT void cvector_cstring_init_with_capacity(cvector_cstring_t* cvector
 
 /** Clear all contents of the vector.
  * Call deleter_value_t on all elements of the vector, but the capacity stays untouched.
- * \param[in] cvect pointer to a cvector_gen_t instance */
+ * \param[in] cvector_str pointer to a cvector_gen_t instance */
 SHARED_EXPORT void cvector_cstring_clear(cvector_cstring_t *cvector_str);
 
 /** Destructor, delete before all the content of the list.
@@ -79,8 +75,8 @@ SHARED_EXPORT size_t cvector_cstring_capacity(const cvector_cstring_t *cvector_s
  * Works only for extended
  * \pre new_capacity >= actual_capacity
  * \param[in] cvector_str pointer to an instance of cvector_cstring_t 
- * \param[in] new capacity of the vector */
-SHARED_EXPORT ccontainer_err_t cvector_cstring_set_capacity(cvector_cstring_t *cvector_str, size_t new_size);
+ * \param[in] new_capacity required */
+SHARED_EXPORT ccontainer_err_t cvector_cstring_set_capacity(cvector_cstring_t *cvector_str, size_t new_capacity);
 
 /** Insert a value_cstring_t at the end of the list.
    The null terminaison caracter is present in value_t::data  to allow the retrieval by reference 
@@ -96,23 +92,22 @@ SHARED_EXPORT ccontainer_err_t cvector_cstring_push_back(cvector_cstring_t *cvec
   \return  pointer to a copy string with terminason caracter, NULL on error */
 SHARED_EXPORT char* cvector_cstring_get_copy_at( const cvector_cstring_t *cvector_str, size_t index, ccontainer_err_t *err_code);
 
-/* not possible to get a reference ? maybe for cstring */
+/** Get a reference the C-string value */
 SHARED_EXPORT const char* cvector_cstring_get_ref_at( const cvector_cstring_t *cvector_str, size_t index, ccontainer_err_t *err_code);
 
-/** Get a reference to one element of the list.
-    May be very tricky to modify the original throught the reference (size problems) !!
-    \param[in] index of the collection to retrive
-    \param[out] err_code ccontainer error code
-    \return  pointer to a string in the cvector, NULL on error */
-SHARED_EXPORT char* cvector_cstring_pop_front( cvector_cstring_t *cvector_str, ccontainer_err_t *err_code);
+/* Pop cvector, not implemented
+  \param[in] cvector_str pointer to a cvector_string_t instance
+  \param[out] err_code ccontainer error code
+  \return  pointer to a string in the cvector, NULL on error
+SHARED_EXPORT char* cvector_cstring_pop_front( cvector_cstring_t *cvector_str, ccontainer_err_t *err_code); */
 
 /** Return a array of string, deep copies of the internal elements.
-    \param[in] cvector_str pointer to a cvector_string_t instance
-    \param[out] array_out allocated array_out with length array_len. must be deleted by caller
-        (see carray_cstring_delete)
-    \param[out] array_len size of array_out
-    \return ccontainer error code */
-SHARED_EXPORT ccontainer_err_t cvector_cstring_get_array( cvector_cstring_t *list, char ***array_out, size_t *array_len );
+  \param[in] cvector_str pointer to a cvector_string_t instance
+  \param[out] array_out allocated array_out with length array_len. must be deleted by caller
+        (see \ref carray_cstring_delete)
+  \param[out] array_len size of array_out
+  \return ccontainer error code */
+SHARED_EXPORT ccontainer_err_t cvector_cstring_get_array( cvector_cstring_t *cvector_str, char ***array_out, size_t *array_len );
 
 /** @} */ /** public API */
 

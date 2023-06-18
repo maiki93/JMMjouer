@@ -5,7 +5,7 @@
 #include "assert.h"
 
 /* methods to create/delete ccontainer_value_t */
-ccontainer_value_t ccontainer_make_value(char *data, size_t len, ccontainer_err_t *err_code) 
+ccontainer_value_t ccontainer_make_value(const char *data, size_t len, ccontainer_err_t *err_code) 
 {
     ccontainer_value_t value_out;
     char *tmp_string;

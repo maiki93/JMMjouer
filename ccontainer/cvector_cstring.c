@@ -56,9 +56,9 @@ size_t cvector_cstring_capacity(const cvector_cstring_t *cvector_str)
     return cvector_gen_capacity(cvector_str->cvector);
 }
 
-ccontainer_err_t cvector_cstring_set_capacity(cvector_cstring_t *cvector_str, size_t new_size)
+ccontainer_err_t cvector_cstring_set_capacity(cvector_cstring_t *cvector_str, size_t new_capacity)
 {
-    return cvector_gen_set_capacity( cvector_str->cvector, new_size );
+    return cvector_gen_set_capacity( cvector_str->cvector, new_capacity );
 }
 
 char* cvector_cstring_get_copy_at( const cvector_cstring_t *cvector_str, size_t index, ccontainer_err_t *err_code)
@@ -73,8 +73,7 @@ char* cvector_cstring_get_copy_at( const cvector_cstring_t *cvector_str, size_t 
 const char* cvector_cstring_get_ref_at( const cvector_cstring_t *cvector_str, size_t index, ccontainer_err_t *err_code)
 {
     ccontainer_value_t *pvalue_out;
-    /*ccontainer_err_t err_code;*/
-
+    
     pvalue_out = cvector_gen_get_at( cvector_str->cvector, index, err_code);
     return pvalue_out->data;
 }
@@ -97,7 +96,6 @@ ccontainer_err_t cvector_cstring_push_back(cvector_cstring_t *cvector_str, const
 
 ccontainer_err_t cvector_cstring_get_array( cvector_cstring_t *cvector_str, char ***array_out, size_t *array_len )
 {
-    /*ccontainer_value_t* pvalue_out; *//* temporary value */
     ccontainer_err_t err_code;
     char **array = NULL; /* use local only */
     size_t vgen_len, indice;

@@ -6,21 +6,30 @@
 #include "cmocka.h"
 
 #include "ccontainer/cvector_generic.h"
-/* include directly the implementation, it is for tests */
+/* include directly the implementation */
 #include "ccontainer/tests/struct_complex.c"
 
+/** @file 
+ * Example test for extending a complex structure.
+ * 
+ * @ingroup ccontainer_adapt_own_struture
+*/
+
+/** helper function. */
 static void check_copy_in_value(ccontainer_value_t *value, struct_complex_t *comp_struct );
+
+/** @{ \ingroup ccontainer_adapt_own_struture */
 
 /** \name adapter functions to cvector_generic with ccontainer_value_t internal type */
 /** \{ */
 /** Return a ccontainer_value_t containing a copy of all struct_complex_t data, a "serialized" version.
- Designer of complex_struct must decide of this implemnentation :
+    Designer of complex_struct must decide of this implemnentation :
   - Serialize the data (like for the float and bool), could be done for the string (need size + char[size])
   - Keep a pointer to a dynamic allocated memory (here done for pname), allow faster copy and move inside cvector
 
   Depending on this choice, different copy / destructor pointer funtion must be set to cvector.
   \param[in] complex_struct source
-  \param[out] ccontainer_value_t containing its own copy of all data of complex_struct */
+  \return ccontainer_value_t containing its own copy of all data of complex_struct */
 ccontainer_value_t make_value_struct_complex(const struct_complex_t * complex_struct, ccontainer_err_t *err_code)
 {
     ccontainer_value_t value_out;
@@ -106,9 +115,7 @@ void struct_complex_deleter_value(ccontainer_value_t* value_in)
     value_in->len = 0;
 }
 
-/* Default duplicater is correct, copy byte-to-byte pname allocated on heap does not change.
- This implementation certainly incorrect.
- Would be necessary for a deep_copy_constructor(&ccontainer_gen_t, duplicater_t) */
+/** Deep copy implementation because contains a pointer */
 ccontainer_value_t struct_complex_duplicater_value(const ccontainer_value_t* value_in, ccontainer_err_t *err_code)
 {
     ccontainer_value_t value_out;
@@ -131,6 +138,9 @@ ccontainer_value_t struct_complex_duplicater_value(const ccontainer_value_t* val
     *err_code = CCONTAINER_OK;
     return value_out;
 }
+
+/** Equalizer to be complete */
+
 /** \} */
 
 /* ********* Tests ********** */
@@ -444,7 +454,7 @@ static void wrapper_ref_from_vector()
 */
 
 /* ********  Helper ********* */
-/* may just compare the adress (once clear it is functional)*/
+/** Check it is a copy, source is not modified */
 void check_copy_in_value(ccontainer_value_t *value, struct_complex_t *comp_struct )
 {
     char memo = comp_struct->pname[0];
@@ -458,6 +468,7 @@ void check_copy_in_value(ccontainer_value_t *value, struct_complex_t *comp_struc
     comp_struct->pname[0] = memo;
 }
 
+/** Check it is a reference, can modify the source. */
 void check_ref_in_value(ccontainer_value_t *value, struct_complex_t *comp_struct )
 {
     char memo = comp_struct->pname[0];
@@ -470,6 +481,9 @@ void check_ref_in_value(ccontainer_value_t *value, struct_complex_t *comp_struct
     comp_struct->pname[0] = memo;
 }
 
+/** @} */ /* end group ccontainer_adapt_own_struture */
+
+/** \private */
 int main()
 {
     /* can be inside main, or as global. here no problem with identical name */
@@ -489,3 +503,4 @@ int main()
     /* return cmocka_run_group_tests(tests_historique, group_setup, group_teardown);*/
     return cmocka_run_group_tests(tests_cvector_struct_complex, NULL, NULL);
 }
+

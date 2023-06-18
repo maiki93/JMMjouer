@@ -6,28 +6,25 @@
 extern "C" {
 #endif
 
-/**
-  @file
-  Specialization of  a clist_generic for C-string values.
-  
-  Implemented with an internal generic clist_gen_t.
-  Make interface convenient for C-strings */
-
-/**
+/** @file
+ * 
  * @defgroup ccontainer_clist_cstring_grp clist specialization for C-strings
  * @ingroup ccontainer_grp
- */
+ * 
+ * Specialization of  a clist generic with C-string values.
+ * 
+ * Implemented with an internal generic clist_gen_t and use of value_cstring_t
+ * Make interface convenient for C-strings */
 
 /** @{ \ingroup ccontainer_clist_cstring_grp */
 
-/** Definition of the type. 
- * Use a clist_gen_t for container implementation with private value_cstring */
+/** Use a clist_gen_t for container implementation with private value_cstring */
 typedef struct {
      /** clist_generic container implementation */
     clist_gen_t *clist;
+    /** the actual size is stored internally */
     size_t len;
 } clist_cstring_t;
-
 
 /** @name Constructor/ Destructor */
 /** @{ */
@@ -62,39 +59,24 @@ SHARED_EXPORT size_t clist_cstring_size(clist_cstring_t *clist_str);
 
 /** Insert a value_cstring_t at the end of the list.
    The null terminaison caracter is present in value_t::data  to allow the retrieval by reference 
-   \param[inout] clist_str pointer to an instance of clist_cstring_t 
+   \param[inout] clist_str pointer to an instance of clist_cstring_t
    \param[in] to_insert a string in C, must be null terminated */
 SHARED_EXPORT ccontainer_err_t clist_cstring_push_back(clist_cstring_t *clist_str, const char *to_insert);
 
-/** Get a copy of nb-th element.
-  Copy allocated on heap, must be freed by caller.
-  \param[in] clist_str pointer to a clist_string_t instance
-  \param[in] index of the collection to retrieve
-  \param[out] err_code ccontainer error code
-  \return  pointer to a copy string with terminason caracter, NULL on error */
-/* SHARED_EXPORT char* clist_cstring_get_copy_at( clist_cstring_t *list, size_t index, ccontainer_err_t *err_code); */
-
 /** Get a reference to one element of the list.
     May be very tricky to modify the original throught the reference (size problems) !!
-    \param[in] index of the collection to retrive
+    \param[in] clist_str pointer to an instance of clist_cstring_t
     \param[out] err_code ccontainer error code
     \return  pointer to a string in the clist, NULL on error */
 SHARED_EXPORT char* clist_cstring_pop_front( clist_cstring_t *clist_str, ccontainer_err_t *err_code);
 
-/*
-SHARED_EXPORT clist_node_t* clist_cstring_get_first_node( const clist_cstring_t *clist_str, ccontainer_err_t *err_code);
-SHARED_EXPORT clist_node_t* get_next_node( const clist_cstring_t *clist_str, ccontainer_err_t *err_code);
-*/
-/* need possibilty to do a loop */
-
-
 /** Return a array of string, deep copies of the internal elements.
-    \param[in] clist_str pointer to a clist_string_t instance
-    \param[out] array_out allocated array_out with length array_len. must be deleted by caller
+  \param[in] clist_str pointer to a clist_string_t instance
+  \param[out] array_out allocated array_out with length array_len. must be deleted by caller
         (see carray_cstring_delete)
-    \param[out] array_len size of array_out
-    \return ccontainer error code */
-SHARED_EXPORT ccontainer_err_t clist_cstring_get_array( clist_cstring_t *list, char ***array_out, size_t *array_len );
+  \param[out] array_len size of array_out
+  \return ccontainer error code */
+SHARED_EXPORT ccontainer_err_t clist_cstring_get_array( clist_cstring_t *clist_str, char ***array_out, size_t *array_len );
 
 /** @} */ /** public API */
 

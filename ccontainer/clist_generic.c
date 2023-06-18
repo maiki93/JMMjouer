@@ -5,14 +5,11 @@
 #include "ccontainer/clist_generic.h"
 
 /** @file
-    Implementation file
-*/
+    Implementation file */
 
-/** Nodes of the list. 
+/** Nodes of the list.
  * Structure kept in internal implementation
- * \private
- * \ingroup ccontainer_clist_gen_grp
-*/
+ * \ingroup ccontainer_clist_gen_grp */
 struct clist_node_type {
     /** ccontainer_value_t contained in the node */
     ccontainer_value_t value;
@@ -22,10 +19,9 @@ struct clist_node_type {
     struct clist_node_type *next_node;
 }; /* clist_node_t */
 
-/** @brief Declaration of the list type.
+/** Declaration of the list type.
  * Contains the first node and the actual size of the list.
- * \ingroup ccontainer_clist_gen_grp
-*/
+ * \ingroup ccontainer_clist_gen_grp */
 struct clist_type {
     /** First node of the list */
     clist_node_t* first_node;
