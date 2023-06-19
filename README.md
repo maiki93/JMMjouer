@@ -74,3 +74,8 @@ Les jeux peuvent être :
 ## Validation
 - test unitaires avec CMocka
 - Valgrind, Dr.Memory
+
+## Schéma
+
+![PackageDiagram](doc/img/diagram_package.png)
+
