@@ -114,14 +114,14 @@ static void joueur_with_historic()
 
 
     /*pair_out = game_victories_get_copy( &(joueur.map_victories), "mastermind" );*/
-    status = map_game_score_get_from_name(&(joueur.map_score), "mastermind", &score);
+    status = map_game_score_get_from_name(&(joueur.map_score), "Mastermind", &score);
     /*assert_string_equal( "mastermind", pair_out.game_name);*/
     assert_int_equal(status, 0); /* key found */
     assert_int_equal( 4, score.nb_win);
     assert_int_equal( 5, score.nb_lost);
     assert_int_equal( 0, score.nb_draw);
 
-    status = map_game_score_get_from_name(&(joueur.map_score), "pendu", &score);
+    status = map_game_score_get_from_name(&(joueur.map_score), "Pendu", &score);
     assert_int_equal(status, 0); /* key found */
     /*pair_out = game_victories_get_copy( &(joueur.map_victories), "pendu" );*/
     /*assert_string_equal( "pendu", pair_out.game_name);*/
@@ -130,7 +130,7 @@ static void joueur_with_historic()
     assert_int_equal( 0, score.nb_draw);
 
     //pair_out = game_victories_get_copy( &(joueur.map_victories), "morpion" );
-    status = map_game_score_get_from_name(&(joueur.map_score), "morpion", &score);
+    status = map_game_score_get_from_name(&(joueur.map_score), "Morpion", &score);
     assert_int_equal(status, 0); /* key found */
     assert_int_equal( 1, score.nb_win);
     assert_int_equal( 3, score.nb_lost);

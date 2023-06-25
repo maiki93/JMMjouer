@@ -6,6 +6,7 @@ OBJS_SRC_PLUGINS := $(MODDIR_SRC_PLUGINS)/game_morpion.o
 $(info == SRC_PLUGINS ==)
 $(info $$OBJS_SRC_PLUGINS is [$(OBJS_SRC_PLUGINS)] )
 
+# here certainly need a rpath
 libgame_morpion.so : $(OBJS_SRC_PLUGINS) libjoueur
 	$(CC) -shared $(CFLAGS) -o $@ $(OBJS_SRC_PLUGINS) -L . -ljoueur
 

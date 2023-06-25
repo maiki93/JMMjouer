@@ -28,23 +28,22 @@
     #define EXT_DLL "so"
 #endif
 
-/* full definition, a bit overkill this class with one data member but clear design and extendable */
+/** Complete definition of game_loader_t in implementation */
 struct game_loader_type {
     map_game_ptrf_t *map_game;
 };
 
 /*********** private functions *********/
-
-/* split functions for game_loader_load_all */
-
+/*********** called by public API game_loader_load_all */
 static int load_static_game(game_loader_t *gameldr);
 static int load_shared_game(game_loader_t *gameldr);
 int add_game(game_loader_t *gload, const char *name, ptr_game_t pf_game);
-/* static unsigned int size() {return nb_element;} */
 bool  is_empty(const game_loader_t *gload);
-/* used as callback function by load_shared_game */
+/** Used as callback function by load_shared_game */
 static int load_game_dll_callback( clist_gen_t *clist, const char *name);
+int load_game_dll( map_game_ptrf_t *map, const char *filename );
 /*********** end private functions *********/
+/* static unsigned int size() {return nb_element;} */
 
 /**********  intialization and destruction **************/
 game_loader_t* game_loader_new()
@@ -63,8 +62,13 @@ void game_loader_free( game_loader_t *gameldr)
 {
     CLOG_DEBUG("Clear game_loader %d\n", 1);
     game_ptrf_free( gameldr->map_game );
-    /*gameldr->map_game = NULL;*/
+    gameldr->map_game = NULL;
     free( gameldr );
+}
+
+size_t game_loader_size(const game_loader_t *gameldr)
+{
+    return game_ptrf_size( gameldr->map_game);
 }
 
 int game_loader_load_all(game_loader_t *gameldr)
@@ -89,11 +93,6 @@ int game_loader_get_array_names(const game_loader_t *gload, char ***list_name_ou
     /* shoud be clist_cstring !!!  */
     return game_ptrf_get_array_name( gload->map_game, list_name_out, size_list );
 }
-/*  shoud be clist_cstring !!! 
-int game_loader_get_names2(const game_loader_t *gload, clist_cstring *list_names)
-{
-    return game_ptrf_get_array_name( gload->map_game, list_name_out, size_list );
-}*/
 
 ptr_game_t game_loader_get_ptr_game( const game_loader_t *gameldr, const char * name_game)
 {
@@ -106,88 +105,81 @@ ptr_game_t game_loader_get_ptr_game( const game_loader_t *gameldr, const char * 
 /*** Private functions ***/
 static int load_static_game(game_loader_t *gload) 
 {
-    int retour=0,i;
+    int status=0,i;
     /* load games known at compile-time*/
     for( i = 0; i < nb_default_game; i++ ) {
-        retour = game_ptrf_insert( gload->map_game,
+        status = game_ptrf_insert( gload->map_game,
                                    default_game_name[i],
                                    default_game_prtf[i]);
 
-        if( retour /*!= CLIST_OK */ ) {
-            CLOG_ERR("Cannot load game : %s\n", "Mastermind or Morpion");
-            return retour;
+        if( status /*!= CLIST_OK */ ) {
+            CLOG_ERR("Cannot load static game : %s\n", "Mastermind or Pendu");
+            return status;
         }
     }
-    return retour;
+    return status;
 }
 
 static int load_shared_game(game_loader_t *gload)
 {
-    int retour;
+    int status;
     const char *search_directory = plugin_manager_get_directory( plugin_manager_get_instance() );
     assert( search_directory );
 
     /* 2 functional style */
     CLOG_DEBUG("load all shared librairies in directory: %s\n", search_directory);
-    retour = for_files_with_extension( search_directory, EXT_DLL,
-                                       &load_game_dll_callback, 
+    status = for_files_with_extension( search_directory, EXT_DLL,
+                                       &load_game_dll_callback, /* interface to use utils */
                                        (clist_gen_t *)gload->map_game );
-    /* to check retour or return directly */
-    return retour;
+    /* to check status or return directly */
+    return status;
 }
-
 
 int load_game_dll_callback( clist_gen_t *clist_base, const char *filename )
 {
-    ptr_game_t pf_game = NULL;
-    char *p_name_game_plugin;
-    int retour;
-    plugin_mgr_t *plg_manager;
-    /* down cast , must be sure */
+   int status;
+
+    /* cast , it allows to retrive the map, not provided in initial call to utils
+        a bit tricky ... but keep for_extension_general */
     map_game_ptrf_t *map = (map_game_ptrf_t *)clist_base;
     assert( map );
 
-    plg_manager = plugin_manager_get_instance();
-    CLOG_DEBUG("Load game dll: %s\n", filename);
-
-    /* could return the name of the start_game_function / with register easier */
-    retour = plugin_manager_load_shared_library( plg_manager, filename );
-    if(retour) {
-        CLOG_ERR("Error in loading library %s ", filename);
-        return 1;   
-    }
-
-    /*p_name_game_plugin = plugin_manager_get_name_game( plg_manager );*/
-
-    pf_game = (ptr_game_t) plugin_manager_get_game_ptrf( plg_manager, "start_game_morpion");
-    
-    /* need only map_game to be updated */
-    retour = game_ptrf_insert( map, "Morpion", pf_game);
-
-    return retour;
+    status = load_game_dll( map, filename);
+    return status;
 }
 
-/* could pass plugin_manager as parameter / or own it / or call getInstance() */
 int load_game_dll( map_game_ptrf_t *map, const char *filename )
 {
-    ptr_game_t pf_game = NULL;
-    char *p_game_name;
-    int retour;
+    ptr_game_t game_ptrf = NULL;
+    int status;
+    char *name_game;
+    char *name_start_fct;
 
     plugin_mgr_t *plg_manager = plugin_manager_get_instance();
     CLOG_DEBUG("Load game dll: %s\n", filename);
 
     /* could return the name of the start_game_function / with register easier */
-    retour = plugin_manager_load_shared_library( plg_manager, filename );
-    if(retour) {
+    status = plugin_manager_load_shared_library( plg_manager, filename );
+    if(status) {
         CLOG_ERR("Error in loading library %s ", filename);
         return 1;   
     }
-    pf_game = (ptr_game_t) plugin_manager_get_game_ptrf( plg_manager, "start_game_morpion", &p_game_name);
+
+    /* 2 stages : 1. get the name of the game and the name of the function to call for starting a game */
+    status = plugin_manager_get_names( plg_manager, &name_game, &name_start_fct);
+    if(status != 0) {
+        return status;
+    }
+    /* get the required function */
+    game_ptrf = (ptr_game_t) plugin_manager_get_game_ptrf( plg_manager, name_start_fct);
     
-    /* need only map_game to be updated */
-    retour = game_ptrf_insert( map, "Morpion", pf_game);
-    return retour;
+    /* insert the pair <name_game, game_ptrf */
+    status = game_ptrf_insert( map, name_game, game_ptrf);
+
+    /* free tmp */
+    free(name_game);
+    free(name_start_fct);
+    return status;
 }
 
 int add_game(game_loader_t *gload, const char *name, ptr_game_t pf_game) 
@@ -199,6 +191,6 @@ int add_game(game_loader_t *gload, const char *name, ptr_game_t pf_game)
 /* private function, can be tested with cmocka */
 bool is_empty(const game_loader_t *gload) {
 
-   return (game_ptrf_size( gload->map_game) == 0) ? true
-                                                  : false;
+   return (game_loader_size( gload) == 0) ? true
+                                          : false;
 }

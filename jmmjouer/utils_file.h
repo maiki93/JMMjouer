@@ -1,6 +1,9 @@
 
 #include <stdbool.h>
+/* use clist_generic for files_extension */
 #include "ccontainer/clist_generic.h"
+
+#include "jmmjouer/game_loader/game_loader.h"
 
 /* just an idea...
   typedef struct load_game_fctor {

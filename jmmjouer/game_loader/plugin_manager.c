@@ -13,8 +13,10 @@
 
 #include "clogger/clogger.h"
 
+/** Maximum number of shared libraries */
 enum { MAX_NB_SHARED_LIB = 5};
 
+/** Default value */
 static const char* CURRENT_DIRECTORY = ".";
 
 /* https://helpercode.com/2015/09/16/how-to-fake-a-singleton-in-c/ */
@@ -122,10 +124,12 @@ const char* plugin_manager_get_directory( const plugin_mgr_t *manager)
     return manager->directory_path;   
 }
 
-void plugin_manager_set_directory(plugin_mgr_t *plg_manager, const char * directory)
+/* strcmp if already correct */
+int plugin_manager_set_directory(plugin_mgr_t *plg_manager, const char * directory)
 {
     const char *local_dir;
 
+    /* really need to delete all the time ? , compare ? better */
     if( plg_manager->directory_path != NULL)
         free(plg_manager->directory_path);
 
@@ -135,9 +139,13 @@ void plugin_manager_set_directory(plugin_mgr_t *plg_manager, const char * direct
     else 
         local_dir = directory;
 
+    /* need tmp_buffer */
     plg_manager->directory_path = malloc( strlen(local_dir) + 1 );
-    assert( plg_manager->directory_path );
+    if( !plg_manager->directory_path )
+        return -1;
+    /*assert( plg_manager->directory_path );*/
     strcpy( plg_manager->directory_path, local_dir);
+    return 0;
 }
 
 /* very windows dependent, or maybe not so much in fact */
@@ -152,9 +160,9 @@ int plugin_manager_load_shared_library(plugin_mgr_t *plg_manager, const char *fi
     char *fullname;
     bool b_delete_dir = false; /* flag if need deallocation of dir */
     char *dir = plg_manager->directory_path;
-    /* if directory not set, use current directory.
-       Pssible case ? */
+    /* if directory not set, use current directory. Possible ?, not "." by default ? */
     if( !dir ) {
+        assert(true); /*never happens with default */
         dir = malloc( 5 );
         strcpy( dir, ".//");
         b_delete_dir = true;
@@ -165,11 +173,17 @@ int plugin_manager_load_shared_library(plugin_mgr_t *plg_manager, const char *fi
     CLOG_DEBUG("Load shared_library, dir= %s, name= %s\n", dir, filename);
 
     /* concat filename, can be a function and cross platform if dir is empty */
-    fullname = malloc( strlen(dir) + strlen(filename) + 3 /* x1 */);
+    fullname = malloc( strlen(dir) + strlen(filename) + 3);
     strcpy(fullname, dir);
     strcat(fullname, "//" );
     strcat(fullname, filename);
-
+    /*
+    fullname = malloc( strlen(dir) + strlen(filename) + 4);
+    //strcpy(fullname,"./");
+    strcpy(fullname, dir);
+    strcat(fullname, "/" );
+    strcat(fullname, filename);
+    */
     CLOG_DEBUG("Load game %s\n", fullname);
 
     /* FreeLibrary(handle) to call to be clean, but after use !! crash.. 
@@ -178,6 +192,9 @@ int plugin_manager_load_shared_library(plugin_mgr_t *plg_manager, const char *fi
     handle = LoadLibrary(fullname);
 #else
     handle = dlopen(fullname, RTLD_LAZY);
+    /*handle = dlopen(fullname, RTLD_NOW);*/
+    /* on WSL2 must respect windows filesystem ?? */
+    /*handle = dlopen("test_plugins//libgame_morpion.so",RTLD_GLOBAL);*/
 #endif
     if( !handle)
     {
@@ -201,44 +218,99 @@ int plugin_manager_load_shared_library(plugin_mgr_t *plg_manager, const char *fi
     return PLG_MANAGER_OK;
 }
 
-
-/*void (*)(void *) get_funct_from_last_inserted(const char *name)*/
-/*void  (*get_funct_from_last_inserted(const char *name)(void*)*/
-ptr_plugin_funct plugin_manager_get_game_ptrf( const plugin_mgr_t* manager, const char *name, char** name_game_out)
+int plugin_manager_get_names(const plugin_mgr_t *plg_manager, char **name_game_out, 
+                             char **name_start_fct_out)
 {
 #if defined(_WIN32)
     HINSTANCE current_handle;
-    FARPROC fptr; /* typedef INT_PTR (*FARPROC)() , INT_PTR long long*/
-    FARPROC fptr2; /* for the name */
+    FARPROC fptr_name_game; /* typedef INT_PTR (*FARPROC)() , INT_PTR long long*/
+    FARPROC fptr_name_start_fct; /* for the name */
 #else
     void* current_handle;
-    void* fptr;
-    void *fptr2;
+    void* fptr_name_game;
+    void *fptr_name_start_fct;
 #endif
 
-    ptr_plugin_funct funct_casted;
-    /*char *name_game_dll;*/
+    fptr_name_game =NULL;
+    fptr_name_start_fct = NULL;
+    *name_game_out = NULL;
+    *name_start_fct_out = NULL;
 
-    fptr =NULL;
-    fptr2 = NULL;
-    name_game_out = NULL;
-
-    current_handle = manager->handle_dll[manager->nb_handle-1];
+    current_handle = plg_manager->handle_dll[plg_manager->nb_handle-1];
     assert( current_handle != NULL );
 
 #if defined(_WIN32)
-    fptr = GetProcAddress(current_handle, name);
+    fptr_name_game = GetProcAddress(current_handle, "");
     if( fptr == (FARPROC)NULL ) 
     {
         CLOG_ERR("Error cannot find function %s in library", name);
         printf("Error cannot find function %s in library", name);
+        return -1;
+    }
+#else
+    fptr_name_game = dlsym( current_handle, "name_game_plugin");
+    if( fptr_name_game == NULL) {
+        CLOG_ERR("Error cannot find variable \"name_game_plugin\" in the plugin %d", 0);
+        printf("Error cannot find variable \"name_game_plugin\" in the plugin");
+        return -1;
+    }
+#endif
+
+    *name_game_out = (char*) malloc( strlen((char*)fptr_name_game) + 1);
+    strcpy( *name_game_out, (char*)fptr_name_game);
+
+    /* name function to call */
+#if defined(_WIN32)
+    fptr_name_run_fct = GetProcAddress(current_handle, "name_start_fct");
+    if( fptr == (FARPROC)NULL ) 
+    {
+        CLOG_ERR("Error cannot find function %s in library", name);
+        printf("Error cannot find function %s in library", name);
+        return -1;
+    }
+#else
+    fptr_name_start_fct = dlsym( current_handle, "name_start_fct");
+    if( fptr_name_start_fct == NULL) {
+        CLOG_ERR("Error cannot find variable \"name_start_fct\" in the plugin %d", 0);
+        printf("Error cannot find variable \"name_start_fct\" in the plugin");
+        return -1;
+    }
+#endif
+
+    *name_start_fct_out = (char*) malloc( strlen((char*)fptr_name_start_fct) + 1);
+    strcpy( *name_start_fct_out, (char*)fptr_name_start_fct);
+    return 0;
+}
+
+
+ptr_plugin_funct plugin_manager_get_game_ptrf( const plugin_mgr_t* manager, const char *name_start_fct)
+{
+#if defined(_WIN32)
+    HINSTANCE current_handle;
+    FARPROC fptr; /* typedef INT_PTR (*FARPROC)() , INT_PTR long long*/
+#else
+    void* current_handle;
+    void* fptr;
+#endif
+
+    ptr_plugin_funct funct_casted;
+    /* current is always the last one */
+    current_handle = manager->handle_dll[manager->nb_handle-1];
+    assert( current_handle != NULL );
+
+#if defined(_WIN32)
+    fptr = GetProcAddress(current_handle, name_start_fct);
+    if( fptr == (FARPROC)NULL ) 
+    {
+        CLOG_ERR("Error cannot find function %s in library", name_start_fct);
+        printf("Error cannot find function %s in library", name_start_fct);
         return NULL;
     }
 #else
-    fptr = dlsym( current_handle, name);
+    fptr = dlsym( current_handle, name_start_fct);
     if( fptr == NULL) {
-        CLOG_ERR("Error cannot find function %s in linux library", name);
-        printf("Error cannot find function %s in linux library", name);
+        CLOG_ERR("Error cannot find function %s in linux library", name_start_fct);
+        printf("Error cannot find function %s in linux library", name_start_fct);
         return NULL;
     }
 #endif
@@ -259,36 +331,6 @@ ptr_plugin_funct plugin_manager_get_game_ptrf( const plugin_mgr_t* manager, cons
 
     /*CLOG_DEBUG("handle: %p\n", (long *)funct_casted);*/
     CLOG_DEBUG("record in handle nb_element=%d",manager->nb_handle);
-
-    /* read global variable "name_game_plugin" */
-    /* void * f = dlopen ("lib.dylib", RTLD_NOW);
-        void * obj = dlsym (f, "barleyCorn");
-        int * ptr = (int *) obj; */
-
-#if defined(_WIN32)
-    fptr2 = GetProcAddress(current_handle, "name_game_plugin");
-    if( fptr2 == (FARPROC)NULL ) 
-    {
-        CLOG_ERR("Error cannot find function %s in library", name);
-        printf("Error cannot find function %s in library", name);
-        return NULL;
-    }
-#else
-    fptr2 = dlsym( current_handle, "name_game_plugin");
-    /*name_game_dll = (char*) fptr;*/
-    if( fptr2 == NULL) {
-        CLOG_ERR("Error cannot find function %s in linux library", name);
-        printf("Error cannot find function %s in linux library", name);
-        return NULL;
-    }
-#endif
-
-    printf("Found name of the plugin : %s %ld \n", (char*)fptr2, strlen(fptr2));
-    /* name_game_dll = (char*)fptr2; intermediate cause error valgrind
-    *name_game_out = (char*) malloc( strlen(name_game_dll) + 1);
-    strncpy( *name_game_out, name_game_dll, 40);*/
-    *name_game_out = (char*) malloc( strlen((char*)fptr2) + 1);
-    strcpy( *name_game_out, (char*)fptr2 );
 
     return funct_casted;
 }

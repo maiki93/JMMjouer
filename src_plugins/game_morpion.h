@@ -27,7 +27,10 @@
 /* void test(); */
 
 /** Plugins must indicate a unique name (check performed during loading) */
-SHARED_EXPORT const char name_game_plugin[] = "morpion";
+SHARED_EXPORT const char name_game_plugin[] = "Morpion";
+
+/** Plugins must indicate the name of the function start to call */
+SHARED_EXPORT const char name_start_fct[] = "start_game_morpion";
 
 /* objdump.exe -tT game_morpion.dll | grep 'start' do not see difference start_game_morpion appears in both */
 /** Run a game 

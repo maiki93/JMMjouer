@@ -82,7 +82,7 @@ int for_files_with_extension( const char* directory, const char* extension,
 
     d = opendir(dir_path);
     if( !d ) {
-        CLOG_ERR("Cannot open directory %s\n", dir_path);
+        CLOG_ERR("Cannot open directory %s\n", dir_path); /* return -1 */
     }
    
    while( (dir = readdir(d)) != NULL ) {
