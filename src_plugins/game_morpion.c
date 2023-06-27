@@ -9,7 +9,7 @@
 static void afficher_plateau(char *, int *);
 static int test_plateau_rempli(char *);
 static int test_victoire(char *, char );
-static int test_case_libre(char *, int *);
+/*static int test_case_libre(char *, int *);*/
 static void tour_joueur(int *, char *);
 static void tour_ia(char *);
 static int saisie_est_correct(char *, char );

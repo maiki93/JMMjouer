@@ -7,7 +7,7 @@
 #endif
 
 #include <stdio.h>
-#include <stdlib.h> /* warning on linux */
+#include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 
@@ -47,11 +47,6 @@ static void plugin_manager_init( const char *directory );
 
 plugin_mgr_t* plugin_manager_get_instance()
 {
-    /* only one malloc by program, should be one free (atexit for instance)
-       Do not manage to reset this singleton to NULL => multipe free 
-       can delete the pointed object, but not able to reset this static variable to NULL (for TU) */
-    /*static plugin_mgr_t *singleton;*/
-
     if( singleton == NULL ) {
         singleton = plugin_manager_new();
         plugin_manager_init( CURRENT_DIRECTORY );
@@ -172,18 +167,12 @@ int plugin_manager_load_shared_library(plugin_mgr_t *plg_manager, const char *fi
     }
     CLOG_DEBUG("Load shared_library, dir= %s, name= %s\n", dir, filename);
 
-    /* concat filename, can be a function and cross platform if dir is empty */
+    /* concat filename, can be a function and cross platform if dir is empty 
+        works for all tested platform (not a real linux, only wsl2) */
     fullname = malloc( strlen(dir) + strlen(filename) + 3);
     strcpy(fullname, dir);
     strcat(fullname, "//" );
     strcat(fullname, filename);
-    /*
-    fullname = malloc( strlen(dir) + strlen(filename) + 4);
-    //strcpy(fullname,"./");
-    strcpy(fullname, dir);
-    strcat(fullname, "/" );
-    strcat(fullname, filename);
-    */
     CLOG_DEBUG("Load game %s\n", fullname);
 
     /* FreeLibrary(handle) to call to be clean, but after use !! crash.. 
@@ -192,9 +181,6 @@ int plugin_manager_load_shared_library(plugin_mgr_t *plg_manager, const char *fi
     handle = LoadLibrary(fullname);
 #else
     handle = dlopen(fullname, RTLD_LAZY);
-    /*handle = dlopen(fullname, RTLD_NOW);*/
-    /* on WSL2 must respect windows filesystem ?? */
-    /*handle = dlopen("test_plugins//libgame_morpion.so",RTLD_GLOBAL);*/
 #endif
     if( !handle)
     {
@@ -244,14 +230,12 @@ int plugin_manager_get_names(const plugin_mgr_t *plg_manager, char **name_game_o
     if( fptr == (FARPROC)NULL ) 
     {
         CLOG_ERR("Error cannot find function %s in library", name);
-        printf("Error cannot find function %s in library", name);
         return -1;
     }
 #else
     fptr_name_game = dlsym( current_handle, "name_game_plugin");
     if( fptr_name_game == NULL) {
         CLOG_ERR("Error cannot find variable \"name_game_plugin\" in the plugin %d", 0);
-        printf("Error cannot find variable \"name_game_plugin\" in the plugin");
         return -1;
     }
 #endif
@@ -265,14 +249,12 @@ int plugin_manager_get_names(const plugin_mgr_t *plg_manager, char **name_game_o
     if( fptr == (FARPROC)NULL ) 
     {
         CLOG_ERR("Error cannot find function %s in library", name);
-        printf("Error cannot find function %s in library", name);
         return -1;
     }
 #else
     fptr_name_start_fct = dlsym( current_handle, "name_start_fct");
     if( fptr_name_start_fct == NULL) {
         CLOG_ERR("Error cannot find variable \"name_start_fct\" in the plugin %d", 0);
-        printf("Error cannot find variable \"name_start_fct\" in the plugin");
         return -1;
     }
 #endif
@@ -303,14 +285,12 @@ ptr_plugin_funct plugin_manager_get_game_ptrf( const plugin_mgr_t* manager, cons
     if( fptr == (FARPROC)NULL ) 
     {
         CLOG_ERR("Error cannot find function %s in library", name_start_fct);
-        printf("Error cannot find function %s in library", name_start_fct);
         return NULL;
     }
 #else
     fptr = dlsym( current_handle, name_start_fct);
     if( fptr == NULL) {
         CLOG_ERR("Error cannot find function %s in linux library", name_start_fct);
-        printf("Error cannot find function %s in linux library", name_start_fct);
         return NULL;
     }
 #endif

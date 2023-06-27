@@ -6,13 +6,15 @@
 #include "ccontainer/clist_cstring.h"
 #include "ccontainer/cvector_cstring.h"
 
-/** \file
+/** @file
+ *  @ingroup game_loader_grp
+ * 
     C-style map to store a list of "key" / "value"
     key :  the game_name 
     value : corresponding (pointer to) a function to run the game of signature \ref ptr_game_t
 
    Close to map_game_victories, but try stronger encapsulation in this implementation.
-   Can be only allocated on heap, a priori only used by the game_loader "module"
+   Can be only allocated on heap, only used by the game_loader "module"
 */
 
 /** @{ \ingroup game_loader_grp */
@@ -38,6 +40,8 @@ void game_ptrf_init(map_game_ptrf_t* map);
 void game_ptrf_free(map_game_ptrf_t *map);
 /** @} */
 
+/** \name Public API methods */
+/** \{ */
 /** Return the number of elements in the map.
  *  \param[in] map pointer to an instance of map_game_ptrf_t
  *  \return the number of pair : (game_name, ptr_game_t) */
@@ -77,5 +81,6 @@ cvector_cstring_t game_ptrf_get_names( const map_game_ptrf_t *map );
     \param[out] array_len number of elements in array_out
     \return status or error from clist_genric.h */
 int game_ptrf_get_array_name( const map_game_ptrf_t *map, char ***array_out, size_t *array_len );
+/** \} */
 
 /** @} */ /* end game_loader_grp */

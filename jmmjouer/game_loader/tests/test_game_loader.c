@@ -16,6 +16,20 @@ const char* START_GAME_FUNCTION = "start_game_morpion";
 
 game_loader_t * gload;
 
+static int group_setup(void **state)
+{
+    (void) state;
+    init_clogger("test_game_loader.log");
+    return 0;
+}
+
+static int group_teardown(void **state)
+{
+    (void) state;
+    close_clogger();
+    return 0;
+}
+
 /* creation and initilaization of an empty game_loader */
 static int setup(void **state) {
     (void) state;
@@ -152,5 +166,5 @@ int main()
     };
 
     /* call group_setup and teardown at the very beginning and end */
-    return cmocka_run_group_tests(tests_game_loader, NULL, NULL);
+    return cmocka_run_group_tests(tests_game_loader, group_setup, group_teardown);
 }

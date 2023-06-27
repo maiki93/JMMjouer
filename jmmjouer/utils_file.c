@@ -86,7 +86,7 @@ int for_files_with_extension( const char* directory, const char* extension,
     }
    
    while( (dir = readdir(d)) != NULL ) {
-        printf("Load file: %s\n", dir->d_name);
+        /*printf("Load file: %s\n", dir->d_name);*/
         /* check it is a file (no symlink, directory...)
         if (dir->d_type == DT_REG)
         {
@@ -160,7 +160,7 @@ bool check_extension( const char* name, const char* extension )
     const char *pdot = strrchr( name, '.');
     if( !pdot )
         return false;
-    /*printf("pdot %s\n", pdot+1);*/
+        
     if ( !strcmp( pdot+1, extension) )
         return true;
 

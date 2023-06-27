@@ -14,7 +14,7 @@ struct map_game_ptrf_type {
     Contains heap-allocated memory, but same deleter for ccontainer_value_t
     Only (intermediate) pair must be carefully deallocated
     Variant to pair_game_victory_t, with dynamically allocated game_name */
-typedef struct /*pair_game_ptrf*/ {
+typedef struct {
     char *game_name;
     ptr_game_t pfgame;
 } pair_game_ptrf_t;

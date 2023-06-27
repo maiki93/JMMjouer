@@ -82,7 +82,7 @@ CFLAGS_TESTS = -g3 -W -Wall -fPIC -Wunused -Wextra -pedantic -Wstrict-overflow=5
 STD_TESTS = -std=c99
 
 ##### External libraries
-# use of Windows CMocka from wsl2-linux !? yep , working !
+# use of Windows CMocka from wsl2-linux !? yep , working !!!
 INCLUDE_CMOCKA = C:\dev\cmocka_local_mingw\include
 LIB_CMOCKA = C:\dev\cmocka_local_mingw\lib
 
@@ -114,17 +114,10 @@ $(info $$EXE is $(EXE) )
 ### Libraries compilation,
 # 	suprees libgame_loader included in jmmjouer now.to see later.
 # libgame_pendu always shared and linked at compilation
-LIB_STATIC = libclogger libccontainer libjoueur
+LIB_STATIC = libclogger libccontainer
 # libjouer : linked with -shared -Bstatic against libclogger and libccontainer
 # librecord need only libjoueur ! (good, bad ?) cannot really works ?
-LIB_DYNAMIC = librecord  
-
-
-## Acthung libjoueur static (+libclogger and libccontainer ), no problem with test_plugin_manager !!
-# path maybe to adjust ?? 
-# otherwise need to recall make libgame_morpion (very starnge)
-# to continue to check !!!
-## not really, need a couple of libraries created => then make libgame and copy into test_plugins
+LIB_DYNAMIC = librecord  libjoueur
 
 # on mingw => error JMMjouer
 #LIB_DYNAMIC = libclogger libjoueur
@@ -167,4 +160,6 @@ clean::
 	@echo "Clean in root directory"
 	rm -f ./*.o
 	rm -f ./*.so ./*.a
+	rm -f ./*.log
+
 

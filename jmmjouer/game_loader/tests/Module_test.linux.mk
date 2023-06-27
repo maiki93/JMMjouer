@@ -27,21 +27,22 @@ test_map_game_ptrf: $(MODDIR_GL_TESTS)/test_map_game_ptrf.o libccontainer libclo
 	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $< -L. -lccontainer -lclogger -L $(LIB_CMOCKA) -lcmocka
 
 # test_plugin_manager, make sense could be appart of jmmjouer
+# libjoueur necessary for loading plugins (game_morpion refer to it)
 # warning : overidde recipe if the One general rule used
-test_plugin_manager: $(MODDIR_GL_TESTS)/test_plugin_manager.o libclogger
+test_plugin_manager: $(MODDIR_GL_TESTS)/test_plugin_manager.o libjoueur libclogger
 	@echo "Building test_plugin_manager @ :    $@"  # target name
 	@echo "Building test_plugin_manager < :    $<"  # test_X.o
 	@echo "Building test_plugin_manager ^ :    $^"  # test_X.o utils.o (ok for compil)
 	@echo "Building test_plugin_manager ? :    $?"  # 
-	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $< -L. -lclogger -L $(LIB_CMOCKA) -lcmocka
+	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $< -L. -ljoueur -lclogger -L $(LIB_CMOCKA) -lcmocka
 
 # add libgame_pendu, otherwise does not compile with shared libgame_loader.so
-test_game_loader: $(MODDIR_GL_TESTS)/test_game_loader.o jmmjouer/utils.o jmmjouer/utils_file.o joueur/score_game.o $(OBJS_GAMES) jmmjouer/game_loader/plugin_manager.o jmmjouer/game_loader/map_game_ptrf.o libccontainer libclogger libgame_pendu
+test_game_loader: $(MODDIR_GL_TESTS)/test_game_loader.o jmmjouer/utils.o jmmjouer/utils_file.o joueur/score_game.o $(OBJS_GAMES) jmmjouer/game_loader/plugin_manager.o jmmjouer/game_loader/map_game_ptrf.o libjoueur libccontainer libclogger libgame_pendu
 	@echo "Building test_game_loader @ :    $@"  # target name
-	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $(MODDIR_GL_TESTS)/test_game_loader.o jmmjouer/utils.o jmmjouer/utils_file.o joueur/score_game.o $(OBJS_GAMES) jmmjouer/game_loader/plugin_manager.o jmmjouer/game_loader/map_game_ptrf.o -L. -lccontainer -lclogger -lgame_pendu -L $(LIB_CMOCKA) -lcmocka
+	$(CC) $(STD_TESTS) $(CFLAGS_TESTS) -o $@ $(MODDIR_GL_TESTS)/test_game_loader.o jmmjouer/utils.o jmmjouer/utils_file.o joueur/score_game.o $(OBJS_GAMES) jmmjouer/game_loader/plugin_manager.o jmmjouer/game_loader/map_game_ptrf.o -L. -ljoueur -lccontainer -lclogger -lgame_pendu -L $(LIB_CMOCKA) -lcmocka
 
 clean ::
 	@echo "Clean test unit game_loader: $(MODDIR_GL_TESTS)"
 	rm -f $(OBJS_GL_TESTS)
 	rm -f $(EXE_GL_TESTS)
-#	rm -f test_game_loader test_cmap_game_ptrf test_plugin_manager test_mastermind
+

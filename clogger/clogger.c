@@ -64,11 +64,9 @@ void log_debug(const char *filename, long line, const char* format, ...)
 
     if ( fp == NULL ) return;
 
-    /*printf("%s:%ld :: ", filename, line);*/
     fprintf(fp, "%s:%ld :: ", filename, line);
     /* loop over the argument */
     va_start(args, format);
-    /*vprintf(format, args);*/
     vfprintf(fp, format, args);
     va_end(args);
 }

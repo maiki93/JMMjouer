@@ -25,6 +25,21 @@ const char* DIR_PLUGINS = "test_plugins";
 const char* NAME_GAME = "Morpion";
 const char* START_GAME_FUNCTION = "start_game_morpion";
 
+static int group_setup(void **state)
+{
+    (void) state;
+    init_clogger("test_plugin_manager.log");
+    return 0;
+}
+
+static int group_teardown(void **state)
+{
+    (void) state;
+    close_clogger();
+    return 0;
+}
+
+
 /* because inclusion of *c file, can check private data */
 static void get_instance_manager()
 {
@@ -101,12 +116,6 @@ static void retrieve_function_from_dll()
     plugin_manager_free();
 }
 
-/*
-static void plugin_variable_not_existing()
-{
-
-}*/
-
 static void shared_library_does_not_exist()
 {
     int status;
@@ -138,8 +147,7 @@ static void function_does_not_exist()
 ****/
 int main()
 {
-    // this can be moved, maybe shared amongst *c file ? seems not so easy. not expected it seems
-    const struct CMUnitTest tests[] = {
+    const struct CMUnitTest tests_plugin_manager[] = {
         
         cmocka_unit_test(get_instance_manager),
         cmocka_unit_test(set_directory_dll),
@@ -149,7 +157,6 @@ int main()
         cmocka_unit_test(shared_library_does_not_exist),
         cmocka_unit_test(function_does_not_exist),
     };
-
-    // if singleton may need a reset 
-    return cmocka_run_group_tests(tests, NULL, NULL);
+    // group for clogger
+    return cmocka_run_group_tests(tests_plugin_manager, group_setup, group_teardown);
 }

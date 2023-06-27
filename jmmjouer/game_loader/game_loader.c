@@ -8,11 +8,6 @@
 #include <string.h>
 #include <assert.h>
 
-/* \file Implementation of the loader
-
-    Storage : similar to a map<nameGame, ptr_game_t>
-*/
-
 #include "jmmjouer/game_loader/game_loader.h"
 #include "jmmjouer/game_loader/map_game_ptrf.h"
 
@@ -30,6 +25,7 @@
 
 /** Complete definition of game_loader_t in implementation */
 struct game_loader_type {
+    /** internal map, no provided access */
     map_game_ptrf_t *map_game;
 };
 
@@ -39,11 +35,11 @@ static int load_static_game(game_loader_t *gameldr);
 static int load_shared_game(game_loader_t *gameldr);
 int add_game(game_loader_t *gload, const char *name, ptr_game_t pf_game);
 bool  is_empty(const game_loader_t *gload);
-/** Used as callback function by load_shared_game */
+/* Used as callback for use with generic utils methods */
 static int load_game_dll_callback( clist_gen_t *clist, const char *name);
+/* load shared library, and insert the pair name_game and ptrf into the internal map */
 int load_game_dll( map_game_ptrf_t *map, const char *filename );
 /*********** end private functions *********/
-/* static unsigned int size() {return nb_element;} */
 
 /**********  intialization and destruction **************/
 game_loader_t* game_loader_new()
@@ -90,7 +86,6 @@ cvector_cstring_t game_loader_get_names(const game_loader_t *gameldr)
    3. can send back a full copy of the struct (on stack not possible ?) */
 int game_loader_get_array_names(const game_loader_t *gload, char ***list_name_out, size_t *size_list)
 {
-    /* shoud be clist_cstring !!!  */
     return game_ptrf_get_array_name( gload->map_game, list_name_out, size_list );
 }
 
@@ -188,7 +183,6 @@ int add_game(game_loader_t *gload, const char *name, ptr_game_t pf_game)
     return game_ptrf_insert( gload->map_game, name, pf_game);
 }
 
-/* private function, can be tested with cmocka */
 bool is_empty(const game_loader_t *gload) {
 
    return (game_loader_size( gload) == 0) ? true
