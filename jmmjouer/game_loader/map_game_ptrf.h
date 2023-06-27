@@ -7,17 +7,17 @@
 #include "ccontainer/cvector_cstring.h"
 
 /** @file
- *  @ingroup game_loader_grp
- * 
+    @ingroup game_loader_class_grp
+
     C-style map to store a list of "key" / "value"
     key :  the game_name 
-    value : corresponding (pointer to) a function to run the game of signature \ref ptr_game_t
+    value : corresponding (pointer to) a function to run the game of signature ptr_game_t
 
    Close to map_game_victories, but try stronger encapsulation in this implementation.
    Can be only allocated on heap, only used by the game_loader "module"
 */
 
-/** @{ \ingroup game_loader_grp */
+/** @{ \ingroup game_loader_class_grp */
 
 /** Forward declaration, user can only use a pointer to it.
     Maybe shared (or some part) by plugin_manager if cannot make it fuly independent */
@@ -26,7 +26,7 @@ typedef struct map_game_ptrf_type map_game_ptrf_t;
 /** \name Constructor/Destructor */
 /** @{ */
 /** Allocator for object in heap memory.
- * A contructor \ref game_ptrf_init must be called to get a valid map.
+ * A contructor game_ptrf_init() must be called to get a valid map.
  * \return a map pointer to an instance of map_game_ptrf_t */
 map_game_ptrf_t* game_ptrf_new();
 
@@ -76,8 +76,8 @@ cvector_cstring_t game_ptrf_get_names( const map_game_ptrf_t *map );
 /** Return a array of C-string containing the game names.
     Deep copies of the internal elements.
     \param[in] map pointer to an instance of map_game_ptrf_t
-    \param[out] heap allocated array_out inside the function. Must be deleted by caller
-        (see \ref carray_cstring_delete \ref ccontainer_utlis::caray_cstring_delete )
+    \param[out] array_out heap allocated array_out inside the function. Must be deleted by caller
+        (see \ref carray_cstring_delete ccontainer_utils::carray_cstring_delete )
     \param[out] array_len number of elements in array_out
     \return status or error from clist_genric.h */
 int game_ptrf_get_array_name( const map_game_ptrf_t *map, char ***array_out, size_t *array_len );

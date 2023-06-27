@@ -7,18 +7,19 @@
 /* always dont know where to declare new group */
 /** @defgroup game_loader_grp game loader */
 
-/** @file
- * 
+
+/** @file 
+ * @defgroup game_loader_class_grp structure game_loader
  * @ingroup game_loader_grp
  * 
- * Load, store and provide pointers to execute the different games.
+ *  Load, store and provide pointers to execute the different games.
  *  Group all games : compiled with the source code and plugins with plugin_manager
  *
  * Use plugin_manger singleton instance to load games provided by plugins
  * Internal storage with a cmap_game<name_game, prt_f>, internal/private use only
  */
 
-/** @{ \ingroup game_loader_grp */
+/** @{ \ingroup game_loader_class_grp */
 
 /** Error code for jmmjouer core */
 enum {

@@ -25,14 +25,18 @@ static const char* CURRENT_DIRECTORY = ".";
 /* or atexit
     https://stackoverflow.com/questions/39385520/do-i-have-to-free-static-dynamically-allocated-pointers */
 
-/* declaration of the structure */
+/** Declaration of the structure */
 struct plugin_manager {
     #if defined(_WIN32)
+        /** windows handler */
         HINSTANCE handle_dll[MAX_NB_SHARED_LIB]; /* INVALID_HANDLE_VALUE */
     #else
+        /** Linux handler */
         void* handle_dll[MAX_NB_SHARED_LIB];
     #endif
+    /** Nb of files loaded */
     size_t nb_handle; /*= 0 primitive initialized by default */
+    /** Directory where files are searched */
     char* directory_path; /* default initialized to NULL ? bad current_dir  */
 };
 
@@ -226,10 +230,10 @@ int plugin_manager_get_names(const plugin_mgr_t *plg_manager, char **name_game_o
     assert( current_handle != NULL );
 
 #if defined(_WIN32)
-    fptr_name_game = GetProcAddress(current_handle, "");
-    if( fptr == (FARPROC)NULL ) 
+    fptr_name_game = GetProcAddress(current_handle, "name_game_plugin");
+    if( fptr_name_game == (FARPROC)NULL ) 
     {
-        CLOG_ERR("Error cannot find function %s in library", name);
+        CLOG_ERR("Error cannot find variable \"name_game_plugin\" in the plugin %d", 0);
         return -1;
     }
 #else
@@ -240,15 +244,24 @@ int plugin_manager_get_names(const plugin_mgr_t *plg_manager, char **name_game_o
     }
 #endif
 
+#if defined(__GNUC__) || defined(__GNUG__)
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wpedantic" /* on mingw64 warning only */
+#endif
+
     *name_game_out = (char*) malloc( strlen((char*)fptr_name_game) + 1);
     strcpy( *name_game_out, (char*)fptr_name_game);
 
+#if defined(__GNUC__) || defined(__GNUG__)
+    #pragma GCC diagnostic pop
+#endif
+
     /* name function to call */
 #if defined(_WIN32)
-    fptr_name_run_fct = GetProcAddress(current_handle, "name_start_fct");
-    if( fptr == (FARPROC)NULL ) 
+    fptr_name_start_fct = GetProcAddress(current_handle, "name_start_fct");
+    if( fptr_name_start_fct == (FARPROC)NULL ) 
     {
-        CLOG_ERR("Error cannot find function %s in library", name);
+        CLOG_ERR("Error cannot find variable \"name_start_fct\" in the plugin %d", 0);
         return -1;
     }
 #else
@@ -259,8 +272,17 @@ int plugin_manager_get_names(const plugin_mgr_t *plg_manager, char **name_game_o
     }
 #endif
 
+#if defined(__GNUC__) || defined(__GNUG__)
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wpedantic" /* on mingw64 warning */
+#endif
+
     *name_start_fct_out = (char*) malloc( strlen((char*)fptr_name_start_fct) + 1);
     strcpy( *name_start_fct_out, (char*)fptr_name_start_fct);
+
+#if defined(__GNUC__) || defined(__GNUG__)
+    #pragma GCC diagnostic pop
+#endif
     return 0;
 }
 

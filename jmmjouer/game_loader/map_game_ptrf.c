@@ -1,21 +1,24 @@
-#include <stdio.h> /* for printf, to suppress */
 #include <string.h>
 #include <assert.h>
+/*#include <stdio.h> */ /* for printf, to suppress */
 
 #include "jmmjouer/game_loader/map_game_ptrf.h"
 #include "ccontainer/value_cstring.h"
 
+/** Full definition of map_game_ptrf_type */
 struct map_game_ptrf_type {
     /** first data member, cast to (clist_gen_t*) valid */
     clist_gen_t *clist;
 };
 
-/** intermediate for storage / ccontainer_value_t specialization 
+/** Intermediate for storage / ccontainer_value_t specialization 
     Contains heap-allocated memory, but same deleter for ccontainer_value_t
     Only (intermediate) pair must be carefully deallocated
     Variant to pair_game_victory_t, with dynamically allocated game_name */
 typedef struct {
+    /** name of the game */
     char *game_name;
+    /** pointer to start_game function */
     ptr_game_t pfgame;
 } pair_game_ptrf_t;
 
