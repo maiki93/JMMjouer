@@ -25,7 +25,8 @@
         "clist_cstring.h": "c",
         "Makefile.linux": "makefile",
         "error_code.h": "c",
-        "type_traits": "c"
+        "type_traits": "c",
+        "ptrf_game_typedef.h": "c"
     }, // default
 
     // https://earthly.dev/blog/vscode-make/

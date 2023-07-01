@@ -72,4 +72,5 @@ test_game_loader: $(MODDIR_GL_TESTS)/test_game_loader.obj $(MODDIR_GAME_LOADER)/
 
 clean ::
 	del $(MODDIR_GL_TESTS)\*.obj
-	del test_mastermind.exe, test_plugin_manager.exe, test_cmap_game_ptrf.exe, test_game_loader
+	del test_mastermind.exe, test_plugin_manager.exe, test_map_game_ptrf.exe, test_game_loader.exe
+
