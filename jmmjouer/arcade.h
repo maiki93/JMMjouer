@@ -3,10 +3,8 @@
 #include "jmmjouer/game_loader/game_loader.h"
 #include "record/irecord_fwd.h" /* typedef irecord_t */
 
-/** @defgroup jmmjouer_core_grp core module */
-
-/** @file 
- * @ingroup jmmjouer_core_grp
+/** @file
+ *  @defgroup jmmjouer_core_grp core_module
  *  Core of the game.
 */
 

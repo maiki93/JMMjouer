@@ -119,7 +119,7 @@ LIB_STATIC = libclogger libccontainer
 # librecord need only libjoueur ! (good, bad ?) cannot really works ?
 LIB_DYNAMIC = librecord  libjoueur
 
-# on mingw => error JMMjouer
+# on mingw => error JMMjouer at compilation (multiple definitions)
 #LIB_DYNAMIC = libclogger libjoueur
 #LIB_STATIC = librecord libccontainer
 

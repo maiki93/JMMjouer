@@ -5,6 +5,15 @@
 #include <time.h>
 #include <assert.h>
 
+/** @file
+ *  \defgroup executable_grp executable in text console
+ * 
+ *  Main executable for running JMMjouer in a text console.
+ *   
+ * This executable initializes the different modules
+ * and call arcade main loop
+*/
+
 /* available system-wide only with gnu / glibc, found one implementation for windows */
 #if defined(_WIN32) && defined(_MSC_VER)
     #include "executables/getopt.h"
@@ -25,35 +34,53 @@
 #include "clogger/clogger.h"
 #include "jmmjouer/utils.h"
 
+/** @{ @ingroup executable_grp */
+
+/** \name for use with getopt.h */
+/** \{ */
 /* https://opensource.com/article/19/5/how-write-good-c-main-function */
-#define OPTSTR "vahd:" 
+/** list of options */
+#define OPTSTR "vahd:"
+/** usage line */ 
 #define USAGE_FMT  "%s [-v] [-a anonym] [-d plugin_directory] [-h]"
-
+/** default progname */
 #define DEFAULT_PROGNAME JMMjouer
-
+/** default directory for plugins */
 static const char* const DEFAULT_PLUGINS_DIR = "plugins";
-
 /* extern int errno;*/ /*dllimport attribute needed (windows spacific ?)*/
+/** store arguments */
 extern char *optarg;
-extern int  optind; /* current parsed indice */
-extern int opterr; /* not used here, for error */
+/** current parsed indice */
+extern int  optind;
+ /** not used here, for error */
+extern int opterr;
 
+/** Structure build from the command line argument.
+ * Passed as arugument to arcade */
 typedef struct {
+  /** mode verbose */
   bool           verbose;
+  /** run games as  anonymous player, skip identification */
   int            flags_anomymous;
+  /** to override default directory search path for plugins */
   char           *plg_dir;
 } options_t;
+/** \} */
 
 
-/* set_terminate equivalent, to make better */
+/** set_terminate equivalent, to make better */
 void clear_ressources_and_exit();
-/** @brief deal with command-line arguments */
+/** read command-line arguments */
 int treat_options(options_t *options, arcade_params_t *arcade_opt);
+/** print info usage */
 void usage(char *progname, bool opt_verbose);
+/** same, but more verbose */
 void print_verbose(const options_t* opt_cmd, const arcade_params_t* opt_arcade);
-/** @brief Print preprocessor directives for achitecture */
+/** Print preprocessor directives for achitecture.
+ *  Usefull for debug preprocessor stage */
 void log_directives();
 
+/** Main executable. */
 int main(int argc, char *argv[])
 {
     /**********
@@ -144,11 +171,18 @@ int main(int argc, char *argv[])
     /* base interface storage_description/info: filename/txt or db/port...*/
     printf("First interface usage: %s", record_get_storage_info( (irecord_t*)record ));
 
+    /* *********
+    *  Run Arcade 
+    * **********/
     /* init core logic with inejection : game_loader and irecord */
     retour = arcade_init( game_loader, (irecord_t*)record);
     /* error, normal ending .. for return value */
     retour = arcade_run( &arcade_options );
 
+
+    /* ********
+    *  Clear ressources
+    * *********/
     /* not a bad idea, but do nothing actually */
     /*arcade_clear() / */
 
@@ -264,3 +298,5 @@ void usage(char *progname, bool opt_verbose)
     }
     exit(EXIT_FAILURE);
 }
+
+/** @} */ /* end executable grp */
